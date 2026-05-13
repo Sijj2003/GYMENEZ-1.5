@@ -4,8 +4,8 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #0d0d1a;
-    /* Fondo Inicial (LOGIN) */
-    background-image: url('../../FONDO.png'); /* Ajuste de ruta asumiendo que la imagen está en la raíz */
+    /* Ruta actualizada desde la carpeta CSS hacia la carpeta de logos */
+    background-image: url('../img/logos/FONDO.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -106,7 +106,8 @@ body {
 
 /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
 .dashboard-background {
-    background-image: url('../../PROFILE_FONDO.png') !important; /* Ajuste de ruta */
+    /* Ruta actualizada desde la carpeta CSS hacia la carpeta de logos */
+    background-image: url('../img/logos/PROFILE_FONDO.png') !important;
 }
 
 /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
