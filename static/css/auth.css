@@ -4,8 +4,8 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #0d0d1a;
-    /* Ruta actualizada desde la carpeta CSS hacia la carpeta de logos */
-    background-image: url('../img/logos/FONDO.png');
+    /* Ruta actualizada: subimos dos niveles para llegar a backgrounds */
+    background-image: url('../img/logos/backgrounds/FONDO.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -89,7 +89,7 @@ body {
     padding: 1rem 1.5rem;
     border-radius: 0.75rem;
     font-weight: 600;
-    z-index: 9999; /* ¡CAMBIO AQUÍ! Asegura que esté por encima de todo */
+    z-index: 9999; 
     opacity: 0;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     pointer-events: none;
@@ -106,8 +106,8 @@ body {
 
 /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
 .dashboard-background {
-    /* Ruta actualizada desde la carpeta CSS hacia la carpeta de logos */
-    background-image: url('../img/logos/PROFILE_FONDO.png') !important;
+    /* Ruta actualizada: subimos dos niveles para llegar a backgrounds */
+    background-image: url('../img/logos/backgrounds/PROFILE_FONDO.png') !important;
 }
 
 /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
@@ -117,22 +117,21 @@ body {
 
 /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
 .help-link {
-    font-size: 0.875rem; /* text-sm */
+    font-size: 0.875rem; 
     font-weight: 500;
-    color: #9ca3af; /* gray-400 */
+    color: #9ca3af; 
     transition: color 0.3s ease;
     cursor: pointer;
-    /* Flex-grow-1 para distribuir espacio equitativamente */
     flex-grow: 1; 
     text-align: center;
 }
 .help-link:hover {
-    color: #38bdf8; /* sky-400 */
-    text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
+    color: #38bdf8; 
+    text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); 
 }
 /* Ajuste específico para que el contenedor de enlaces maneje tres elementos */
 #login-help-links {
     display: flex;
     justify-content: space-between;
-    gap: 10px; /* Espacio entre los enlaces */
+    gap: 10px; 
 }
