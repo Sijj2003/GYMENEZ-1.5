@@ -14,57 +14,56 @@
     </style>
 </head>
 <body class="selection:bg-[#FFC300] selection:text-black">
-    <nav class="fixed w-full z-[100] glass-header py-4 px-6 md:px-16 flex justify-between items-center transition-all duration-500">
+    <nav class="fixed w-full z-[100] glass-header py-4 px-6 md:px-16 flex justify-between items-center">
         <div class="flex items-center cursor-pointer group">
-            <span class="text-[#FFC300] font-[900] text-3xl italic tracking-tighter transition-transform group-hover:scale-105">GYM</span>
+            <span class="text-[#FFC300] font-[900] text-3xl italic tracking-tighter group-hover:scale-105 transition-transform">GYM</span>
             <span class="text-white font-[900] text-3xl italic tracking-tighter">ENEZ</span>
         </div>
-
         <div class="hidden lg:flex gap-10 items-center">
             <a href="/fitness" class="text-xs font-black tracking-widest hover:text-[#FFC300] transition uppercase">Fitness</a>
             <a href="/eats" class="text-xs font-black tracking-widest hover:text-[#FFC300] transition uppercase">Eats</a>
             <a href="/on" class="text-xs font-black tracking-widest hover:text-[#FFC300] transition uppercase">Gymenez ON</a>
             <a href="/about" class="text-xs font-black tracking-widest hover:text-[#FFC300] transition uppercase">Nosotros</a>
         </div>
-
         <div class="flex items-center gap-6">
             <a href="/login" class="text-[10px] font-black tracking-widest hover:text-[#FFC300] transition uppercase">Login</a>
-            <a href="/join" class="bg-white text-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-tighter hover:bg-[#FFC300] transition-all transform hover:scale-105 shadow-xl shadow-white/5">
-                Comenzar ahora
-            </a>
+            <a href="/join" class="bg-white text-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-tighter hover:bg-[#FFC300] transition-all transform hover:scale-105">Comenzar</a>
         </div>
     </nav>
 
     <section class="relative h-screen flex items-center px-6 md:px-16 overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070" class="w-full h-full object-cover opacity-30 grayscale" alt="Training">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070" class="w-full h-full object-cover opacity-30 grayscale">
             <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
         </div>
-
-        <div class="relative z-10 max-w-5xl">
+        <div class="relative z-10 max-w-4xl">
             <span class="text-[#FFC300] font-black tracking-[0.5em] text-[10px] uppercase mb-6 block">The Standard of Excellence</span>
-            <h1 class="text-6xl md:text-[130px] font-[900] leading-[0.85] italic tracking-tighter mb-10 uppercase">
-                El Hierro <br> <span class="text-glow text-[#FFC300]">No Miente.</span>
-            </h1>
-            <p class="text-lg md:text-xl text-gray-400 max-w-xl font-medium leading-relaxed mb-10">
-                Tecnología avanzada y cultura deportiva de élite unificadas para transformar tu rendimiento.
-            </p>
+            <h1 class="text-7xl md:text-[120px] font-[900] leading-[0.9] italic tracking-tighter mb-10 uppercase">El Hierro <br><span class="text-glow text-[#FFC300]">No Miente.</span></h1>
+            <p class="text-lg text-gray-400 max-w-xl font-medium leading-relaxed mb-12">Tecnología avanzada y cultura deportiva de élite unificadas en un solo lugar.</p>
             <div class="flex gap-6">
-                <a href="#ecosistema" class="px-10 py-4 bg-[#FFC300] text-black font-black text-xs uppercase tracking-widest rounded-lg hover:bg-yellow-400 transition transform hover:-translate-y-1">
-                    Explorar Servicios
-                </a>
+                <a href="#servicios" class="bg-[#FFC300] text-black px-10 py-4 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-yellow-400 transition">Explorar Servicios</a>
             </div>
         </div>
     </section>
 
-    <section id="ecosistema" class="py-32 px-6 md:px-16 bg-[#050505]">
+    <section id="servicios" class="py-32 px-6 md:px-16 bg-[#050505]">
         <div class="grid md:grid-cols-3 gap-10 max-w-7xl mx-auto">
-            <div class="group relative bg-[#111] rounded-[40px] p-8 border border-white/5 hover:border-[#FFC300]/30 transition-all duration-500 hover:-translate-y-4">
-                <h3 class="text-3xl font-[900] mb-4 italic tracking-tight uppercase">GYMENEZ <br> FITNESS</h3>
-                <p class="text-gray-400 text-sm mb-8">Programas de entrenamiento basados en data biológica y seguimiento profesional.</p>
-                <a href="/fitness" class="inline-flex items-center gap-2 text-[11px] font-black tracking-[0.2em] text-[#FFC300] uppercase italic">Descubrir &rarr;</a>
+            <div class="group bg-[#111] p-8 rounded-[40px] border border-white/5 hover:border-[#FFC300]/30 transition-all duration-500 hover:-translate-y-4">
+                <h3 class="text-3xl font-[900] mb-4 italic tracking-tight">GYMENEZ <br> FITNESS</h3>
+                <p class="text-gray-400 text-sm mb-8">Entrenamiento algorítmico personalizado.</p>
+                <a href="/fitness" class="text-[#FFC300] font-black text-[10px] tracking-widest uppercase italic">Descubrir &rarr;</a>
             </div>
+            <div class="group bg-[#111] p-8 rounded-[40px] border border-white/5 hover:border-[#FFC300]/30 transition-all duration-500 hover:-translate-y-4">
+                <h3 class="text-3xl font-[900] mb-4 italic tracking-tight text-[#FFC300]">GYMENEZ <br> EATS</h3>
+                <p class="text-gray-400 text-sm mb-8">Nutrición de precisión científica.</p>
+                <a href="/eats" class="text-white font-black text-[10px] tracking-widest uppercase italic">Descubrir &rarr;</a>
             </div>
+            <div class="group bg-[#111] p-8 rounded-[40px] border border-white/5 hover:border-red-600/30 transition-all duration-500 hover:-translate-y-4">
+                <h3 class="text-3xl font-[900] mb-4 italic tracking-tight">GYMENEZ <br> ON</h3>
+                <p class="text-gray-400 text-sm mb-8">Contenido original y estilo de vida.</p>
+                <a href="/on" class="text-red-600 font-black text-[10px] tracking-widest uppercase italic">Ver Ahora &rarr;</a>
+            </div>
+        </div>
     </section>
 </body>
 </html>
