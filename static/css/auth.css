@@ -5,7 +5,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: #0d0d1a;
     /* Ruta actualizada: subimos dos niveles para llegar a backgrounds */
-    background-image: url('../img/logos/backgrounds/FONDO.png');
+    background-image: url('../img/backgrounds/FONDO.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -107,7 +107,7 @@ body {
 /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
 .dashboard-background {
     /* Ruta actualizada: subimos dos niveles para llegar a backgrounds */
-    background-image: url('../img/logos/backgrounds/PROFILE_FONDO.png') !important;
+    background-image: url('../img/backgrounds/PROFILE_FONDO.png') !important;
 }
 
 /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
