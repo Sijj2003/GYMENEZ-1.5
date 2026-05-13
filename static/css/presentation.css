@@ -1,53 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
 body {
-    scroll-behavior: smooth;
-    text-shadow: -0.5px -0.5px 0 #000, 0.5px -0.5px 0 #000, -0.5px 0.5px 0 #000, 0.5px 0.5px 0 #000;
+    font-family: 'Inter', sans-serif;
+    text-rendering: optimizeLegibility;
 }
 
-/* Glassmorphism mejorado para Cards */
-.glass-card {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(10px);
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+/* Enlaces del Dashboard Superior */
+.nav-link {
+    font-size: 13px; /* Más grandes como pediste */
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: white;
+    position: relative;
+    transition: color 0.3s ease;
 }
 
-.glass-card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-10px);
-    border-color: rgba(56, 189, 248, 0.3);
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #FFD700;
+    transition: width 0.3s ease;
 }
 
-/* Animaciones */
-@keyframes subtle-zoom {
-    from { transform: scale(1.1); }
-    to { transform: scale(1); }
+.nav-link:hover {
+    color: #FFD700;
 }
 
-.animate-subtle-zoom {
-    animation: subtle-zoom 10s ease-out forwards;
+.nav-link:hover::after {
+    width: 100%;
 }
 
-@keyframes fade-up {
-    from { opacity: 0; transform: translateY(30px); }
+/* Cards de Servicio Estilo Cashea/CrossFit */
+.service-card {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+}
+
+.service-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+/* Animaciones de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-up {
-    animation: fade-up 1s ease-out;
-}
-
-/* Scrollbar personalizado */
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #000;
-}
-::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #0ea5e9;
+.animate-fade {
+    animation: fadeIn 1s ease-out;
 }
