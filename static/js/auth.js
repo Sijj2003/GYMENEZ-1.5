@@ -35,14 +35,11 @@ async function apiLogin(email, password, deviceId) {
 
         const data = await response.json();
 
-        // Si el usuario está bloqueado o hay otra sesión (Error 403)
         if (response.status === 403) {
              return { success: false, error: data.error || 'Acceso denegado (403).' };
         }
         
-        // 🚩 AJUSTE AQUÍ: Manejo de errores y activación requerida 🚩
         if (!response.ok || !data.success) {
-            // Si el backend dice que falta activar la cuenta:
             if (data.requires_activation) {
                 return { 
                     success: false, 
@@ -51,11 +48,9 @@ async function apiLogin(email, password, deviceId) {
                     message: data.message 
                 };
             }
-            // Error genérico de credenciales
             return { success: false, error: data.error || 'Error de conexión con la API o credenciales inválidas.' };
         }
 
-        // Si todo sale bien (Success)
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         return { success: true, user: data.user };
@@ -137,7 +132,6 @@ async function loadDashboardData() {
     console.log("Dashboard cargado solo con los accesos directos.");
 }
 
-// --- Variables y Utilidades Globales ---
 const SPLASH_DURATION_MS = 3000; 
 const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
 const messagebox = document.getElementById('message-box');
@@ -152,7 +146,7 @@ function showMessage(message, type = 'success') {
     messagebox.style.transform = 'translateX(-50%) translateY(0)';
 
     setTimeout(() => {
-        messagebox.removeAttribute('style'); // ¡CORRECCIÓN AQUÍ!
+        messagebox.removeAttribute('style'); 
         messagebox.style.opacity = '0';
         messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
     }, 3000);
@@ -300,7 +294,7 @@ function formatDateInput(input) {
     input.value = value;
 }
 
-async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
+async function apiForceLogout(email, password, deviceId, name, lastname, dob, phone, ci) {
     console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}. Device ID: ${deviceId}`);
     
     try {
@@ -309,7 +303,7 @@ async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password, deviceId, name, dob, phone, ci })
+            body: JSON.stringify({ email, password, deviceId, name, lastname, dob, phone, ci })
         });
 
         const data = await response.json();
@@ -345,20 +339,13 @@ async function handleLogin(e) {
         btn.disabled = false;
         btn.textContent = 'INGRESAR';
 
-        // 🚩 NUEVA LÓGICA: Si el usuario necesita activación por código 🚩
         if (response.requires_activation) {
-            // Guardamos el email en el campo oculto del modal de activación
             document.getElementById('activation-email').value = response.email || email;
-            
-            // Abrimos el modal de ingreso de código
             openActivationModal();
-            
-            // Mostramos un mensaje informativo (en verde para indicar que el login fue correcto pero falta un paso)
             showMessage('Revisa tu correo para el código de seguridad.', 'success');
             return;
         }
         
-        // --- Manejo de errores existentes ---
         if (response.error && response.error.includes('bloqueada')) {
             blockModal.classList.remove('hidden'); 
             showMessage('Acceso Restringido.', 'error');
@@ -382,7 +369,6 @@ async function handleLogin(e) {
         return;
     } 
     
-    // Si el login es exitoso y el usuario ya está activo
     showMessage('¡Inicio de sesión exitoso!', 'success');
     navigateTo('dashboard-screen');
     sessionModal.classList.add('hidden'); 
@@ -394,35 +380,28 @@ async function handleLogin(e) {
 async function handleRegister(e) {
     e.preventDefault();
     
-    // 1. Selección del botón y feedback visual
     const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
     const originalText = btn ? btn.textContent : 'Crear Cuenta';
 
-    // --- CONSTRUCCIÓN DE VALORES COMPUESTOS ---
     const ciType = document.getElementById('reg-ci-type').value;
     const ciNumber = document.getElementById('reg-ci').value.trim();
-    const fullCI = `${ciType}-${ciNumber}`; // Ejemplo: V-20.123.456
+    const fullCI = `${ciType}-${ciNumber}`; 
 
     const phonePrefix = document.getElementById('reg-phone-prefix').value;
     const phoneNum = document.getElementById('reg-phone-num').value.trim();
-    const fullPhone = `${phonePrefix}-${phoneNum}`; // Ejemplo: 0414-3543922
+    const fullPhone = `${phonePrefix}-${phoneNum}`; 
 
-    // 2. Recolección de datos (Usando las variables compuestas)
     const data = {
-        // Datos de cuenta
         email: document.getElementById('reg-email').value.trim().toLowerCase(),
         password: document.getElementById('reg-password').value,
-        
-        // Datos personales para la colección 'profiles'
         name: document.getElementById('reg-name').value.trim(),
         last_name: document.getElementById('reg-lastname').value.trim(),
-        id_number: fullCI,        // Enviado como V-00.000.000
-        phone_number: fullPhone,  // Enviado como 04XX-0000000
-        dob: document.getElementById('reg-dob').value.trim(), // Formato DD/MM/YYYY
+        id_number: fullCI,        
+        phone_number: fullPhone,  
+        dob: document.getElementById('reg-dob').value.trim(), 
         sex: document.getElementById('reg-sex').value
     };
 
-    // 3. Estado de carga
     if (btn) {
         btn.disabled = true;
         btn.textContent = 'PROCESANDO PERFIL...';
@@ -435,7 +414,6 @@ async function handleRegister(e) {
             body: JSON.stringify(data)
         });
 
-        // --- MANEJO DE BLOQUEO POR LÍMITE (ERROR 429) ---
         if (response.status === 429) {
             const responseText = await response.text();
             let errorMsg = 'Acceso restringido temporalmente por seguridad.';
@@ -449,19 +427,15 @@ async function handleRegister(e) {
             return; 
         }
 
-        // --- MANEJO DE RESPUESTAS ---
         const res = await response.json();
         
         if (response.ok && res.success) {
-            // Éxito: El perfil ya está lleno en la base de datos
             showMessage('¡Perfil creado! Revisa tu correo e inicia sesión para activar tu cuenta.', 'success');
-            
             if (typeof handleCloseRegisterModal === 'function') {
                 handleCloseRegisterModal();
             }
-            e.target.reset(); // Limpia el formulario
+            e.target.reset(); 
         } else {
-            // Error: Ejemplo "El correo ya existe" o "Datos incompletos"
             showMessage(res.error || 'No se pudo completar el perfil.', 'error');
         }
 
@@ -469,7 +443,6 @@ async function handleRegister(e) {
         console.error('Error en registro:', err);
         showMessage('Error de conexión. Inténtalo más tarde.', 'error');
     } finally {
-        // 4. Restaurar estado del botón
         if (btn) {
             btn.disabled = false;
             btn.textContent = originalText;
@@ -482,6 +455,7 @@ async function handleForceLogout(e) {
     const email = document.getElementById('force-email').value;
     const password = document.getElementById('login-password').value; 
     const name = document.getElementById('force-name').value;
+    const lastname = document.getElementById('force-lastname').value;
     const dob = document.getElementById('force-dob').value;
     
     const phoneInput = document.getElementById('force-phone').value;
@@ -497,13 +471,11 @@ async function handleForceLogout(e) {
     btn.textContent = 'VERIFICANDO DATOS...';
     showForceLogoutMessage(''); 
 
-    const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
+    const response = await apiForceLogout(email, password, localDeviceId, name, lastname, dob, phone, ci);
 
     if (response.success) {
         const delayMs = 7000;
-                
         modal.classList.add('hidden');
-        
         const successMessage = `Proceso completado. La sesión anterior ha sido cerrada exitosamente. Por favor, inicie sesión nuevamente para acceder.`;
         showCenteredMessage(successMessage, delayMs); 
 
@@ -513,7 +485,6 @@ async function handleForceLogout(e) {
         setTimeout(() => {
             navigateTo('login-screen');
             document.getElementById('login-password').value = '';
-            
         }, delayMs); 
 
     } else {
@@ -527,22 +498,16 @@ async function handleForceLogout(e) {
 async function handleLogout() {
     const btn = document.getElementById('logout-button');
     const originalText = btn.textContent;
-    
     btn.disabled = true;
     btn.textContent = 'Cerrando...';
-    
     stopSessionChecker(); 
-
     await apiLogout(); 
-    
     showMessage('Sesión cerrada correctamente.', 'success');
     navigateTo('login-screen');
-
     btn.disabled = false;
     btn.textContent = originalText;
 }
 
-// --- FUNCIONES DEL NUEVO MODAL DE REGISTRO ---
 function handleOpenRegisterModal() {
     const ventanaModal = document.getElementById('register-modal');
     ventanaModal.classList.remove('hidden');
@@ -581,7 +546,6 @@ function handleCloseAreaSelectionModal() {
     document.getElementById('area-selection-modal').classList.add('hidden');
 }
 
-// --- FUNCIONES DEL MODAL DE ACTIVACIÓN ---
 function openActivationModal() {
     const modal = document.getElementById('activation-modal');
     document.getElementById('activation-code').value = '';
@@ -616,10 +580,7 @@ async function handleVerifyActivation(e) {
         if (response.ok && data.success) {
             showMessage('¡Cuenta activada! Ingresando al sistema...', 'success');
             closeActivationModal();
-            
-            // Como ya se activó, simulamos un click en "INGRESAR" para que inicie sesión de una vez
             document.getElementById('login-btn').click(); 
-            
         } else {
             showMessage(data.error || 'Código inválido o expirado.', 'error');
         }
@@ -645,20 +606,12 @@ window.onload = function() {
     document.getElementById('login-form').addEventListener('submit', handleLogin);
     document.getElementById('logout-button').addEventListener('click', handleLogout);
     document.getElementById('register-form').addEventListener('submit', handleRegister);
-    
-    // --- NUEVO: AHORA ABRE EL MODAL EN VEZ DE WHATSAPP ---
     document.getElementById('register-request-link').addEventListener('click', handleOpenRegisterModal); 
     document.getElementById('close-register-modal').addEventListener('click', handleCloseRegisterModal);
-    // -----------------------------------------------------
-
-    // --- LISTENERS DEL MODAL DE ACTIVACIÓN ---
     document.getElementById('activation-form').addEventListener('submit', handleVerifyActivation);
     document.getElementById('close-activation-modal').addEventListener('click', closeActivationModal);
-
     document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
-    
     document.getElementById('staff-access-link').addEventListener('click', handleStaffAccess); 
-    
     document.getElementById('select-trainer-btn').addEventListener('click', handleSelectTrainer);
     document.getElementById('select-admin-btn').addEventListener('click', handleSelectAdmin);
     document.getElementById('modal-close-btn').addEventListener('click', handleCloseAreaSelectionModal);
@@ -698,7 +651,6 @@ window.onload = function() {
     }, true); 
 };
 
-// --- Formateo Automático de Fecha (DD/MM/YYYY) ---
 const dobInput = document.getElementById('reg-dob');
 if (dobInput) {
     dobInput.addEventListener('input', function(e) {
@@ -712,7 +664,6 @@ if (dobInput) {
     });
 }
 
-// --- Formateo Automático de Cédula (00.000.000) ---
 const ciInput = document.getElementById('reg-ci');
 if (ciInput) {
     ciInput.addEventListener('input', function(e) {
@@ -728,7 +679,6 @@ if (ciInput) {
     });
 }
 
-// --- Bloqueo de letras en Teléfono ---
 const phoneInput = document.getElementById('reg-phone-num');
 if (phoneInput) {
     phoneInput.addEventListener('input', function(e) {
