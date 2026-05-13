@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina Sábado</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            background-image: url('routines_background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            /* Sombra de texto general del body (se mantiene) */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
+        }
+        
+        /* Estilo para tarjetas de ejercicios */
+        .glass-item-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #facc15; /* Borde amarillo de contraste */
+        }
+        
+        /* === ESTILOS DE CONTRASTE === */
+        .text-contrast-dark {
+            text-shadow: 
+                1px 1px 2px #000,
+                -1px -1px 2px #000,
+                1px -1px 2px #000,
+                -1px 1px 2px #000,
+                0 0 5px rgba(0, 0, 0, 0.8); 
+        }
+        .text-border-gray {
+            text-shadow: 0 0 3px #4b5563; 
+        }
+
+        /* Estilos para notificaciones */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 3000; /* Alto para estar sobre todo */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; }
+        
+        /* ======================================= */
+        /* Estilos para Pantalla de Éxito / Encuesta */
+        /* ======================================= */
+        #finish-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000; 
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
+            text-align: center; 
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.7s ease-in-out; 
+            gap: 1rem; 
+        }
+
+        #finish-screen.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Título Principal: RUTINA FINALIZADA (CON FADE) */
+        #finish-message {
+            font-size: 3rem; 
+            font-weight: 900;
+            line-height: 1;
+            padding: 0.5rem 1rem;
+            color: #facc15; /* Amarillo */
+            
+            /* Animación de Desvanecimiento (Fade In/Fade Out) */
+            animation: fade-pulse 1.5s ease-in-out infinite alternate; 
+
+            /* Sombra suave para contraste */
+            text-shadow: 
+                0 0 5px rgba(250, 202, 21, 0.5), 
+                0 0 15px rgba(250, 202, 21, 0.3); 
+            
+            z-index: 2001;
+        }
+
+        /* Keyframes para la animación de desvanecimiento */
+        @keyframes fade-pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        /* Ajuste de tamaño en pantallas más grandes */
+        @media (min-width: 768px) {
+            #finish-message {
+                font-size: 5rem;
+            }
+        }
+        
+        /* Estilos de la Encuesta y Modal */
+        #survey-container, #contact-modal {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(13, 13, 26, 0.95); /* Fondo oscuro semitransparente */
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            opacity: 0; /* Inicialmente oculto */
+            transition: opacity 1s ease-in-out;
+            z-index: 2002;
+        }
+
+        #survey-container.fade-in, #contact-modal.fade-in {
+            opacity: 1;
+        }
+        
+        /* Estilo para inputs en la encuesta */
+        .survey-input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #4b5563;
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .survey-label {
+            font-weight: 600;
+            color: #facc15; /* Amarillo de contraste */
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="message-box"></div>
+    
+    <div id="finish-screen">
+        <h2 id="finish-message">RUTINA FINALIZADA</h2>
+        
+        <div id="survey-container" class="hidden">
+            <h3 class="text-2xl font-bold text-white mb-6 text-center">Encuesta de Sesión</h3>
+            <form id="routine-survey-form">
+                
+                <div class="mb-5">
+                    <label for="costo-rutina" class="survey-label block mb-2">
+                        1. Del 1 al 10, ¿cuánto te costó completar esta rutina? (1 Fácil, 10 Difícil)
+                    </label>
+                    <select id="costo-rutina" name="costo-rutina" class="survey-input" required>
+                        <option value="">Selecciona</option>
+                        <option value="1">1 (Muy Fácil)</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 (Normal)</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10 (Muy Difícil)</option>
+                    </select>
+                </div>
+
+                <div class="mb-5 p-4 border border-gray-700 rounded-lg">
+                    <label class="survey-label block mb-3">
+                        2. ¿Sentiste algún tipo de dolor inusual?
+                    </label>
+                    
+                    <div class="flex items-center space-x-4 mb-3">
+                        <input type="radio" id="dolor-si" name="sintio-dolor" value="si" class="text-red-500 focus:ring-red-500">
+                        <label for="dolor-si" class="text-white">Sí</label>
+                        <input type="radio" id="dolor-no" name="sintio-dolor" value="no" class="text-green-500 focus:ring-green-500" checked>
+                        <label for="dolor-no" class="text-white">No</label>
+                    </div>
+
+                    <div id="dolor-details" class="space-y-4 mt-2 hidden">
+                        <div>
+                            <label for="zona-dolor" class="text-gray-400 block mb-1 text-sm">Zona del dolor (Ej: Hombro derecho, lumbar):</label>
+                            <input type="text" id="zona-dolor" name="zona-dolor" placeholder="Ej: Hombro, Espalda Baja" class="survey-input">
+                        </div>
+
+                        <div>
+                            <label for="nivel-dolor" class="text-gray-400 block mb-1 text-sm">Nivel del dolor (1 Mínimo, 10 Severo):</label>
+                            <select id="nivel-dolor" name="nivel-dolor" class="survey-input">
+                                <option value="">Selecciona Nivel</option>
+                                <script>
+                                    for(let i = 1; i <= 10; i++) {
+                                        document.write(`<option value="${i}">${i}</option>`);
+                                    }
+                                </script>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-gray-400 block mb-1 text-sm">Tipo de dolor:</label>
+                            <div class="grid grid-cols-2 gap-2 text-white text-sm">
+                                <div><input type="radio" id="tipo-pinchazo" name="tipo-dolor" value="pinchazo"> <label for="tipo-pinchazo">Pinchazo</label></div>
+                                <div><input type="radio" id="tipo-ardor" name="tipo-dolor" value="ardor"> <label for="tipo-ardor">Ardor</label></div>
+                                <div><input type="radio" id="tipo-calambre" name="tipo-dolor" value="calambre"> <label for="tipo-calambre">Calambre</label></div>
+                                <div><input type="radio" id="tipo-otro" name="tipo-dolor" value="otro"> <label for="tipo-otro">Otro</label></div>
+                            </div>
+                        </div>
+
+                        <div id="otro-dolor-container" class="hidden">
+                            <label for="otro-dolor-desc" class="text-gray-400 block mb-1 text-sm">Describe el tipo de dolor:</label>
+                            <input type="text" id="otro-dolor-desc" name="otro-dolor-desc" class="survey-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="submit" 
+                            id="submit-survey-btn"
+                            class="w-full py-3 rounded-xl text-lg font-bold bg-amber-400 text-black hover:bg-amber-300 transition duration-300 uppercase shadow-xl">
+                        ENVIAR Y FINALIZAR
+                    </button>
+                    <a href="#" id="skip-survey-link" class="text-gray-400 text-sm mt-3 inline-block hover:text-white transition duration-300">
+                        Omitir encuesta
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <div id="contact-modal" class="hidden text-center">
+            <h3 class="text-2xl font-bold text-white mb-4">¿Necesita un ajuste en su rutina o notificar alguna dolencia?</h3>
+            <p class="text-gray-300 mb-6">
+                Si deseas ajustar tu rutina o notificar alguna dolencia presentada te invitamos a contactar a uno de nuestros entrenadores.
+            </p>
+            <div id="countdown" class="text-sm font-semibold text-red-500 mb-4">
+                Redireccionando en <span id="timer-count">25</span> segundos...
+            </div>
+
+            <div class="flex space-x-4 justify-center">
+                <button id="contact-yes-btn" 
+                        class="px-8 py-3 rounded-xl text-xl font-bold bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-lg">
+                    Sí
+                </button>
+                <button id="contact-no-btn" 
+                        class="px-8 py-3 rounded-xl text-xl font-bold bg-red-600 text-white hover:bg-red-500 transition duration-300 shadow-lg">
+                    No
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <audio id="fireworks-audio" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/download/mixkit-fireworks-whistle-explosion-466.wav" type="audio/wav">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <header class="flex justify-between items-center py-4 px-8 mb-4">
+        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
+            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+        </h1>
+        
+        <div class="flex space-x-4">
+            <a href="routines.html" 
+               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
+                REGRESAR
+            </a>
+        </div>
+    </header>
+    
+    <section id="routine-detail" class="min-h-screen p-4 sm:p-8 pt-0"> 
+        <div class="max-w-4xl mx-auto">
+            
+            <h2 id="day-title" class="text-4xl font-extrabold text-center text-amber-400 uppercase mb-8 pb-2">
+                Cargando Rutina...
+            </h2>
+
+            <div id="loading-spinner" class="text-center py-10">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full"></div>
+                <p class="mt-4 text-gray-400">Estableciendo conexión y cargando ejercicios...</p>
+            </div>
+
+            <div id="exercises-container" class="space-y-4">
+            </div>
+            
+            <div id="finish-routine-container" class="mt-8 text-center hidden">
+                <button id="finish-routine-btn" 
+                        class="w-full sm:w-1/2 py-3 rounded-xl text-lg font-bold transition duration-300 uppercase shadow-xl"
+                        disabled>
+                    RUTINA TERMINADA
+                </button>
+            </div>
+            
+            <div id="no-data-message" class="hidden text-center py-10 text-gray-400">
+                <p class="text-xl">
+                    <span class="text-amber-400 font-bold">¡Día Libre!</span> No se encontraron ejercicios asignados para este día.
+                </p>
+                <p class="mt-2 text-sm">Disfruta tu descanso o contacta a tu entrenador.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="module">
+        // 🚀 URL BASE DE TU API.
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- RUTA DE GUARDADO
+        const CONTACT_WHATSAPP = '584148780392'; 
+        const REDIRECT_URL = 'routines.html';
+        const REDIRECT_TIMEOUT_SECONDS = 25; 
+
+        let userId = null;
+        let userFullName = null; 
+        let routineExercises = []; 
+        let redirectTimer = null; 
+        
+        // Nombre del día actual
+        const CURRENT_DAY = 'Sábado'; // <<<<<<< MODIFICADO A SÁBADO
+        
+        // --- Utilidades del DOM ---
+        const messagebox = document.getElementById('message-box');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const exercisesContainer = document.getElementById('exercises-container');
+        const noDataMessage = document.getElementById('no-data-message');
+        const dayTitle = document.getElementById('day-title');
+        const finishRoutineContainer = document.getElementById('finish-routine-container');
+        const finishRoutineBtn = document.getElementById('finish-routine-btn');
+        const finishScreen = document.getElementById('finish-screen');
+        const fireworksAudio = document.getElementById('fireworks-audio');
+        // Elementos de la encuesta
+        const finishMessage = document.getElementById('finish-message');
+        const surveyContainer = document.getElementById('survey-container');
+        const surveyForm = document.getElementById('routine-survey-form');
+        const skipSurveyLink = document.getElementById('skip-survey-link');
+        const dolorSi = document.getElementById('dolor-si');
+        const dolorNo = document.getElementById('dolor-no');
+        const dolorDetails = document.getElementById('dolor-details');
+        const tipoDolorRadios = document.getElementsByName('tipo-dolor');
+        const otroDolorContainer = document.getElementById('otro-dolor-container');
+        // Elementos del Modal de Contacto
+        const contactModal = document.getElementById('contact-modal');
+        const contactYesBtn = document.getElementById('contact-yes-btn');
+        const contactNoBtn = document.getElementById('contact-no-btn');
+        const timerCount = document.getElementById('timer-count');
+
+
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
+        
+        /**
+         * Llama a la API para obtener el enlace del tutorial y lo abre en una nueva pestaña.
+         */
+        async function openTutorial(exerciseName) {
+            const encodedName = encodeURIComponent(exerciseName);
+            const API_URL = `${API_BASE_URL}/api/exercises/link_tutorial/${encodedName}`;
+            let data = null;
+
+            try {
+                showMessage(`Buscando tutorial para: ${exerciseName}...`, 'success');
+                
+                const response = await fetch(API_URL);
+                const contentType = response.headers.get("content-type");
+                
+                if (contentType && contentType.includes("application/json")) {
+                    data = await response.json();
+                } else {
+                    const errorText = await response.text(); 
+                    console.error("Respuesta no JSON del servidor:", errorText);
+                    throw new Error(`Error ${response.status} en el servidor. El servidor devolvió HTML/Texto, no JSON. (Revisar logs del servidor)`);
+                }
+                
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || `Error ${response.status} en el servidor. Tutorial no disponible.`);
+                }
+                
+                const tutorialLink = data.tutorialLink;
+
+                if (tutorialLink) {
+                    window.open(tutorialLink, '_blank'); 
+                    showMessage(`Tutorial abierto: ${exerciseName}`, 'success');
+                } else {
+                    showMessage('El enlace del tutorial no está configurado.', 'error');
+                }
+
+            } catch (e) {
+                console.error("Error al obtener el tutorial:", e);
+                if (e.message.includes('500') || e.message.includes('404')) {
+                    showMessage(`Error de conexión o configuración. Detalles: ${e.message}`, 'error');
+                } else {
+                    showMessage(`Error: ${e.message}`, 'error');
+                }
+            }
+        }
+        
+        window.openTutorial = openTutorial; 
+
+
+        // --- FUNCIONES DE PERSISTENCIA ---
+        
+        /**
+         * Guarda el resumen de la rutina completada y los datos de la encuesta en el servidor.
+         * @param {object | null} surveyData - Los datos recopilados de la encuesta.
+         */
+        async function saveRoutineJournal(surveyData) {
+            if (!userId) {
+                console.error("No se puede guardar el journal: userId no está definido.");
+                showMessage("Error: Sesión de usuario no encontrada para guardar el registro.", 'error');
+                return false;
+            }
+
+            // Filtrar y mapear solo los datos esenciales de los ejercicios.
+            // Solo incluimos ejercicios con estado 'completed' o 'skipped' para el registro,
+            // aunque en la lógica actual el botón "RUTINA TERMINADA" solo se activa si no hay 'pending'.
+            const summaryExercises = routineExercises.map(e => ({
+                name: e.exerciseName,
+                status: e.status, // 'completed', 'skipped', 'pending'
+                sets: e.sets,
+                reps: e.reps
+            }));
+
+            const journalData = {
+                userId: userId,
+                day: CURRENT_DAY,
+                exercises: summaryExercises,
+                survey: surveyData 
+            };
+            
+            showMessage("Guardando registro de rutina...", 'success');
+
+            try {
+                const response = await fetch(API_JOURNAL_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(journalData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    console.error("Error al guardar el journal:", data.error);
+                    showMessage(`Error al guardar el journal: ${data.error || 'Fallo desconocido'}. Puede continuar.`, 'error');
+                    return false;
+                }
+                
+                showMessage("Registro de rutina guardado exitosamente.", 'success');
+                return true;
+
+            } catch (e) {
+                console.error("Error de red al guardar el journal:", e);
+                showMessage(`Error de red al guardar el journal: ${e.message}. Puede continuar.`, 'error');
+                return false;
+            }
+        }
+
+        // --- FUNCIONES DE INTERACTIVIDAD ---
+
+        /**
+         * Actualiza el estado visual del botón 'Rutina Terminada'.
+         */
+        function updateFinishButtonState() {
+            // Comprueba si TODOS los ejercicios están marcados como completados (incluye saltados)
+            const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.status !== 'pending');
+            
+            finishRoutineBtn.disabled = !allCompleted;
+            
+            // Eliminar clases anteriores
+            finishRoutineBtn.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-green-600', 'hover:bg-green-500', 'text-gray-300', 'text-white');
+
+            if (allCompleted) {
+                // Estado ACTIVO (Verde)
+                finishRoutineBtn.classList.add('bg-green-600', 'hover:bg-green-500', 'text-white');
+            } else {
+                // Estado INACTIVO (Rojo)
+                finishRoutineBtn.classList.add('bg-red-600', 'hover:bg-red-500', 'text-gray-300');
+            }
+        }
+        
+        /**
+         * Aplica las clases de color a un botón específico.
+         */
+        function applyButtonColor(buttonElement, baseColorClass, hoverColorClass, isActive) {
+            // Esta línea remueve TODAS las clases de color conocidas para evitar conflictos
+            buttonElement.classList.remove('bg-green-600', 'hover:bg-green-500', 'bg-red-600', 'hover:bg-red-500', 'bg-amber-400', 'hover:bg-amber-300', 'text-black', 'bg-gray-700', 'hover:bg-gray-600', 'text-white');
+            
+            if (isActive) {
+                // Estado Activo/Seleccionado: Gris Oscuro
+                buttonElement.classList.add('bg-gray-700', 'hover:bg-gray-600', 'text-white');
+            } else {
+                // Estado Inactivo: Color Base
+                buttonElement.classList.add(baseColorClass, hoverColorClass, 'text-white');
+                // Añadir color de texto negro si el fondo es amarillo 
+                if(baseColorClass.includes('amber')) {
+                     buttonElement.classList.add('text-black');
+                     buttonElement.classList.remove('text-white');
+                }
+            }
+        }
+
+        /**
+         * Maneja el clic en los botones de estado ('COMPLETAR' y 'SALTAR').
+         * statusType puede ser 'completed' o 'skipped'.
+         */
+        function toggleExerciseStatus(exerciseName, statusType) {
+            const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
+            if (!exercise) return;
+
+            // Define el nuevo estado (Alternar si es el mismo, o cambiar si es diferente)
+            const newStatus = exercise.status === statusType ? 'pending' : statusType;
+
+            // 1. Alternar el estado en el modelo de datos
+            exercise.status = newStatus;
+
+            // 2. Actualizar visualmente la tarjeta
+            const cardId = exerciseName.replace(/\s/g, '-');
+            const completedIndicator = document.getElementById(`completed-indicator-${cardId}`);
+            const completeButton = document.getElementById(`completed-button-${cardId}`);
+            const skipButton = document.getElementById(`skip-button-${cardId}`);
+            // El botón de tutorial no se controla aquí (se mantiene amarillo por su clase estática en el HTML)
+
+            // Resetear indicador
+            completedIndicator.classList.remove('bg-green-600', 'bg-red-600', 'bg-gray-700');
+            completeButton.textContent = 'COMPLETAR';
+            skipButton.textContent = 'SALTAR';
+            
+            // Definición de colores base (verde, rojo)
+            const completeBaseClasses = 'bg-green-600';
+            const completeHoverClasses = 'hover:bg-green-500';
+            const skipBaseClasses = 'bg-red-600';
+            const skipHoverClasses = 'hover:bg-red-500';
+
+            // Aplicar colores según el nuevo estado
+            if (newStatus === 'completed') {
+                completedIndicator.classList.add('bg-green-600');
+                applyButtonColor(completeButton, completeBaseClasses, completeHoverClasses, true); // Gris (Activo)
+                applyButtonColor(skipButton, skipBaseClasses, skipHoverClasses, false); // Rojo (Inactivo)
+                completeButton.textContent = 'HECHO';
+                showMessage(`${exerciseName} marcado como completado.`, 'success');
+            } else if (newStatus === 'skipped') {
+                completedIndicator.classList.add('bg-red-600');
+                applyButtonColor(completeButton, completeBaseClasses, completeHoverClasses, false); // Verde (Inactivo)
+                applyButtonColor(skipButton, skipBaseClasses, skipHoverClasses, true); // Gris (Activo)
+                skipButton.textContent = 'SALTADO';
+                showMessage(`${exerciseName} marcado como saltado.`, 'error');
+            } else { // 'pending'
+                completedIndicator.classList.add('bg-gray-700');
+                applyButtonColor(completeButton, completeBaseClasses, completeHoverClasses, false); // Verde (Inactivo)
+                applyButtonColor(skipButton, skipBaseClasses, skipHoverClasses, false); // Rojo (Inactivo)
+                showMessage(`${exerciseName} marcado como pendiente.`, 'error');
+            }
+
+            // 3. Actualizar el estado del botón de rutina terminada
+            updateFinishButtonState();
+        }
+
+        window.toggleExerciseCompleted = (exerciseName) => toggleExerciseStatus(exerciseName, 'completed'); 
+        window.toggleExerciseSkipped = (exerciseName) => toggleExerciseStatus(exerciseName, 'skipped'); 
+
+        /**
+         * Muestra el modal de contacto con el temporizador.
+         */
+        function showContactModal() {
+            surveyContainer.classList.add('hidden');
+            contactModal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                contactModal.classList.add('fade-in');
+            }, 50);
+
+            let count = REDIRECT_TIMEOUT_SECONDS;
+            timerCount.textContent = count;
+
+            // Limpiar cualquier temporizador anterior
+            if (redirectTimer) {
+                clearInterval(redirectTimer);
+            }
+
+            // Iniciar el temporizador de redirección
+            redirectTimer = setInterval(() => {
+                count--;
+                timerCount.textContent = count;
+
+                if (count <= 0) {
+                    clearInterval(redirectTimer);
+                    handleRedirect();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Maneja la redirección final y limpia el temporizador.
+         */
+        function handleRedirect(contacted = false) {
+            if (redirectTimer) {
+                clearInterval(redirectTimer);
+                redirectTimer = null;
+            }
+            if (contacted) {
+                // Usamos userFullName (que ya contendrá Nombre y Apellido o el ID)
+                const identifier = userFullName || userId;
+                
+                // Mensaje de WhatsApp actualizado con "dolencia" y usando 'identifier'
+                const message = encodeURIComponent(`Hola, soy ${identifier} y acabo de terminar mi rutina de ${CURRENT_DAY}. Me gustaría ponerme en contacto contigo para un ajuste o para notificar alguna dolencia.`);
+                const whatsappUrl = `https://wa.me/${CONTACT_WHATSAPP}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+            }
+
+            showMessage("Volviendo a la pantalla principal...", 'success');
+            setTimeout(() => {
+                window.location.href = REDIRECT_URL;
+            }, 500); // Pequeña espera para mostrar el último mensaje
+        }
+
+        /**
+         * Muestra la animación de felicitación, oculta el mensaje y MUESTRA LA ENCUESTA.
+         */
+        function displayCompletionFireworks() {
+            finishScreen.classList.add('show');
+            
+            // Intentar reproducir el sonido 
+            fireworksAudio.currentTime = 0; // Reiniciar
+            fireworksAudio.play().catch(e => console.warn("Error al reproducir audio:", e.message));
+
+            const duration = 5 * 1000; // Duración total de la animación de 5 segundos
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2001 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    
+                    // TRANSICIÓN DE DESVANECIMIENTO: Ocultar mensaje y mostrar encuesta
+                    finishMessage.style.transition = 'opacity 0.7s ease-out';
+                    finishMessage.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        finishMessage.classList.add('hidden');
+                        surveyContainer.classList.remove('hidden');
+                        // Iniciar el fade-in de la encuesta
+                        setTimeout(() => {
+                            surveyContainer.classList.add('fade-in');
+                        }, 50); 
+                    }, 700); 
+
+                    return;
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                // Lanzamiento desde la izquierda
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0.7, 0.9) } }));
+                // Lanzamiento desde la derecha
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.7, 0.9) } }));
+            }, 250);
+        }
+
+        /**
+         * Evento para el botón de rutina terminada.
+         */
+        finishRoutineBtn.addEventListener('click', () => {
+            if (!finishRoutineBtn.disabled) {
+                displayCompletionFireworks();
+                showMessage("¡Gran trabajo! Rutina finalizada con éxito.", 'success');
+            }
+        });
+        
+        // --- Lógica del formulario de Encuesta ---
+        
+        // 1. Mostrar/Ocultar detalles del dolor
+        function handleDolorToggle() {
+            if (dolorSi.checked) {
+                dolorDetails.classList.remove('hidden');
+            } else {
+                dolorDetails.classList.add('hidden');
+                // Opcional: Resetear campos del dolor si no hay dolor
+                document.getElementById('zona-dolor').value = '';
+                document.getElementById('nivel-dolor').value = '';
+                document.getElementById('tipo-pinchazo').checked = false;
+                document.getElementById('tipo-ardor').checked = false;
+                document.getElementById('tipo-calambre').checked = false;
+                document.getElementById('tipo-otro').checked = false;
+                otroDolorContainer.classList.add('hidden');
+                document.getElementById('otro-dolor-desc').value = '';
+            }
+        }
+
+        dolorSi.addEventListener('change', handleDolorToggle);
+        dolorNo.addEventListener('change', handleDolorToggle);
+        
+        // 2. Mostrar/Ocultar campo "Otro" para tipo de dolor
+        function handleTipoDolorChange() {
+            const selectedType = Array.from(tipoDolorRadios).find(radio => radio.checked)?.value;
+            if (selectedType === 'otro') {
+                otroDolorContainer.classList.remove('hidden');
+            } else {
+                otroDolorContainer.classList.add('hidden');
+                document.getElementById('otro-dolor-desc').value = '';
+            }
+        }
+        
+        tipoDolorRadios.forEach(radio => radio.addEventListener('change', handleTipoDolorChange));
+
+
+        // 3. Manejar el envío del formulario
+        surveyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Recopilar datos de la encuesta
+            const formData = {
+                userId: userId,
+                day: CURRENT_DAY,
+                costoRutina: document.getElementById('costo-rutina').value,
+                sintioDolor: dolorSi.checked,
+                dolorDetalles: dolorSi.checked ? {
+                    zona: document.getElementById('zona-dolor').value,
+                    nivel: document.getElementById('nivel-dolor').value,
+                    tipo: Array.from(tipoDolorRadios).find(radio => radio.checked)?.value,
+                    otroTipoDesc: document.getElementById('tipo-otro').checked ? document.getElementById('otro-dolor-desc').value : null
+                } : null
+            };
+
+            // Guardar el journal antes de mostrar el modal
+            const saveSuccess = await saveRoutineJournal(formData); 
+            
+            // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
+            setTimeout(showContactModal, 500); 
+        });
+
+        // 5. Manejar la omisión de la encuesta
+        skipSurveyLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            showMessage("Encuesta omitida. Guardando registro...", 'error');
+            
+            // Guardar el journal con datos de encuesta nulos (null).
+            const saveSuccess = await saveRoutineJournal(null); 
+            
+            // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
+            setTimeout(showContactModal, 500); 
+        });
+
+        // 6. --- Lógica de los botones del Modal de Contacto ---
+
+        contactYesBtn.addEventListener('click', () => {
+            handleRedirect(true); // Redirige e inicia contacto por WhatsApp
+        });
+
+        contactNoBtn.addEventListener('click', () => {
+            handleRedirect(false); // Redirige sin iniciar contacto
+        });
+
+        // --- FIN Funciones de Encuesta y Contacto ---
+        
+        /**
+         * Renderiza la lista de ejercicios en el DOM.
+         */
+        function renderExercises(exercises) {
+            exercisesContainer.innerHTML = ''; 
+            finishRoutineContainer.classList.add('hidden'); 
+            routineExercises = exercises; 
+            
+            if (exercises.length === 0) {
+                noDataMessage.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+
+            noDataMessage.classList.add('hidden');
+            loadingSpinner.classList.add('hidden');
+            finishRoutineContainer.classList.remove('hidden'); 
+            
+            exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+            exercises.forEach(exercise => {
+                const card = document.createElement('div');
+                card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
+                
+                // Inicializar estado: 'pending', 'completed', 'skipped'
+                exercise.status = exercise.status || 'pending'; 
+                
+                const cardId = exercise.exerciseName.replace(/\s/g, '-');
+                
+                let completeBtnBgClass = 'bg-green-600 hover:bg-green-500';
+                let completeBtnText = 'COMPLETAR';
+                let skipBtnBgClass = 'bg-red-600 hover:bg-red-500';
+                let skipBtnText = 'SALTAR';
+                let circleBgClass = 'bg-gray-700';
+
+                // Ajuste inicial de colores si ya tiene un estado
+                if (exercise.status === 'completed') {
+                    completeBtnBgClass = 'bg-gray-700 hover:bg-gray-600';
+                    completeBtnText = 'HECHO';
+                    circleBgClass = 'bg-green-600';
+                } else if (exercise.status === 'skipped') {
+                    skipBtnBgClass = 'bg-gray-700 hover:bg-gray-600';
+                    skipBtnText = 'SALTADO';
+                    circleBgClass = 'bg-red-600';
+                }
+                
+                // Muestra la información de la base de datos
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="text-contrast-dark"> 
+                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.exerciseName || 'Ejercicio sin nombre'}</p>
+                            <p class="text-sm text-gray-300">Series: ${exercise.sets || '-'}</p>
+                            <p class="text-sm text-gray-300">Repeticiones: ${exercise.reps || '-'}</p>
+                            <p class="text-sm text-gray-300">Peso Estimado: ${exercise.weight || 'N/A'}</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            
+                            <div class="flex flex-col space-y-2 items-end"> 
+                                
+                                <button 
+                                    id="completed-button-${cardId}"
+                                    onclick="toggleExerciseCompleted('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${completeBtnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
+                                    ${completeBtnText}
+                                </button>
+                                
+                                <button 
+                                    id="tutorial-button-${cardId}"
+                                    onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg bg-amber-400 text-black hover:bg-amber-300 transition duration-300 shadow-md whitespace-nowrap">
+                                    TUTORIAL
+                                </button>
+                                
+                                <button 
+                                    id="skip-button-${cardId}"
+                                    onclick="toggleExerciseSkipped('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${skipBtnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
+                                    ${skipBtnText}
+                                </button>
+                            </div>
+
+                            <div id="completed-indicator-${cardId}" class="w-10 h-10 rounded-full flex items-center justify-center ${circleBgClass} text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                exercisesContainer.appendChild(card);
+            });
+            
+            updateFinishButtonState();
+        }
+
+
+        /**
+         * Carga la rutina del día actual usando la API REST, con chequeo de bloqueo.
+         */
+        async function loadRoutine(dayName) {
+            if (!userId) {
+                showMessage("Sesión de usuario no encontrada. Por favor, inicie sesión.", 'error');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+
+            dayTitle.textContent = `Rutina de ${dayName}`;
+            loadingSpinner.classList.remove('hidden');
+            exercisesContainer.innerHTML = ''; 
+            finishRoutineContainer.classList.add('hidden'); 
+
+            // ==================================================
+            // 🚨 LÓGICA DE BLOQUEO (SEMANAL/DÍA ESPECÍFICO) 🚨
+            // ==================================================
+            const API_LAST_SESSION_URL = `${API_BASE_URL}/api/journal/last_session/${userId}/${dayName}`;
+            
+            try {
+                const response = await fetch(API_LAST_SESSION_URL);
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    // Advertencia si la API falla, pero no bloqueamos al usuario por un fallo del servidor.
+                    console.warn(`[CHECK LOCK WARNING] Fallo al obtener el último registro. Continuando con la carga: ${data.error || 'Fallo desconocido'}`);
+                }
+                
+                const lastCompletedTimestampSec = data.lastCompletedTimestamp; // Timestamp UNIX en segundos
+
+                if (lastCompletedTimestampSec) {
+                    const now = new Date();
+                    const lastCompletionDate = new Date(lastCompletedTimestampSec * 1000); 
+
+                    // Mapeo de días de la semana (Lunes=1, Martes=2, ..., Sábado=6, Domingo=0 - según JS getDay())
+                    const dayMap = { 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 0 };
+                    const requiredDayOfWeek = dayMap[dayName]; // e.g., 6 for Sábado
+
+                    // --- 1. Calcular la fecha y hora exacta del próximo desbloqueo (Next Unlock Date) ---
+                    
+                    let lastCompletionDay = lastCompletionDate.getDay();
+                    
+                    // Inicializar la fecha de desbloqueo a la fecha de finalización
+                    let nextUnlockDate = new Date(lastCompletionDate);
+
+                    // 1.1. Calcular cuántos días faltan para llegar al 'requiredDayOfWeek'
+                    let daysToAdd = (requiredDayOfWeek - lastCompletionDay + 7) % 7;
+
+                    // 1.2. Si daysToAdd es 0 (la finalización fue en el día de la rutina, ej: Sábado)
+                    if (daysToAdd === 0) {
+                        // Crear una fecha para las 00:01 AM del día de finalización
+                        let dayStart = new Date(lastCompletionDate);
+                        dayStart.setHours(0, 1, 0, 0);
+
+                        if (lastCompletionDate.getTime() >= dayStart.getTime()) {
+                            // Si se completó la rutina *a partir* de las 00:01 AM, el desbloqueo es la próxima semana.
+                            daysToAdd = 7;
+                        } else {
+                            // Caso raro: se completó la rutina antes de las 00:01 AM. 
+                            daysToAdd = 0;
+                        }
+                    }
+
+                    // 1.3. Ajustar la fecha y hora al próximo día de desbloqueo a las 00:01 AM
+                    nextUnlockDate.setDate(lastCompletionDate.getDate() + daysToAdd);
+                    nextUnlockDate.setHours(0, 1, 0, 0); // Establecer la hora a 00:01 AM
+
+                    // --- 2. Decisión de Bloqueo Final ---
+                    // Si la hora actual es anterior a la hora de desbloqueo, está BLOQUEADO.
+                    let isBlocked = now.getTime() < nextUnlockDate.getTime();
+                    
+                    if (isBlocked) {
+                        // Muestra el mensaje de bloqueo y detiene la carga
+                        loadingSpinner.classList.add('hidden');
+                        noDataMessage.classList.remove('hidden');
+                        
+                        // Formato profesional para la fecha (sin hora)
+                        const completionTime = lastCompletionDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
+                        const unlockDate = nextUnlockDate.toLocaleDateString('es-ES', { dateStyle: 'long' }); // Solo la fecha
+                        const unlockTime = nextUnlockDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }); // Necesario para el showMessage
+
+                        // === INICIO DEL MENSAJE PROFESIONAL CORREGIDO (Solo fecha de desbloqueo, sin mensaje técnico) ===
+                        noDataMessage.innerHTML = `
+                            <div class="p-6 bg-gray-800 bg-opacity-70 rounded-xl shadow-2xl border-l-4 border-red-500 mx-auto max-w-sm">
+                                <h3 class="text-2xl font-bold text-red-400 mb-3 uppercase">Rutina Bloqueada</h3>
+                                <p class="text-white mb-4">
+                                    Ha completado esta sesión satisfactoriamente.
+                                </p>
+                                
+                                <p class="text-sm text-gray-400 mt-2">
+                                    Última sesión completada:
+                                    <span class="font-semibold text-gray-300 block">${completionTime}</span>
+                                </p>
+                                
+                                <p class="text-base text-amber-400 mt-4 font-bold">
+                                    Disponible nuevamente el:
+                                    <span class="text-white block text-lg">${unlockDate}</span>
+                                </p>
+                            </div>
+                        `;
+
+                        return; // 🛑 Detener la carga de la rutina
+                    }
+                    // Si no está bloqueado (isBlocked es false), el código continúa a cargar la rutina.
+                }
+            } catch (e) {
+                console.error("Error al verificar el último registro de rutina:", e);
+                // Si la verificación falla, se asume que se puede cargar la rutina por seguridad/usabilidad.
+                showMessage(`Advertencia: Error al chequear historial de rutina: ${e.message}. Continuando...`, 'error');
+            }
+            // ==================================================
+            // 🚀 CONTINUAR CON LA CARGA DE LA RUTINA ORIGINAL 🚀
+            // ==================================================
+
+            const API_URL = `${API_BASE_URL}/api/routines/day/${userId}/${dayName}`; 
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Fallo en la respuesta de la API.');
+                }
+                
+                const routines = data.routines;
+                let allExercises = [];
+
+                if (routines.length > 0 && routines[0].exercises) {
+                    allExercises = routines[0].exercises;
+                }
+                
+                allExercises.forEach(e => {
+                    // Estado inicial: 'pending'
+                    e.status = 'pending'; 
+                });
+
+
+                renderExercises(allExercises);
+
+                if (allExercises.length > 0) {
+                    showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
+                } else {
+                    loadingSpinner.classList.add('hidden');
+                    noDataMessage.classList.remove('hidden');
+                    showMessage(`No se encontraron ejercicios asignados para ${dayName}.`, 'success');
+                }
+
+            } catch (e) {
+                console.error("Error al cargar la rutina:", e);
+                showMessage(`Error al cargar la rutina: ${e.message}`, 'error');
+                loadingSpinner.classList.add('hidden');
+                noDataMessage.classList.remove('hidden');
+                noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola: ${e.message}</p>`;
+            }
+        }
+
+        /**
+         * Carga la sesión del usuario desde localStorage.
+         */
+        function loadSessionAndData() {
+            const storedSession = localStorage.getItem('userSession');
+            
+            if (storedSession) {
+                try {
+                    const userSession = JSON.parse(storedSession);
+                    userId = userSession._id || userSession.id; 
+                    
+                    // Lógica para obtener Nombre y Apellido
+                    const name = userSession.name || '';
+                    const apellido = userSession.apellido || '';
+                    
+                    if (name.trim() !== '' || apellido.trim() !== '') {
+                        userFullName = `${name.trim()} ${apellido.trim()}`.trim();
+                    } else {
+                        // Si no hay nombre/apellido, usamos el ID como identificador
+                        userFullName = userId;
+                    }
+
+                    if (userId) {
+                        loadRoutine(CURRENT_DAY); 
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error parsing user session:", e);
+                }
+            }
+            
+            showMessage("Sesión expirada o no iniciada.", 'error');
+            loadingSpinner.classList.add('hidden');
+            noDataMessage.classList.remove('hidden');
+            noDataMessage.innerHTML = '<p class="text-xl text-red-400">Acceso denegado.</p><p class="mt-2 text-sm">Por favor, inicie sesión nuevamente para ver su rutina.</p>';
+        }
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            loadSessionAndData();
+        };
+    </script>
+</body>
+</html>
