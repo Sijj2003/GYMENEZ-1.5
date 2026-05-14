@@ -444,51 +444,6 @@
         </div>
     </div>
 
-<script>
-        // --- Formateo Automático de Fecha (DD/MM/YYYY) ---
-        const dobInput = document.getElementById('reg-dob');
-        if (dobInput) {
-            dobInput.addEventListener('input', function(e) {
-                let v = e.target.value.replace(/\D/g, ''); 
-                if (v.length > 8) v = v.slice(0, 8);
-                let final = "";
-                if (v.length > 0) final += v.slice(0, 2);
-                if (v.length > 2) final += '/' + v.slice(2, 4);
-                if (v.length > 4) final += '/' + v.slice(4, 8);
-                e.target.value = final;
-            });
-        }
-
-        // --- Formateo Automático de Cédula (00.000.000) ---
-        const ciInput = document.getElementById('reg-ci');
-        if (ciInput) {
-            ciInput.addEventListener('input', function(e) {
-                let v = e.target.value.replace(/\D/g, ''); 
-                if (v.length > 8) v = v.slice(0, 8);
-                let formatted = "";
-                if (v.length > 0) {
-                    if (v.length <= 2) formatted = v;
-                    else if (v.length <= 5) formatted = v.slice(0, v.length - 3) + '.' + v.slice(v.length - 3);
-                    else formatted = v.slice(0, v.length - 6) + '.' + v.slice(v.length - 6, v.length - 3) + '.' + v.slice(v.length - 3);
-                }
-                e.target.value = formatted;
-            });
-        }
-
-        // --- Bloqueo de letras en Teléfono ---
-        const phoneInput = document.getElementById('reg-phone-num');
-        if (phoneInput) {
-            phoneInput.addEventListener('input', function(e) {
-                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7);
-            });
-        }
-    </script>
-    ```
-
-### ¿Cómo debe quedar el final de tu HTML?
-Muy limpio. Solo deben quedar los modales, la llamada al script externo de `auth.js` y el cierre del body:
-
-```html
     <script src="/static/js/auth.js"></script>
 </body>
 </html>
