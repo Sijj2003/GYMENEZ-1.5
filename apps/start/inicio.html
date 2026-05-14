@@ -19,7 +19,7 @@
             overflow-x: hidden;
         }
         
-        /* Glassmorphism de Alta Gama */
+        /* Glassmorphism de Alta Gama - Opacidad en 0.6 para soportar Firefox */
         .glass-panel {
             background: rgba(15, 15, 20, 0.6);
             backdrop-filter: blur(24px);
@@ -200,8 +200,6 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
-        const API_BASE_URL = "https://sijj2003.pythonanywhere.com";
-
         // Muestra notificaciones flotantes (necesario para cuando clican una tarjeta bloqueada)
         function showMessage(message, type = 'error') {
             const messagebox = document.getElementById('message-box');
@@ -218,35 +216,35 @@
             }, 3500);
         }
 
-        // Función para aplicar la UI de bloqueo a una tarjeta
+        // Función para aplicar la UI de bloqueo a una tarjeta específica
         function lockCard(cardElement, requiredLevel) {
             if (!cardElement) return;
             
-            // 1. Cambiar comportamiento
+            // 1. Cambiar comportamiento: Prevenir redirección y lanzar alerta
             cardElement.href = "javascript:void(0)"; 
             cardElement.onclick = (e) => {
                 e.preventDefault();
                 showMessage(`MÓDULO BLOQUEADO: Requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
             };
 
-            // 2. Estilos visuales
+            // 2. Estilos visuales de bloqueo
             cardElement.classList.add('locked-card');
             cardElement.classList.remove('hover-green', 'hover-red', 'hover-sky'); 
 
-            // 3. Modificar el tag superior
+            // 3. Modificar el tag superior para mostrar el candado
             const tag = cardElement.querySelector('.badge-tag');
             if (tag) {
                 tag.innerHTML = `🔒 PLAN ${requiredLevel}`;
                 tag.className = 'badge-tag bg-gray-800/80 text-gray-300 text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block border border-gray-600 shadow-md';
-                tag.classList.remove('hidden'); // Asegurarnos de que se vea (útil para la tarjeta de Objetivos)
+                tag.classList.remove('hidden'); // Asegurarnos de que el badge se vea
             }
         }
 
-        // Lógica Principal de Suscripción
+        // Lógica Principal: Define qué tarjetas se bloquean según el nivel
         function applySubscriptionLocks(level) {
             const normalizedLevel = (level || 'No Suscrito').toUpperCase();
             
-            // Referencias a las tarjetas
+            // Referencias a los módulos dinámicos
             const cardEats = document.getElementById('card-eats');
             const cardOn = document.getElementById('card-on');
             const cardGoals = document.getElementById('card-goals');
@@ -255,29 +253,31 @@
             const isUltra = normalizedLevel === 'ULTRA';
             const isPlus = normalizedLevel === 'PLUS' || isUltra;
 
-            // Aplicar bloqueos según el nivel
+            // Bloqueos por jerarquía
             if (!isUltra) {
-                lockCard(cardEats, 'ULTRA');
+                lockCard(cardEats, 'ULTRA'); // Solo el Ultra tiene Eats
             }
             if (!isPlus) {
-                lockCard(cardOn, 'PLUS');
-                lockCard(cardGoals, 'PLUS');
+                lockCard(cardOn, 'PLUS');    // Standard no tiene ON
+                lockCard(cardGoals, 'PLUS'); // Standard no tiene Objetivos Históricos
             }
 
-            // Actualizar Banner Inferior si es ULTRA
+            // Actualizar Banner Inferior promocional si el usuario ya es ULTRA
             if (isUltra) {
                 const bannerTitle = document.getElementById('upgrade-banner-title');
                 const bannerDesc = document.getElementById('upgrade-banner-desc');
                 const bannerBtn = document.getElementById('upgrade-banner-btn');
                 
-                bannerTitle.textContent = "Nivel Ultra Activado";
-                bannerTitle.classList.replace('text-white', 'text-[#FFC300]');
-                bannerDesc.textContent = "Estás aprovechando el ecosistema al 100%. Sigue rompiendo tus límites.";
-                bannerBtn.classList.add('hidden');
+                if (bannerTitle && bannerDesc && bannerBtn) {
+                    bannerTitle.textContent = "Nivel Ultra Activado";
+                    bannerTitle.classList.replace('text-white', 'text-[#FFC300]');
+                    bannerDesc.textContent = "Estás aprovechando el ecosistema al 100%. Sigue rompiendo tus límites.";
+                    bannerBtn.classList.add('hidden');
+                }
             }
         }
 
-        // Inicialización al cargar la página
+        // Ejecución al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('userSession');
             
@@ -285,17 +285,17 @@
                 const user = JSON.parse(storedSession);
                 const userId = user.id || user._id;
                 
-                // Saludo Básico Inmediato
+                // 1. Renderizar Saludo Básico inmediatamente (para UX rápida)
                 const firstName = user.name ? user.name.split(' ')[0] : 'Atleta';
                 document.getElementById('welcome-name').textContent = firstName;
                 document.getElementById('header-user-name').textContent = `${firstName} ${user.last_name ? user.last_name.split(' ')[0] : ''}`;
 
-                // Poner la fecha actual
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
                 // ==========================================
-                // Llama a la API para obtener el Nivel de Suscripción
+                // 2. Fetch de Seguridad: Obtener el nivel real desde Firestore
+                // Utiliza API_BASE_URL que fue declarado previamente en auth.js
                 // ==========================================
                 fetch(`${API_BASE_URL}/api/profile/${userId}`)
                     .then(res => res.json())
@@ -303,19 +303,18 @@
                         if (data.success && data.profile) {
                             const subLevel = data.profile.subscription_level || 'No Suscrito';
                             
-                            // Mostrar el nivel en el header
+                            // Mostrar el nivel dinámico en la esquina superior derecha
                             document.getElementById('header-subscription').textContent = `Plan ${subLevel}`;
                             
-                            // Aplicar la lógica visual de bloqueos
+                            // Bloquear o desbloquear funciones
                             applySubscriptionLocks(subLevel);
                         } else {
-                            // Fallback por defecto si la API falla
                             applySubscriptionLocks('No Suscrito');
                         }
                     })
                     .catch(err => {
                         console.error("Error obteniendo perfil:", err);
-                        applySubscriptionLocks('No Suscrito');
+                        applySubscriptionLocks('No Suscrito'); // Fallback seguro
                     });
             }
         });
