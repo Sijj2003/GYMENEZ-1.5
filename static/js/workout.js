@@ -3,7 +3,7 @@
 const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`;
 const CONTACT_WHATSAPP = '584148780392'; 
-const REDIRECT_URL = '/apps/user/routines.html';
+const REDIRECT_URL = 'routines.html'; // Redirección relativa al Hub de Rutinas
 const REDIRECT_TIMEOUT_SECONDS = 25; 
 
 let userId = null;
@@ -11,36 +11,72 @@ let userFullName = null;
 let routineExercises = []; 
 let redirectTimer = null; 
 
-// === DINAMISMO POR URL ===
+// === 1. DINAMISMO POR URL ===
 const urlParams = new URLSearchParams(window.location.search);
 const urlDay = urlParams.get('day');
+// Valida que el día exista o usa 'Lunes' por defecto. Formatea la primera letra a Mayúscula.
 const CURRENT_DAY = urlDay ? urlDay.charAt(0).toUpperCase() + urlDay.slice(1).toLowerCase() : 'Lunes';
 
-// Elementos DOM Globales
+// Elementos DOM
 const messagebox = document.getElementById('message-box');
+const loadingSpinner = document.getElementById('loading-spinner');
 const exercisesContainer = document.getElementById('exercises-container');
+const noDataMessage = document.getElementById('no-data-message');
+const dayTitle = document.getElementById('day-title');
+const finishRoutineContainer = document.getElementById('finish-routine-container');
 const finishRoutineBtn = document.getElementById('finish-routine-btn');
+const finishScreen = document.getElementById('finish-screen');
 
+// Establecer título dinámicamente
 document.title = `Protocolo ${CURRENT_DAY} | GYMENEZ`;
-document.getElementById('day-title').textContent = `${CURRENT_DAY}`;
+if (dayTitle) dayTitle.textContent = `${CURRENT_DAY}`;
 
-// === REPRODUCTOR NATIVO DE VIDEO (YOUTUBE PARSER) ===
+// =======================================================
+// 🎬 MODAL DE REPRODUCTOR NATIVO (YOUTUBE PARSER) 🎬
+// =======================================================
 const videoModal = document.getElementById('video-modal');
 const videoIframe = document.getElementById('video-iframe');
 const videoTitle = document.getElementById('video-title');
 
 function getCleanYouTubeEmbed(url) {
-    let videoId = '';
-    // Regex para capturar el ID de youtube (watch?v=, youtu.be/, embed/)
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    
-    if (match && match[2].length === 11) {
-        videoId = match[2];
-        // Parámetros mágicos para modo "Elitista": Sin cookies, auto-play, sin branding, sin videos relacionados al final
-        return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&showinfo=0&controls=1&iv_load_policy=3&disablekb=1`;
+    try {
+        // Objeto URL para parsear inteligentemente
+        const urlObj = new URL(url);
+        let videoId = null;
+
+        // Si es youtube.com
+        if (urlObj.hostname.includes('youtube.com')) {
+            if (urlObj.pathname === '/watch') {
+                videoId = urlObj.searchParams.get('v');
+            } else if (urlObj.pathname.startsWith('/embed/')) {
+                videoId = urlObj.pathname.split('/')[2];
+            } else if (urlObj.pathname.startsWith('/v/')) {
+                videoId = urlObj.pathname.split('/')[2];
+            } else if (urlObj.pathname.startsWith('/shorts/')) {
+                videoId = urlObj.pathname.split('/')[2]; // Soporte para Youtube Shorts
+            }
+        } 
+        // Si es youtu.be (enlaces acortados)
+        else if (urlObj.hostname === 'youtu.be') {
+            videoId = urlObj.pathname.slice(1);
+        }
+
+        // Si logramos extraer el ID, armamos el reproductor premium (sin branding, sin sugerencias)
+        if (videoId && videoId.length >= 10) {
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&controls=1&showinfo=0&iv_load_policy=3`;
+        }
+    } catch (e) {
+        console.warn("La URL no tiene un formato estándar, usando Fallback Regex...");
     }
-    return url; // Si no es youtube, devuelve normal
+
+    // Fallback de emergencia por si falla el constructor URL
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
+    if (match && match[1]) {
+        return `https://www.youtube.com/embed/${match[1]}?autoplay=1&modestbranding=1&rel=0`;
+    }
+
+    // Si de plano no es YouTube, retornamos la URL tal cual
+    return url;
 }
 
 window.openTutorial = async (exerciseName) => {
@@ -49,19 +85,21 @@ window.openTutorial = async (exerciseName) => {
         const res = await fetch(`${API_BASE_URL}/api/exercises/link_tutorial/${encodeURIComponent(exerciseName)}`);
         const data = await res.json();
         
-        if(data.success && data.tutorialLink) {
+        if (data.success && data.tutorialLink) {
             const cleanUrl = getCleanYouTubeEmbed(data.tutorialLink);
             
             // Setup Modal
-            videoTitle.textContent = exerciseName;
-            videoModal.classList.remove('hidden');
+            if (videoTitle) videoTitle.textContent = exerciseName;
+            if (videoModal) videoModal.classList.remove('hidden');
             
             // Pequeño delay para el fade-in y el iframe
             setTimeout(() => {
                 videoModal.classList.remove('opacity-0');
-                videoIframe.src = cleanUrl;
-                // Mostrar el iframe después de 1s para que la animación de carga se vea fluida
-                setTimeout(() => videoIframe.classList.remove('opacity-0'), 800);
+                if (videoIframe) {
+                    videoIframe.src = cleanUrl;
+                    // Mostrar el iframe después de un instante para que la animación de carga se vea fluida
+                    setTimeout(() => videoIframe.classList.remove('opacity-0'), 800);
+                }
             }, 50);
 
         } else {
@@ -72,17 +110,27 @@ window.openTutorial = async (exerciseName) => {
     }
 };
 
-document.getElementById('close-video-btn').addEventListener('click', () => {
-    videoModal.classList.add('opacity-0');
-    setTimeout(() => {
-        videoModal.classList.add('hidden');
-        videoIframe.src = ""; // Detener el video
-        videoIframe.classList.add('opacity-0');
-    }, 300);
-});
+const closeVideoBtn = document.getElementById('close-video-btn');
+if (closeVideoBtn) {
+    closeVideoBtn.addEventListener('click', () => {
+        if (videoModal) videoModal.classList.add('opacity-0');
+        setTimeout(() => {
+            if (videoModal) videoModal.classList.add('hidden');
+            if (videoIframe) {
+                videoIframe.src = ""; // Detener el video cortando el src
+                videoIframe.classList.add('opacity-0');
+            }
+        }, 300);
+    });
+}
+
+// =======================================================
+// 🧩 SISTEMA DE INTERFAZ Y RUTINAS 🧩
+// =======================================================
 
 // UI Helpers
 function showMessage(message, type = 'success') {
+    if (!messagebox) return;
     messagebox.textContent = message;
     messagebox.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-[10px] font-black tracking-[0.2em] uppercase shadow-2xl z-[9999] transition-all duration-300 text-center border border-white/10';
     messagebox.classList.add(type === 'success' ? 'bg-emerald-600' : 'bg-red-600', 'text-white');
@@ -96,19 +144,20 @@ function showMessage(message, type = 'success') {
 
 // Lógica de Renderizado de Ejercicios
 function renderExercises(exercises) {
+    if (!exercisesContainer) return;
     exercisesContainer.innerHTML = ''; 
-    document.getElementById('finish-routine-container').classList.add('hidden'); 
+    if (finishRoutineContainer) finishRoutineContainer.classList.add('hidden'); 
     routineExercises = exercises; 
     
     if (exercises.length === 0) {
-        document.getElementById('no-data-message').classList.remove('hidden');
-        document.getElementById('loading-spinner').classList.add('hidden');
+        if (noDataMessage) noDataMessage.classList.remove('hidden');
+        if (loadingSpinner) loadingSpinner.classList.add('hidden');
         return;
     }
 
-    document.getElementById('no-data-message').classList.add('hidden');
-    document.getElementById('loading-spinner').classList.add('hidden');
-    document.getElementById('finish-routine-container').classList.remove('hidden'); 
+    if (noDataMessage) noDataMessage.classList.add('hidden');
+    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+    if (finishRoutineContainer) finishRoutineContainer.classList.remove('hidden'); 
     
     exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
 
@@ -157,6 +206,9 @@ function updateCardUI(exerciseName, status) {
     const cardId = exerciseName.replace(/\s/g, '-');
     const cBtn = document.getElementById(`completed-button-${cardId}`);
     const sBtn = document.getElementById(`skip-button-${cardId}`);
+    
+    if (!cBtn || !sBtn) return;
+    
     const card = cBtn.closest('.glass-item-card');
 
     // Resets
@@ -174,6 +226,7 @@ function updateCardUI(exerciseName, status) {
 }
 
 function updateFinishButtonState() {
+    if (!finishRoutineBtn) return;
     const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.status !== 'pending');
     finishRoutineBtn.disabled = !allCompleted;
     finishRoutineBtn.className = `w-full md:w-2/3 py-5 rounded-2xl text-sm tracking-[0.2em] font-black transition duration-300 uppercase shadow-2xl ${allCompleted ? 'bg-[#FFC300] hover:bg-yellow-400 text-black shadow-[0_0_30px_rgba(255,195,0,0.3)]' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/10'}`;
@@ -196,15 +249,20 @@ async function loadRoutine() {
         if (data.success && data.routines.length > 0 && data.routines[0].exercises) {
             renderExercises(data.routines[0].exercises);
         } else {
-            document.getElementById('loading-spinner').classList.add('hidden');
-            document.getElementById('no-data-message').classList.remove('hidden');
+            if (loadingSpinner) loadingSpinner.classList.add('hidden');
+            if (noDataMessage) noDataMessage.classList.remove('hidden');
         }
     } catch (e) {
-        document.getElementById('loading-spinner').innerHTML = `<p class="text-red-500 font-bold uppercase tracking-widest text-[10px]">Error Crítico de Datos</p>`;
+        if (loadingSpinner) {
+            loadingSpinner.innerHTML = `<p class="text-red-500 font-bold uppercase tracking-widest text-[10px]">Error Crítico de Datos</p>`;
+        }
     }
 }
 
-// Inicialización de la sesión
+// =======================================================
+// 🚀 INICIALIZACIÓN Y EVENTOS GLOBALES 🚀
+// =======================================================
+
 window.addEventListener('DOMContentLoaded', () => {
     const session = JSON.parse(localStorage.getItem('userSession'));
     if (!session) {
@@ -217,66 +275,81 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // Eventos de Fin de Rutina y Encuesta
-finishRoutineBtn.addEventListener('click', () => {
-    const screen = document.getElementById('finish-screen');
-    const survey = document.getElementById('survey-container');
-    const msg = document.getElementById('finish-message');
-    
-    screen.classList.remove('hidden');
-    // Pequeño delay para el fade
-    setTimeout(() => screen.classList.remove('opacity-0'), 50);
-    
-    // Si hay audio, intenta reproducirlo (silenciado si el nav lo bloquea)
-    const audio = document.getElementById('fireworks-audio');
-    if(audio) audio.play().catch(()=>{});
-    
-    // Setup Confetti Elegante (Dorado y Blanco)
-    const duration = 2500;
-    const end = Date.now() + duration;
-    (function frame() {
-        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFC300', '#ffffff', '#333333'] });
-        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFC300', '#ffffff', '#333333'] });
-        if (Date.now() < end) requestAnimationFrame(frame);
-        else {
-            msg.style.opacity = 0;
-            setTimeout(() => {
-                msg.classList.add('hidden');
-                survey.classList.remove('hidden');
-                setTimeout(() => survey.classList.add('survey-visible'), 50);
-            }, 500);
+if (finishRoutineBtn) {
+    finishRoutineBtn.addEventListener('click', () => {
+        const survey = document.getElementById('survey-container');
+        const msg = document.getElementById('finish-message');
+        
+        if (finishScreen) {
+            finishScreen.classList.remove('hidden');
+            setTimeout(() => finishScreen.classList.remove('opacity-0'), 50);
         }
-    }());
-});
+        
+        const audio = document.getElementById('fireworks-audio');
+        if(audio) audio.play().catch(()=>{});
+        
+        const duration = 2500;
+        const end = Date.now() + duration;
+        (function frame() {
+            if (typeof confetti !== 'undefined') {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFC300', '#ffffff', '#333333'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFC300', '#ffffff', '#333333'] });
+            }
+            if (Date.now() < end) requestAnimationFrame(frame);
+            else {
+                if (msg) msg.style.opacity = 0;
+                setTimeout(() => {
+                    if (msg) msg.classList.add('hidden');
+                    if (survey) {
+                        survey.classList.remove('hidden');
+                        setTimeout(() => survey.classList.add('survey-visible'), 50);
+                    }
+                }, 500);
+            }
+        }());
+    });
+}
 
 // Control visual del dolor en Encuesta
 document.querySelectorAll('input[name="sintio-dolor"]').forEach(r => r.addEventListener('change', (e) => {
-    document.getElementById('dolor-details').classList.toggle('hidden', e.target.value !== 'si');
+    const details = document.getElementById('dolor-details');
+    if (details) details.classList.toggle('hidden', e.target.value !== 'si');
 }));
 
 document.querySelectorAll('input[name="tipo-dolor"]').forEach(r => r.addEventListener('change', (e) => {
-    document.getElementById('otro-dolor-container').classList.toggle('hidden', e.target.value === 'otro');
+    const otroContainer = document.getElementById('otro-dolor-container');
+    if (otroContainer) otroContainer.classList.toggle('hidden', e.target.value !== 'otro');
 }));
 
 // Submit Encuesta
-document.getElementById('routine-survey-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    showModalContacto();
-});
+const surveyForm = document.getElementById('routine-survey-form');
+if (surveyForm) {
+    surveyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // Llamada futura a saveRoutineJournal
+        showModalContacto();
+    });
+}
 
-document.getElementById('skip-survey-link').addEventListener('click', (e) => {
-    e.preventDefault();
-    showModalContacto();
-});
+const skipLink = document.getElementById('skip-survey-link');
+if (skipLink) {
+    skipLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showModalContacto();
+    });
+}
 
 function showModalContacto() {
     const survey = document.getElementById('survey-container');
     const contact = document.getElementById('contact-modal');
     
-    survey.classList.remove('survey-visible');
+    if (survey) survey.classList.remove('survey-visible');
     setTimeout(() => {
-        survey.classList.add('hidden');
-        contact.classList.remove('hidden');
-        setTimeout(() => contact.classList.add('survey-visible'), 50);
+        if (survey) survey.classList.add('hidden');
+        if (contact) {
+            contact.classList.remove('hidden');
+            setTimeout(() => contact.classList.add('survey-visible'), 50);
+        }
         startRedirectTimer();
     }, 500);
 }
@@ -284,10 +357,10 @@ function showModalContacto() {
 function startRedirectTimer() {
     let count = REDIRECT_TIMEOUT_SECONDS;
     const tc = document.getElementById('timer-count');
-    tc.textContent = count;
+    if (tc) tc.textContent = count;
     redirectTimer = setInterval(() => {
         count--;
-        tc.textContent = count;
+        if (tc) tc.textContent = count;
         if (count <= 0) handleRedirect();
     }, 1000);
 }
@@ -297,10 +370,14 @@ function handleRedirect(contactWhatsapp = false) {
     if (contactWhatsapp) {
         window.open(`https://wa.me/${CONTACT_WHATSAPP}?text=${encodeURIComponent(`Reporte de Sistema: Acabo de terminar mi sesión de ${CURRENT_DAY} y solicito revisión técnica.`)}`, '_blank');
     }
-    // Animación de salida
-    document.getElementById('finish-screen').classList.add('opacity-0');
+    
+    if (finishScreen) finishScreen.classList.add('opacity-0');
+    
     setTimeout(() => { window.location.href = REDIRECT_URL; }, 700);
 }
 
-document.getElementById('contact-yes-btn').addEventListener('click', () => handleRedirect(true));
-document.getElementById('contact-no-btn').addEventListener('click', () => handleRedirect(false));
+const contactYesBtn = document.getElementById('contact-yes-btn');
+if (contactYesBtn) contactYesBtn.addEventListener('click', () => handleRedirect(true));
+
+const contactNoBtn = document.getElementById('contact-no-btn');
+if (contactNoBtn) contactNoBtn.addEventListener('click', () => handleRedirect(false));
