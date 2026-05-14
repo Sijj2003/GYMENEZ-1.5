@@ -1,48 +1,54 @@
-/* Estética de Alto Nivel: Obsidian & Indigo */
+/* admin_auth.css */
 body { 
     font-family: 'Inter', sans-serif; 
     background-color: #030305; 
-    color: #ffffff;
-    overflow-x: hidden;
 }
 
+/* Glassmorphism Nivel Pro */
 .glass-panel {
-    background: rgba(10, 10, 18, 0.8);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 40px 120px -20px rgba(0, 0, 0, 0.9);
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.7) 0%, rgba(10, 10, 15, 0.8) 100%);
+    backdrop-filter: blur(60px) saturate(180%);
+    -webkit-backdrop-filter: blur(60px) saturate(180%);
+    box-shadow: 
+        0 40px 100px -20px rgba(0, 0, 0, 0.9),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05);
 }
 
+/* Inputs con estilo Terminal */
 .glass-input {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .glass-input:focus {
-    border-color: #6366f1;
-    background: rgba(99, 102, 241, 0.05);
+    background: rgba(99, 102, 241, 0.03);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.05);
     outline: none;
 }
 
+/* Botón Estilo Fintech */
 .btn-admin {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.4);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .btn-admin:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.15);
-    box-shadow: 0 15px 40px -5px rgba(79, 70, 229, 0.5);
+    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.1);
+    box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.5);
 }
+
+.btn-admin:active { transform: translateY(0) scale(0.98); }
 
 .ambient-glow {
     position: absolute;
     width: 60vw;
     height: 60vw;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(0,0,0,0) 70%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(0,0,0,0) 70%);
     border-radius: 50%;
     pointer-events: none;
     top: 50%;
@@ -50,25 +56,17 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.animate-premium-in { 
-    animation: reveal 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-}
-
-@keyframes reveal {
-    0% { opacity: 0; transform: scale(0.98) translateY(20px); filter: blur(10px); }
+@keyframes premiumReveal {
+    0% { opacity: 0; transform: scale(0.9) translateY(40px); filter: blur(20px); }
     100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
 
-/* Dashboard Panel Cards */
-.panel-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.animate-premium-in { 
+    animation: premiumReveal 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
 }
 
-.panel-card:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(99, 102, 241, 0.4);
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-}
+/* Custom Scrollbar para el Dashboard */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.2); border-radius: 20px; }
+::-webkit-scrollbar-thumb:hover { background: #6366f1; }
