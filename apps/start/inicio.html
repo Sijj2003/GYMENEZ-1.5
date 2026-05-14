@@ -128,7 +128,10 @@
                     <div class="relative z-10">
                         <span class="px-2 md:px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[8px] md:text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-3 md:mb-4">Core Module</span>
                         <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 break-words">Fitness Performance</h3>
-                        <p class="text-gray-400 text-xs md:text-sm max-w-sm">Algoritmos de entrenamiento personalizados, métricas físicas y progresión de fuerza en tiempo real.</p>
+                        
+                        <p id="motivational-message" class="text-gray-300 italic text-xs md:text-sm max-w-sm tracking-wide leading-relaxed min-h-[40px]">
+                            Cargando motivación...
+                        </p>
                     </div>
                     
                     <div class="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 relative z-10">
@@ -137,8 +140,9 @@
                             <span class="text-base md:text-lg">→</span>
                         </a>
                         <a href="/apps/user/recovery.html" class="bg-[#111] border border-white/10 text-white font-bold text-[10px] md:text-xs uppercase tracking-widest py-3 md:py-4 px-4 md:px-6 rounded-xl md:rounded-2xl flex items-center justify-between hover:border-sky-400 hover:text-sky-400 transition">
-    <span>Recovery Room</span>
-</a>
+                            <span>Recovery Room</span>
+                            <span class="text-base md:text-lg">🧘‍♂️</span>
+                        </a>
                     </div>
                 </div>
 
@@ -199,7 +203,6 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
-        // Muestra notificaciones flotantes (necesario para cuando clican una tarjeta bloqueada)
         function showMessage(message, type = 'error') {
             const messagebox = document.getElementById('message-box');
             if(!messagebox) return;
@@ -215,53 +218,42 @@
             }, 3500);
         }
 
-        // Función para aplicar la UI de bloqueo a una tarjeta específica
         function lockCard(cardElement, requiredLevel) {
             if (!cardElement) return;
             
-            // 1. Cambiar comportamiento: Prevenir redirección y lanzar alerta
             cardElement.href = "javascript:void(0)"; 
             cardElement.onclick = (e) => {
                 e.preventDefault();
                 showMessage(`MÓDULO BLOQUEADO: Requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
             };
 
-            // 2. Estilos visuales de bloqueo
             cardElement.classList.add('locked-card');
             cardElement.classList.remove('hover-green', 'hover-red', 'hover-sky'); 
 
-            // 3. Modificar el tag superior para mostrar el candado
             const tag = cardElement.querySelector('.badge-tag');
             if (tag) {
                 tag.innerHTML = `🔒 PLAN ${requiredLevel}`;
                 tag.className = 'badge-tag bg-gray-800/80 text-gray-300 text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block border border-gray-600 shadow-md';
-                tag.classList.remove('hidden'); // Asegurarnos de que el badge se vea
+                tag.classList.remove('hidden'); 
             }
         }
 
-        // Lógica Principal: Define qué tarjetas se bloquean según el nivel
         function applySubscriptionLocks(level) {
             const normalizedLevel = (level || 'No Suscrito').toUpperCase();
             
-            // Referencias a los módulos dinámicos
             const cardEats = document.getElementById('card-eats');
             const cardOn = document.getElementById('card-on');
             const cardGoals = document.getElementById('card-goals');
 
-            // Determinar accesos
             const isUltra = normalizedLevel === 'ULTRA';
             const isPlus = normalizedLevel === 'PLUS' || isUltra;
 
-            // Bloqueos por jerarquía
-            if (!isUltra) {
-                lockCard(cardEats, 'ULTRA'); // Solo el Ultra tiene Eats
-            }
+            if (!isUltra) lockCard(cardEats, 'ULTRA');
             if (!isPlus) {
-                lockCard(cardOn, 'PLUS');    // Standard no tiene ON
-                lockCard(cardGoals, 'PLUS'); // Standard no tiene Objetivos Históricos
+                lockCard(cardOn, 'PLUS');    
+                lockCard(cardGoals, 'PLUS'); 
             }
 
-            // Actualizar Banner Inferior promocional si el usuario ya es ULTRA
             if (isUltra) {
                 const bannerTitle = document.getElementById('upgrade-banner-title');
                 const bannerDesc = document.getElementById('upgrade-banner-desc');
@@ -276,15 +268,58 @@
             }
         }
 
+        // ==========================================
+        // ALGORITMO GENERADOR DE MOTIVACIÓN 
+        // 10,000 Combinaciones Neutrales y Premium
+        // ==========================================
+        function setMotivationalQuote() {
+            const quoteEl = document.getElementById('motivational-message');
+            if (!quoteEl) return;
+
+            const parts = {
+                p1: [
+                    "La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", 
+                    "La dedicación innegociable", "Cada gota de sudor", "Una mentalidad de hierro", 
+                    "El enfoque milimétrico", "La verdadera resiliencia", "El trabajo inteligente", 
+                    "La intensidad calculada"
+                ],
+                p2: [
+                    "forja", "construye", "materializa", "desencadena", "garantiza", 
+                    "consolida", "despierta", "maximiza", "blinda", "potencia"
+                ],
+                p3: [
+                    "tu mejor versión física", "resultados matemáticos", "un progreso innegable", 
+                    "una fuerza interior brutal", "el rendimiento a largo plazo", "un sistema inquebrantable", 
+                    "tu capacidad de adaptación", "la verdadera excelencia", "una genética de élite", 
+                    "tu resistencia ante la fatiga"
+                ],
+                p4: [
+                    "día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", 
+                    "superando los límites del cuerpo.", "en cada fase del entrenamiento.", "para alcanzar tu pico de rendimiento.", 
+                    "venciendo la comodidad.", "un 1% a la vez.", "con cada repetición.", 
+                    "manteniendo la visión clara."
+                ]
+            };
+
+            const r = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            const finalQuote = `"${r(parts.p1)} ${r(parts.p2)} ${r(parts.p3)} ${r(parts.p4)}"`;
+            
+            quoteEl.textContent = finalQuote;
+        }
+
         // Ejecución al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Activar frase motivacional
+            setMotivationalQuote();
+
+            // 2. Cargar sesión y nombre
             const storedSession = localStorage.getItem('userSession');
             
             if (storedSession) {
                 const user = JSON.parse(storedSession);
                 const userId = user.id || user._id;
                 
-                // 1. Renderizar Saludo Básico inmediatamente (para UX rápida)
                 const firstName = user.name ? user.name.split(' ')[0] : 'Atleta';
                 document.getElementById('welcome-name').textContent = firstName;
                 document.getElementById('header-user-name').textContent = `${firstName} ${user.last_name ? user.last_name.split(' ')[0] : ''}`;
@@ -292,20 +327,13 @@
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
-                // ==========================================
-                // 2. Fetch de Seguridad: Obtener el nivel real desde Firestore
-                // Utiliza API_BASE_URL que fue declarado previamente en auth.js
-                // ==========================================
+                // 3. Fetch Nivel Suscripción
                 fetch(`${API_BASE_URL}/api/profile/${userId}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data.success && data.profile) {
                             const subLevel = data.profile.subscription_level || 'No Suscrito';
-                            
-                            // Mostrar el nivel dinámico en la esquina superior derecha
                             document.getElementById('header-subscription').textContent = `Plan ${subLevel}`;
-                            
-                            // Bloquear o desbloquear funciones
                             applySubscriptionLocks(subLevel);
                         } else {
                             applySubscriptionLocks('No Suscrito');
@@ -313,7 +341,7 @@
                     })
                     .catch(err => {
                         console.error("Error obteniendo perfil:", err);
-                        applySubscriptionLocks('No Suscrito'); // Fallback seguro
+                        applySubscriptionLocks('No Suscrito'); 
                     });
             }
         });
