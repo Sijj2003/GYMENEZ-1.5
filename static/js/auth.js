@@ -7,7 +7,7 @@ if (!localDeviceId) {
     localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
 }
 
-// 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
+// 🚀 URL BASE DE TU API
 const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
 let CURRENT_USER_SESSION = null; 
@@ -16,7 +16,7 @@ let isFirstCheckIgnored = false;
 
 // --- CONSTANTES PARA WHATSAPP ---
 const WHATSAPP_NUMBER = '+584148780392';
-const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de usuario/contraseña';
+const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de credenciales';
 
 /**
  * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
@@ -57,7 +57,7 @@ async function apiLogin(email, password, deviceId) {
 
     } catch (e) {
         console.error("Error en la conexión fetch:", e);
-        return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+        return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica tu conexión.' };
     }
 }
 
@@ -162,11 +162,11 @@ function showCenteredMessage(message, durationMs) {
     void modal.offsetWidth; 
     
     modal.style.opacity = '1';
-    modal.querySelector('.glass-card').style.transform = 'scale(1)';
+    modal.querySelector('.glass-panel').style.transform = 'scale(1)';
 
     setTimeout(() => {
         modal.style.opacity = '0';
-        modal.querySelector('.glass-card').style.transform = 'scale(0.9)';
+        modal.querySelector('.glass-panel').style.transform = 'scale(0.9)';
         
         setTimeout(() => {
             modal.classList.add('hidden');
@@ -178,7 +178,7 @@ function showForceLogoutMessage(message, type = 'error') {
     const msgBox = document.getElementById('force-logout-message');
     if (message) {
         msgBox.textContent = message;
-        msgBox.className = `p-3 mb-4 rounded-lg font-semibold text-center ${type === 'error' ? 'bg-red-800/70 text-red-100' : 'bg-green-800/70 text-green-100'}`;
+        msgBox.className = `p-3 mb-4 rounded-lg font-bold text-center text-xs tracking-widest uppercase ${type === 'error' ? 'bg-red-900/30 border border-red-500/50 text-red-400' : 'bg-green-900/30 border border-green-500/50 text-green-400'}`;
         msgBox.classList.remove('hidden');
     } else {
         msgBox.classList.add('hidden'); 
@@ -202,7 +202,6 @@ function navigateTo(targetId) {
         });
         
         if (targetId === 'dashboard-screen') {
-            body.classList.add('dashboard-background');
             const storedSession = localStorage.getItem('userSession');
             if (storedSession) {
                 CURRENT_USER_SESSION = JSON.parse(storedSession);
@@ -213,7 +212,6 @@ function navigateTo(targetId) {
                 startSessionChecker(); 
             }
         } else {
-            body.classList.remove('dashboard-background');
             stopSessionChecker(); 
         }
     }
@@ -295,7 +293,7 @@ function formatDateInput(input) {
 }
 
 async function apiForceLogout(email, password, deviceId, name, lastname, dob, phone, ci) {
-    console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}. Device ID: ${deviceId}`);
+    console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}.`);
     
     try {
         const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
@@ -318,7 +316,7 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
 
     } catch (e) {
         console.error("Error en la conexión fetch para force_logout:", e);
-        return { success: false, error: 'No se pudo conectar con el servidor API REST para forzar el cierre.' };
+        return { success: false, error: 'No se pudo conectar con el servidor para forzar el cierre.' };
     }
 }
 
@@ -331,13 +329,13 @@ async function handleLogin(e) {
     const blockModal = document.getElementById('block-modal'); 
 
     btn.disabled = true;
-    btn.textContent = 'VERIFICANDO SESIÓN...';
+    btn.textContent = 'VERIFICANDO...';
 
     const response = await apiLogin(email, password, localDeviceId);
     
     if (!response.success) {
         btn.disabled = false;
-        btn.textContent = 'INGRESAR';
+        btn.textContent = 'INGRESAR AL PORTAL';
 
         if (response.requires_activation) {
             document.getElementById('activation-email').value = response.email || email;
@@ -354,9 +352,10 @@ async function handleLogin(e) {
                 blockModal.classList.add('hidden');
             }, 10000); 
         
-        } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
+        // 🟢 AQUÍ ESTÁ LA CORRECCIÓN CLAVE: Ahora busca la frase exacta de tu backend Python 🟢
+        } else if (response.error && (response.error.includes('Sesion activa detectada') || response.error.includes('sesión activa'))) {
             sessionModal.classList.remove('hidden');
-            showMessage('Sesión activa detectada.', 'error');
+            showMessage('Sesión en uso detectada.', 'error');
             
             document.getElementById('force-logout-form').classList.add('hidden');
             document.getElementById('modal-options').classList.remove('hidden');
@@ -374,7 +373,7 @@ async function handleLogin(e) {
     sessionModal.classList.add('hidden'); 
     
     btn.disabled = false;
-    btn.textContent = 'INGRESAR';
+    btn.textContent = 'INGRESAR AL PORTAL';
 }
 
 async function handleRegister(e) {
@@ -404,7 +403,7 @@ async function handleRegister(e) {
 
     if (btn) {
         btn.disabled = true;
-        btn.textContent = 'PROCESANDO PERFIL...';
+        btn.textContent = 'PROCESANDO...';
     }
 
     try {
@@ -476,8 +475,7 @@ async function handleForceLogout(e) {
     if (response.success) {
         const delayMs = 7000;
         modal.classList.add('hidden');
-        const successMessage = `Proceso completado. La sesión anterior ha sido cerrada exitosamente. Por favor, inicie sesión nuevamente para acceder.`;
-        showCenteredMessage(successMessage, delayMs); 
+        showCenteredMessage('La sesión anterior ha sido cerrada. Ingresa de nuevo.', delayMs); 
 
         localStorage.removeItem('userSession');
         CURRENT_USER_SESSION = null; 
@@ -488,18 +486,18 @@ async function handleForceLogout(e) {
         }, delayMs); 
 
     } else {
-        showForceLogoutMessage('Verificación fallida: Los datos introducidos son incorrectos o la contraseña es inválida.', 'error');
+        showForceLogoutMessage('Error: Los datos introducidos no coinciden con tu perfil o clave.', 'error');
     }
     
     btn.disabled = false;
-    btn.textContent = 'Cerrar Sesión Activa';
+    btn.textContent = 'CONFIRMAR IDENTIDAD';
 }
 
 async function handleLogout() {
     const btn = document.getElementById('logout-button');
     const originalText = btn.textContent;
     btn.disabled = true;
-    btn.textContent = 'Cerrando...';
+    btn.textContent = 'SALIENDO...';
     stopSessionChecker(); 
     await apiLogout(); 
     showMessage('Sesión cerrada correctamente.', 'success');
@@ -535,11 +533,11 @@ function handleStaffAccess() {
 }
 
 function handleSelectTrainer() {
-    window.location.href = 'trainer.html'; 
+    window.location.href = '/templates/staff/trainer.html'; 
 }
 
 function handleSelectAdmin() {
-    window.location.href = 'administration.html'; 
+    window.location.href = '/templates/admin/administration.html'; 
 }
 
 function handleCloseAreaSelectionModal() {
@@ -588,7 +586,7 @@ async function handleVerifyActivation(e) {
         showMessage('Error al verificar el código de activación.', 'error');
     } finally {
         btn.disabled = false;
-        btn.textContent = 'VERIFICAR';
+        btn.textContent = 'AUTENTICAR CÓDIGO';
     }
 }
 
@@ -650,38 +648,3 @@ window.onload = function() {
         }
     }, true); 
 };
-
-const dobInput = document.getElementById('reg-dob');
-if (dobInput) {
-    dobInput.addEventListener('input', function(e) {
-        let v = e.target.value.replace(/\D/g, ''); 
-        if (v.length > 8) v = v.slice(0, 8);
-        let final = "";
-        if (v.length > 0) final += v.slice(0, 2);
-        if (v.length > 2) final += '/' + v.slice(2, 4);
-        if (v.length > 4) final += '/' + v.slice(4, 8);
-        e.target.value = final;
-    });
-}
-
-const ciInput = document.getElementById('reg-ci');
-if (ciInput) {
-    ciInput.addEventListener('input', function(e) {
-        let v = e.target.value.replace(/\D/g, ''); 
-        if (v.length > 8) v = v.slice(0, 8);
-        let formatted = "";
-        if (v.length > 0) {
-            if (v.length <= 2) formatted = v;
-            else if (v.length <= 5) formatted = v.slice(0, v.length - 3) + '.' + v.slice(v.length - 3);
-            else formatted = v.slice(0, v.length - 6) + '.' + v.slice(v.length - 6, v.length - 3) + '.' + v.slice(v.length - 3);
-        }
-        e.target.value = formatted;
-    });
-}
-
-const phoneInput = document.getElementById('reg-phone-num');
-if (phoneInput) {
-    phoneInput.addEventListener('input', function(e) {
-        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7);
-    });
-}
