@@ -33,7 +33,7 @@ function showMessage(message, type = 'success') {
 }
 
 // ---------------------------------------------
-// LÓGICA DE LOGIN (administration.html)
+// LÓGICA DE LOGIN (login.html)
 // ---------------------------------------------
 async function handleAdminLogin(event) {
     event.preventDefault(); 
@@ -75,7 +75,7 @@ async function handleAdminLogin(event) {
 function handleLogout() {
     localStorage.removeItem('adminSession');
     // Redirigir de vuelta al login
-    window.location.href = 'administration.html';
+    window.location.href = 'login.html';
 }
 
 // ---------------------------------------------
@@ -100,7 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (isDashboardScreen) {
         // Si NO está logueado, patearlo al login
         if (!storedSession) {
-            window.location.href = 'administration.html';
+            window.location.href = 'login.html';
             return;
         }
         
