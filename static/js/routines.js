@@ -62,7 +62,7 @@ function highlightTodayRoutine() {
         4: 'Jueves',
         5: 'Viernes',
         6: 'Sábado',
-        0: 'Domingo' // Normalmente día de descanso
+        0: 'Domingo' // Día de descanso
     };
 
     const todayDayName = daysMap[dayIndex];
@@ -72,17 +72,14 @@ function highlightTodayRoutine() {
         const todayCard = document.querySelector(`[data-day="${todayDayName}"]`);
         
         if (todayCard) {
-            // Añade clases de animación y muestra la etiqueta "Entrenamiento de Hoy"
+            // Añade clases de animación y muestra la etiqueta superior
             todayCard.classList.add('today');
             
             const badge = todayCard.querySelector('.today-badge');
             if (badge) {
                 badge.classList.remove('hidden');
             }
-            
-            // Subir la tarjeta visualmente si está en vista desktop (opcional, pero la escala ya lo hace)
         } else if (todayDayName === 'Domingo') {
-            // Mensaje de día de descanso
             showMessage('Hoy es Domingo. ¡Día de recuperación activa!', 'success');
         }
     }
