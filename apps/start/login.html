@@ -158,25 +158,42 @@
                 </div>
             </div>
             <form id="force-logout-form" class="hidden mt-6 pt-6 border-t border-white/10 space-y-4">
-                <p class="text-[10px] font-black text-[#FFC300] text-center mb-4 uppercase tracking-[0.3em]">Protocolo de Identidad</p>
-                <div id="force-logout-message" class="hidden p-3 rounded-lg text-xs font-bold text-center uppercase tracking-widest"></div>
-                <div><input type="email" id="force-email" name="email" readonly class="w-full glass-input px-4 py-3 rounded-xl text-gray-500 text-xs cursor-not-allowed" placeholder="Email Bloqueado"></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="force-name" name="name" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Nombre" required>
-                    <input type="text" id="force-lastname" name="lastname" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Apellido" required>
-                </div>
-                <div><input type="text" id="force-dob" name="dob" maxlength="10" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Nacimiento (DD/MM/YYYY)" required></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="force-phone" name="phone" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Teléfono" required>
-                    <input type="text" id="force-ci" name="ci" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Cédula" required>
-                </div>
-                <div class="pt-6 mt-4 border-t border-white/5">
-                    <button type="submit" id="force-logout-btn" class="w-full py-4 rounded-xl bg-red-600 text-white font-black text-xs uppercase tracking-widest hover:bg-red-500 transition shadow-[0_0_15px_rgba(220,38,38,0.3)]">Confirmar Identidad</button>
-                    <button type="button" id="force-logout-cancel" class="mt-4 w-full text-center text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-widest transition">Abortar</button>
-                </div>
-            </form>
-        </div>
+    <p class="text-[10px] font-black text-[#FFC300] text-center mb-4 uppercase tracking-[0.3em]">Protocolo de Identidad</p>
+    <div id="force-logout-message" class="hidden p-3 rounded-lg text-xs font-bold text-center uppercase tracking-widest"></div>
+    
+    <div>
+        <input type="email" id="force-email" name="email" readonly class="w-full glass-input px-4 py-3 rounded-xl text-gray-500 text-xs cursor-not-allowed" placeholder="Email Bloqueado">
     </div>
+    
+    <div class="grid grid-cols-2 gap-3">
+        <input type="text" id="force-name" name="name" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Nombre" required>
+        <input type="text" id="force-lastname" name="lastname" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Apellido" required>
+    </div>
+    
+    <div>
+        <input type="text" id="force-dob" name="dob" maxlength="10" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Nacimiento (DD/MM/YYYY)" required>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="flex gap-2">
+            <select id="force-phone-prefix" class="w-20 px-2 py-3 rounded-xl glass-input text-white text-xs font-bold text-center appearance-none">
+                <option value="0414">0414</option>
+                <option value="0424">0424</option>
+                <option value="0412">0412</option>
+                <option value="0422">0422</option>
+                <option value="0416">0416</option>
+                <option value="0426">0426</option>
+            </select>
+            <input type="text" id="force-phone-num" name="phone" class="flex-1 w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="1234567" maxlength="7" required>
+        </div>
+        <input type="text" id="force-ci" name="ci" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Cédula" required>
+    </div>
+
+    <div class="pt-6 mt-4 border-t border-white/5">
+        <button type="submit" id="force-logout-btn" class="w-full py-4 rounded-xl bg-red-600 text-white font-black text-xs uppercase tracking-widest hover:bg-red-500 transition shadow-[0_0_15px_rgba(220,38,38,0.3)]">Confirmar Identidad</button>
+        <button type="button" id="force-logout-cancel" class="mt-4 w-full text-center text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-widest transition">Abortar</button>
+    </div>
+</form>
 
     <div id="temp-message-modal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[2000] transition-opacity duration-500 opacity-0 px-4">
         <div class="glass-panel p-10 w-full max-w-md mx-auto rounded-[32px] text-center transform scale-90 transition-transform duration-500 border-t border-emerald-500/50">
