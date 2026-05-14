@@ -11,123 +11,124 @@
         .glass-nav { background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .text-glow-red { text-shadow: 0 0 20px rgba(220, 38, 38, 0.4); }
         .ultra-glow { box-shadow: 0 0 40px rgba(251, 191, 36, 0.15); border: 1px solid #FFC300 !important; }
-        .section-line { border-left: 2px solid #dc2626; padding-left: 2rem; }
+        .section-line { border-left: 2px solid #dc2626; padding-left: 1.5rem; } /* Ajuste leve para móvil */
+        @media (min-width: 768px) { .section-line { padding-left: 2rem; } }
     </style>
 </head>
-<body class="selection:bg-red-600 selection:text-white">
+<body class="selection:bg-red-600 selection:text-white overflow-x-hidden">
 
-    <nav class="fixed top-0 w-full z-[100] glass-nav py-4 px-6 md:px-16 flex justify-between items-center">
+    <nav class="fixed top-0 w-full z-[100] glass-nav py-3 md:py-4 px-4 md:px-16 flex justify-between items-center">
         <div class="flex items-center group cursor-pointer">
-            <span class="text-[#FFC300] font-[900] text-2xl italic tracking-tighter transition-transform group-hover:scale-105">GYM</span>
-            <span class="text-white font-[900] text-2xl italic tracking-tighter">ENEZ</span>
+            <span class="text-[#FFC300] font-[900] text-xl md:text-2xl italic tracking-tighter transition-transform group-hover:scale-105">GYM</span>
+            <span class="text-white font-[900] text-xl md:text-2xl italic tracking-tighter">ENEZ</span>
         </div>
-        <a href="../index.html" class="text-gray-400 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:text-white transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <a href="../index.html" class="text-gray-400 font-black text-[9px] md:text-[10px] uppercase tracking-widest flex items-center gap-1.5 md:gap-2 hover:text-white transition">
+            <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Volver al Hub
         </a>
     </nav>
 
-    <section class="relative pt-40 pb-20 px-6 md:px-16 overflow-hidden min-h-[70vh] flex items-center">
-        <div class="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
+    <section class="relative pt-32 md:pt-40 pb-16 md:pb-20 px-6 md:px-16 overflow-hidden min-h-[70vh] flex items-center">
+        <div class="absolute top-0 right-0 w-full md:w-1/2 h-full opacity-10 md:opacity-20 pointer-events-none">
             <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=2070" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-l from-transparent to-[#050505]"></div>
         </div>
         
         <div class="relative z-10 max-w-4xl">
-            <span class="bg-red-600 text-white text-[10px] font-[900] px-3 py-1 rounded-full uppercase tracking-widest mb-6 inline-block">Plataforma Educativa y Cultural</span>
-            <h1 class="text-6xl md:text-[100px] font-[900] leading-[0.85] italic tracking-tighter mb-8 uppercase">
+            <span class="bg-red-600 text-white text-[9px] md:text-[10px] font-[900] px-3 py-1 rounded-full uppercase tracking-widest mb-4 md:mb-6 inline-block">Plataforma Educativa y Cultural</span>
+            <h1 class="text-5xl sm:text-6xl md:text-[100px] font-[900] leading-[0.9] md:leading-[0.85] italic tracking-tighter mb-6 md:mb-8 uppercase">
                 TU MENTE <br><span class="text-red-600 text-glow-red">EN MODO PERFORMANCE.</span>
             </h1>
-            <p class="text-xl text-gray-400 max-w-2xl font-medium leading-relaxed italic">
+            <p class="text-base md:text-xl text-gray-400 max-w-2xl font-medium leading-relaxed italic">
                 GYMENEZ ON es el centro neurálgico de nuestro ecosistema. Un espacio diseñado para instruirte, inspirarte y transformar tu estilo de vida a través del conocimiento y el entretenimiento saludable.
             </p>
         </div>
     </section>
 
-    <section class="py-24 px-6 md:px-16 bg-white text-black">
-        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-            <div class="space-y-8">
-                <h2 class="text-5xl font-[900] italic tracking-tighter uppercase leading-none text-red-600">Más que Streaming, <br>Cultura Deportiva.</h2>
-                <div class="w-20 h-2 bg-red-600"></div>
-                <p class="text-lg text-gray-600 font-medium italic">
+    <section class="py-16 md:py-24 px-6 md:px-16 bg-white text-black">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 md:gap-20 items-center">
+            <div class="space-y-6 md:space-y-8">
+                <h2 class="text-4xl md:text-5xl font-[900] italic tracking-tighter uppercase leading-none text-red-600">Más que Streaming, <br>Cultura Deportiva.</h2>
+                <div class="w-16 md:w-20 h-1.5 md:h-2 bg-red-600"></div>
+                <p class="text-base md:text-lg text-gray-600 font-medium italic">
                     Brindamos una experiencia cultural integral donde el contenido educativo y el entretenimiento saludable se fusionan. Aquí no solo consumes videos; te instruyes en temas críticos de salud, fitness y bienestar para convertirte en la mejor versión de ti mismo, día tras día.
                 </p>
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="p-6 border-l-4 border-black bg-gray-50">
-                        <span class="block text-2xl font-black italic text-red-600 uppercase">Instrucción</span>
-                        <span class="text-xs font-bold text-gray-400 uppercase">Aprende de los mejores</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                    <div class="p-4 md:p-6 border-l-4 border-black bg-gray-50">
+                        <span class="block text-xl md:text-2xl font-black italic text-red-600 uppercase">Instrucción</span>
+                        <span class="text-[10px] md:text-xs font-bold text-gray-400 uppercase">Aprende de los mejores</span>
                     </div>
-                    <div class="p-6 border-l-4 border-red-600 bg-gray-50">
-                        <span class="block text-2xl font-black italic text-black uppercase">Inspiración</span>
-                        <span class="text-xs font-bold text-gray-400 uppercase">ADN de campeones</span>
+                    <div class="p-4 md:p-6 border-l-4 border-red-600 bg-gray-50">
+                        <span class="block text-xl md:text-2xl font-black italic text-black uppercase">Inspiración</span>
+                        <span class="text-[10px] md:text-xs font-bold text-gray-400 uppercase">ADN de campeones</span>
                     </div>
                 </div>
             </div>
-            <div class="rounded-[40px] overflow-hidden shadow-2xl">
+            <div class="rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl h-64 md:h-auto">
                 <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070" class="w-full h-full object-cover" alt="Culture">
             </div>
         </div>
     </section>
 
-    <section class="py-32 px-6 md:px-16 bg-[#050505]">
+    <section class="py-20 md:py-32 px-6 md:px-16 bg-[#050505]">
         <div class="max-w-7xl mx-auto">
-            <h3 class="text-3xl font-[900] italic uppercase tracking-tighter mb-16 text-center">Un universo de <span class="text-red-600">Conocimiento.</span></h3>
+            <h3 class="text-2xl md:text-3xl font-[900] italic uppercase tracking-tighter mb-12 md:mb-16 text-center">Un universo de <span class="text-red-600">Conocimiento.</span></h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
                 <div class="section-line">
-                    <h4 class="text-xl font-black uppercase mb-4 text-red-600">Series y Documentales</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed italic">Explora la ciencia detrás de la hipertrofia, la biomecánica aplicada y las historias de superación que definen la cultura del hierro.</p>
+                    <h4 class="text-lg md:text-xl font-black uppercase mb-3 md:mb-4 text-red-600">Series y Documentales</h4>
+                    <p class="text-gray-400 text-xs md:text-sm leading-relaxed italic">Explora la ciencia detrás de la hipertrofia, la biomecánica aplicada y las historias de superación que definen la cultura del hierro.</p>
                 </div>
                 <div class="section-line" style="border-color: #ffffff30;">
-                    <h4 class="text-xl font-black uppercase mb-4">Podcast y Entrevistas</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed italic">Conversaciones profundas con atletas de élite y expertos en salud sobre motivación, disciplina y el ADN deportivo latino.</p>
+                    <h4 class="text-lg md:text-xl font-black uppercase mb-3 md:mb-4">Podcast y Entrevistas</h4>
+                    <p class="text-gray-400 text-xs md:text-sm leading-relaxed italic">Conversaciones profundas con atletas de élite y expertos en salud sobre motivación, disciplina y el ADN deportivo latino.</p>
                 </div>
                 <div class="section-line" style="border-color: #ffffff30;">
-                    <h4 class="text-xl font-black uppercase mb-4">Blogs y Curiosidades</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed italic">Artículos científicos simplificados sobre nutrición, rutinas innovadoras y datos curiosos que potenciarán tu día a día.</p>
+                    <h4 class="text-lg md:text-xl font-black uppercase mb-3 md:mb-4">Blogs y Curiosidades</h4>
+                    <p class="text-gray-400 text-xs md:text-sm leading-relaxed italic">Artículos científicos simplificados sobre nutrición, rutinas innovadoras y datos curiosos que potenciarán tu día a día.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-24 px-6 md:px-16 bg-[#0a0a0a]">
+    <section class="py-16 md:py-24 px-6 md:px-16 bg-[#0a0a0a]">
         <div class="max-w-5xl mx-auto text-center">
-            <h2 class="text-5xl font-[900] italic tracking-tighter uppercase mb-8">¿Por qué elegir <span class="text-red-600 text-glow-red">GYMENEZ ON?</span></h2>
-            <p class="text-lg text-gray-400 mb-12 italic leading-relaxed">
+            <h2 class="text-4xl md:text-5xl font-[900] italic tracking-tighter uppercase mb-6 md:mb-8">¿Por qué elegir <span class="text-red-600 text-glow-red">GYMENEZ ON?</span></h2>
+            <p class="text-base md:text-lg text-gray-400 mb-8 md:mb-12 italic leading-relaxed text-left md:text-center">
                 El entrenamiento físico es solo el 50% del éxito. El otro 50% reside en tu mentalidad y tu educación. Contratar GYMENEZ ON significa darte el acceso a una guía que te instruye en temas de salud, te enseña a alimentarte correctamente y te brinda la curiosidad necesaria para no rendirte nunca. Es entretenimiento que te hace **mejor persona**.
             </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <span class="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest">Educación Saludable</span>
-                <span class="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest">Inspiración Diaria</span>
-                <span class="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest">Cultura de Élite</span>
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4">
+                <span class="px-4 md:px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Educación Saludable</span>
+                <span class="px-4 md:px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Inspiración Diaria</span>
+                <span class="px-4 md:px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Cultura de Élite</span>
             </div>
         </div>
     </section>
 
-    <section class="py-32 px-6 md:px-16 bg-white text-black relative overflow-hidden">
+    <section class="py-20 md:py-32 px-6 md:px-16 bg-white text-black relative overflow-hidden">
         <div class="max-w-4xl mx-auto text-center relative z-10">
-            <h2 class="text-5xl md:text-7xl font-[900] italic tracking-tighter uppercase mb-6 leading-none">El Ecosistema <br><span class="text-red-600">Completo.</span></h2>
-            <p class="text-gray-600 text-lg mb-16 italic font-medium">GYMENEZ ON no es un servicio aislado. Es la pieza final de nuestra suscripción más potente, diseñada para quienes no se conforman con lo básico.</p>
+            <h2 class="text-5xl md:text-7xl font-[900] italic tracking-tighter uppercase mb-4 md:mb-6 leading-none">El Ecosistema <br><span class="text-red-600">Completo.</span></h2>
+            <p class="text-gray-600 text-base md:text-lg mb-12 md:mb-16 italic font-medium">GYMENEZ ON no es un servicio aislado. Es la pieza final de nuestra suscripción más potente, diseñada para quienes no se conforman con lo básico.</p>
             
             <div class="max-w-md mx-auto">
-                <div class="bg-[#050505] p-10 rounded-[40px] ultra-glow flex flex-col relative overflow-hidden shadow-2xl text-white">
-                    <div class="absolute top-6 right-[-35px] bg-[#FFC300] text-black text-[9px] font-black py-1 w-32 text-center rotate-45 uppercase">All-In</div>
-                    <h3 class="text-2xl font-black italic mb-2 uppercase text-[#FFC300]">ULTRA</h3>
-                    <span class="text-red-500 text-[10px] font-bold uppercase tracking-widest mb-8 italic">Acceso Total ON + EATS + FITNESS</span>
-                    <ul class="space-y-4 mb-12 text-left">
-                        <li class="text-sm font-black flex gap-3 text-red-500 italic uppercase">✓ GYMENEZ ON INCLUIDO</li>
-                        <li class="text-sm font-bold flex gap-3 text-emerald-400 italic uppercase">✓ GYMENEZ EATS INCLUIDO</li>
-                        <li class="text-sm font-bold flex gap-3 text-white italic">✓ Entrenador 8:00 AM - 10:00 PM</li>
-                        <li class="text-sm font-bold flex gap-3 text-white/50">✓ Todo el Histórico y Analítica</li>
+                <div class="bg-[#050505] p-6 md:p-10 rounded-[32px] md:rounded-[40px] ultra-glow flex flex-col relative overflow-hidden shadow-2xl text-white text-left md:text-center">
+                    <div class="absolute top-6 right-[-35px] bg-[#FFC300] text-black text-[8px] md:text-[9px] font-black py-1 w-32 text-center rotate-45 uppercase">All-In</div>
+                    <h3 class="text-xl md:text-2xl font-black italic mb-1 md:mb-2 uppercase text-[#FFC300]">ULTRA</h3>
+                    <span class="text-red-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-6 md:mb-8 italic">Acceso Total ON + EATS + FITNESS</span>
+                    <ul class="space-y-3 md:space-y-4 mb-8 md:mb-12 text-left">
+                        <li class="text-xs md:text-sm font-black flex gap-3 text-red-500 italic uppercase">✓ GYMENEZ ON INCLUIDO</li>
+                        <li class="text-xs md:text-sm font-bold flex gap-3 text-emerald-400 italic uppercase">✓ GYMENEZ EATS INCLUIDO</li>
+                        <li class="text-xs md:text-sm font-bold flex gap-3 text-white italic">✓ Entrenador 8:00 AM - 10:00 PM</li>
+                        <li class="text-xs md:text-sm font-bold flex gap-3 text-white/50">✓ Todo el Histórico y Analítica</li>
                     </ul>
-                    <a href="templates/app/app.html" class="w-full py-4 bg-[#FFC300] text-black rounded-xl text-center font-black text-[10px] uppercase hover:bg-yellow-400 transition">DESBLOQUEAR ECOSISTEMA</a>
+                    <a href="templates/app/app.html" class="w-full py-3 md:py-4 bg-[#FFC300] text-black rounded-xl text-center font-black text-[9px] md:text-[10px] uppercase hover:bg-yellow-400 transition">DESBLOQUEAR ECOSISTEMA</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="py-20 text-center border-t border-white/5 opacity-40 bg-[#050505]">
-        <p class="text-[9px] font-black uppercase tracking-[0.5em]">© 2026 GYMENEZ PERFORMANCE • All Rights Reserved</p>
+    <footer class="py-12 md:py-20 text-center border-t border-white/5 opacity-40 bg-[#050505]">
+        <p class="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em]">© 2026 GYMENEZ PERFORMANCE • All Rights Reserved</p>
     </footer>
 
 </body>
