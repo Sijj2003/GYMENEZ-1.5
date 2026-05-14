@@ -72,13 +72,15 @@ function highlightTodayRoutine() {
         const todayCard = document.querySelector(`[data-day="${todayDayName}"]`);
         
         if (todayCard) {
-            // Añade clases de animación y muestra la etiqueta superior
-            todayCard.classList.add('today');
-            
-            const badge = todayCard.querySelector('.today-badge');
-            if (badge) {
-                badge.classList.remove('hidden');
-            }
+            // 🚨 CORRECCIÓN DEL GHOST BUG: Esperar a que la tarjeta "nazca" (800ms de animación CSS) 
+            // antes de inyectar el pulso esmeralda, evitando que colisionen.
+            setTimeout(() => {
+                todayCard.classList.add('today');
+                const badge = todayCard.querySelector('.today-badge');
+                if (badge) {
+                    badge.classList.remove('hidden');
+                }
+            }, 800);
         } else if (todayDayName === 'Domingo') {
             showMessage('Hoy es Domingo. ¡Día de recuperación activa!', 'success');
         }
