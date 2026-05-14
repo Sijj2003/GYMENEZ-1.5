@@ -52,14 +52,17 @@ body {
 }
 
 .day-card.today {
-    border-color: rgba(16, 185, 129, 0.8) !important; /* Borde Esmeralda Fuerte */
+    border-color: rgba(16, 185, 129, 0.8) !important;
     animation: pulse-emerald 2.5s infinite ease-in-out;
-    transform: scale(1.02);
+    
+    /* 🚨 CORRECCIÓN DEL GHOST BUG: Fuerza la visibilidad y posición 🚨 */
+    opacity: 1 !important; 
+    transform: translateY(0) scale(1.02) !important;
 }
 
 .day-card.today img {
     opacity: 0.6 !important;
-    filter: grayscale(0) !important; /* El día actual siempre tiene color */
+    filter: grayscale(0) !important;
 }
 
 .day-card.today .day-name-text {
