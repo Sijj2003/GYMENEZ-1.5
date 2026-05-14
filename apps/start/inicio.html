@@ -110,25 +110,67 @@
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-auto">
 
                 <div class="md:col-span-2 lg:col-span-2 row-span-2 glass-panel bento-card rounded-[32px] p-8 flex flex-col justify-between relative overflow-hidden bg-workout fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
-                        <svg class="w-32 h-32 text-[#FFC300]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> </div>
-                    <div>
-                        <span class="px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-4">Core Module</span>
-                        <h3 class="text-3xl font-black uppercase tracking-tighter mb-2">Fitness Performance</h3>
-                        <p class="text-gray-400 text-sm max-w-sm">Algoritmos de entrenamiento personalizados, métricas físicas y progresión de fuerza en tiempo real.</p>
-                    </div>
-                    
-                    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <a href="/templates/user/routines.html" class="bg-white text-black font-black text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between hover:bg-[#FFC300] transition">
-                            <span>Ir a Workout</span>
-                            <span class="text-lg">→</span>
-                        </a>
-                        <a href="/templates/user/schedule.html" class="bg-[#111] border border-white/10 text-white font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between hover:border-white/30 transition">
-                            <span>Agendamiento</span>
-                            <span>📅</span>
-                        </a>
-                    </div>
-                </div>
+    
+    <div class="flex justify-between items-start relative z-10">
+        <div>
+            <span class="px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-4 shadow-[0_0_10px_rgba(251,191,36,0.2)]">Core Module</span>
+            <h3 class="text-3xl font-black uppercase tracking-tighter mb-1">Fitness Performance</h3>
+            <p class="text-gray-400 text-sm max-w-sm">Optimización muscular basada en tu perfil biométrico.</p>
+        </div>
+        
+        <div class="hidden sm:flex flex-col items-center bg-black/40 p-3 rounded-2xl border border-white/5 backdrop-blur-md">
+            <div class="relative w-14 h-14 flex items-center justify-center">
+                <svg class="absolute inset-0 w-full h-full text-gray-800" viewBox="0 0 36 36">
+                    <path class="stroke-current" fill="none" stroke-width="4" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <svg class="absolute inset-0 w-full h-full text-[#FFC300]" viewBox="0 0 36 36">
+                    <path class="stroke-current" fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray="60, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span class="text-white font-black text-sm absolute">3<span class="text-gray-500 text-[10px]">/5</span></span>
+            </div>
+            <span class="text-[8px] text-gray-400 uppercase tracking-widest mt-2 font-bold">Días Activos</span>
+        </div>
+    </div>
+    
+    <div class="mt-6 mb-6 bg-black/60 border border-white/10 rounded-2xl p-5 flex items-center justify-between backdrop-blur-md relative overflow-hidden group hover:border-[#FFC300]/50 transition-colors">
+        <div class="absolute -right-10 -top-10 w-32 h-32 bg-[#FFC300]/10 blur-2xl rounded-full pointer-events-none"></div>
+        
+        <div class="flex items-center gap-4 relative z-10">
+            <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-xl border border-white/10 shadow-inner">⚡</div>
+            <div>
+                <p class="text-[10px] text-[#FFC300] font-black uppercase tracking-widest mb-1 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#FFC300] animate-pulse"></span>
+                    Entrenamiento de Hoy
+                </p>
+                <h4 id="today-routine-name" class="text-white font-black text-lg md:text-xl leading-none uppercase tracking-tight">Fuerza Superior</h4>
+                <p class="text-gray-400 text-xs mt-1.5 font-medium flex items-center gap-2">
+                    <span>Pecho, Hombro, Tríceps</span>
+                    <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
+                    <span>6 Ejercicios</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="hidden md:block text-right relative z-10 border-l border-white/10 pl-6">
+            <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Coach Asignado</p>
+            <div class="flex items-center justify-end gap-2">
+                <p class="text-white font-bold text-sm">Alejandro G.</p>
+                <div class="w-6 h-6 rounded-full bg-gray-800 border border-white/20 flex items-center justify-center text-[10px] font-black">AG</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+        <a href="/templates/user/routines.html" class="bg-[#FFC300] text-black font-black text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between hover:bg-yellow-400 transition transform hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(251,191,36,0.5)]">
+            <span>Iniciar Sesión Física</span>
+            <span class="text-lg">→</span>
+        </a>
+        <a href="/templates/user/schedule.html" class="bg-[#111] border border-white/10 text-white font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between hover:border-white/30 hover:bg-white/5 transition transform hover:-translate-y-1">
+            <span>Ver Agenda (Schedule)</span>
+            <span class="opacity-50">📅</span>
+        </a>
+    </div>
+</div>
 
                 <a href="/templates/user/eats.html" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-green rounded-[32px] p-6 bg-eats flex flex-col justify-end min-h-[220px] fade-in-up" style="animation-delay: 0.3s;">
                     <div class="relative z-10">
