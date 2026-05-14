@@ -2,111 +2,63 @@
 
 body {
     background-color: #030305;
-    background-image: url('/static/img/backgrounds/routines_background.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color: #e5e7eb; 
+    color: #ffffff;
+    overflow-x: hidden;
 }
 
-/* Tarjetas de Ejercicios */
+/* Glassmorphism Alta Gama */
+.glass-panel {
+    background: rgba(15, 15, 20, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+/* Tarjetas de Ejercicios Premium */
 .glass-item-card {
-    background: rgba(15, 15, 20, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(10, 10, 15, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    border-left: 5px solid #FFC300; /* Borde de acento lateral */
-    transition: transform 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
 }
 
+/* Acento sutil izquierdo en lugar del borde grueso anterior */
+.glass-item-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #333;
+    transition: background 0.3s ease;
+}
+.glass-item-card.is-completed::before { background: #10b981; }
+.glass-item-card.is-skipped::before { background: #ef4444; }
 .glass-item-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 195, 0, 0.2);
+    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.8);
 }
 
-/* Tipografía y Sombras */
-.text-contrast-dark {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); 
+/* Animaciones */
+.fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0; transform: translateY(20px);
 }
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-#message-box {
-    position: fixed;
-    top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 1rem 1.5rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    z-index: 3000;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    pointer-events: none;
-}
-.message-success { background-color: #10b981; color: white; } 
-.message-error { background-color: #ef4444; color: white; }
+.survey-visible { opacity: 1 !important; transform: scale(1) !important; }
 
-/* Pantalla de Fin de Rutina (Fuegos Artificiales y Encuesta) */
-#finish-screen {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(3, 3, 5, 0.95);
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    flex-direction: column;
-    z-index: 2000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.7s ease-in-out; 
-}
-#finish-screen.show { opacity: 1; pointer-events: auto; }
+/* Scrollbar Minimalista */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 
-#finish-message {
-    font-size: clamp(3rem, 8vw, 6rem); 
-    font-weight: 900;
-    color: #FFC300;
-    text-transform: uppercase;
-    letter-spacing: -0.05em;
-    animation: fade-pulse 1.5s ease-in-out infinite alternate; 
-    text-shadow: 0 0 20px rgba(255, 195, 0, 0.4); 
+/* Estilos de Radio Buttons ocultos */
+input[type="radio"]:checked + label {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
 }
-
-@keyframes fade-pulse {
-    0% { opacity: 0.5; transform: scale(0.98); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-/* Modales de Encuesta y Contacto */
-#survey-container, #contact-modal {
-    width: 90%;
-    max-width: 500px;
-    background: rgba(15, 15, 20, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.5rem;
-    padding: 2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-    opacity: 0;
-    transition: opacity 0.8s ease;
-}
-#survey-container.fade-in, #contact-modal.fade-in { opacity: 1; }
-
-.survey-input {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid #334155;
-    background-color: #0d0d1a;
-    color: #e5e7eb;
-    font-size: 0.875rem;
-}
-.survey-input:focus {
-    border-color: #FFC300;
-    outline: none;
-}
-
-.survey-label { font-size: 0.875rem; color: #9ca3af; }
