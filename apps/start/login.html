@@ -444,7 +444,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         // --- Formateo Automático de Fecha (DD/MM/YYYY) ---
         const dobInput = document.getElementById('reg-dob');
         if (dobInput) {
@@ -483,7 +483,12 @@
             });
         }
     </script>
+    ```
 
+### ¿Cómo debe quedar el final de tu HTML?
+Muy limpio. Solo deben quedar los modales, la llamada al script externo de `auth.js` y el cierre del body:
+
+```html
     <script src="/static/js/auth.js"></script>
 </body>
 </html>
