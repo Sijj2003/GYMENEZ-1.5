@@ -53,17 +53,6 @@
         }
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* Botón estilo píldora premium */
-        .btn-pill {
-            background-color: #ffffff;
-            color: #000000;
-            transition: all 0.3s ease;
-        }
-        .btn-pill:hover {
-            background-color: #FFC300;
-            transform: scale(1.02);
-        }
-
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
@@ -114,42 +103,78 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-                <div class="md:col-span-2 lg:col-span-2 glass-bento p-8 flex flex-col justify-between relative overflow-hidden fade-in" style="animation-delay: 0.1s;">
-                    <div class="flex justify-between items-start mb-10">
-                        <div>
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="w-2 h-2 rounded-full bg-[#FFC300] animate-pulse"></span>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Entrenamiento de Hoy</span>
-                            </div>
-                            <h3 class="text-2xl font-bold text-white tracking-tight">Fase de Hipertrofia</h3>
-                            <p class="text-gray-400 text-sm mt-1">Tren Superior • 6 Ejercicios • 45 Min</p>
-                        </div>
-                        
-                        <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                    </div>
+                <div class="md:col-span-2 lg:col-span-2 glass-bento p-8 flex flex-col justify-between relative overflow-hidden fade-in group" style="animation-delay: 0.1s;">
+                    
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-[#FFC300]/5 blur-[80px] rounded-full pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
 
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-white/5">
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
-                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-300 border border-white/10">AG</div>
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
-                                <p class="text-sm font-semibold text-white">Alejandro G.</p>
-                                <p class="text-[10px] text-gray-500 uppercase tracking-widest">Coach Asignado</p>
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span class="relative flex h-2.5 w-2.5">
+                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFC300] opacity-75"></span>
+                                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FFC300]"></span>
+                                    </span>
+                                    <span class="text-[10px] text-[#FFC300] font-bold uppercase tracking-[0.2em]">Workout del Día</span>
+                                </div>
+                                
+                                <h3 id="today-routine-name" class="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none mb-4">
+                                    Acondicionamiento <br>Neuromuscular
+                                </h3>
+                                
+                                <div class="flex flex-wrap items-center gap-2 mt-5">
+                                    <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300 font-medium flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                        Tren Superior
+                                    </span>
+                                    <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300 font-medium flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        45 Min
+                                    </span>
+                                    <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300 font-medium flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                        6 Ejercicios
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="hidden sm:flex flex-col items-center justify-center">
+                                <div class="relative w-16 h-16">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-white/10" stroke-width="2" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="text-[#FFC300]" style="filter: drop-shadow(0 0 4px rgba(251,191,36,0.5));" stroke-dasharray="75, 100" stroke-width="2" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-sm font-black text-white leading-none mt-0.5">3<span class="text-[9px] text-gray-500 font-medium">/4</span></span>
+                                    </div>
+                                </div>
+                                <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-3">Días Sem.</span>
                             </div>
                         </div>
-                        
-                        <div class="flex gap-3 w-full sm:w-auto">
-                            <a href="/templates/user/schedule.html" class="px-5 py-3 rounded-xl bg-white/5 text-gray-300 font-medium text-sm hover:bg-white/10 hover:text-white transition text-center w-full sm:w-auto">
-                                Calendario
-                            </a>
-                            <a href="/templates/user/routines.html" class="btn-pill px-6 py-3 rounded-xl font-bold text-sm text-center w-full sm:w-auto shadow-lg shadow-white/5">
-                                Comenzar Sesión
-                            </a>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-white/10 mt-4">
+                            
+                            <div class="flex items-center gap-3 w-full sm:w-auto">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-xs font-black text-white shadow-inner border border-white/10">
+                                    AG
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-white leading-tight">Alejandro G.</p>
+                                    <p class="text-[9px] text-gray-500 uppercase tracking-widest font-semibold mt-0.5">Coach Asignado</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex w-full sm:w-auto gap-3">
+                                <a href="/templates/user/schedule.html" class="flex-1 sm:flex-none px-6 py-3.5 rounded-xl border border-white/10 bg-transparent text-gray-300 font-bold text-xs uppercase tracking-widest hover:bg-white/5 hover:text-white transition text-center">
+                                    Agenda
+                                </a>
+                                <a href="/templates/user/routines.html" class="flex-1 sm:flex-none px-6 py-3.5 rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest text-center hover:bg-[#FFC300] transition transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                                    Iniciar Sesión
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-
                 <a href="/templates/user/eats.html" class="md:col-span-1 lg:col-span-1 glass-bento bg-card-eats p-6 flex flex-col justify-end min-h-[240px] fade-in group" style="animation-delay: 0.2s;">
                     <div class="mb-auto">
                         <span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded uppercase tracking-widest">Nutrición</span>
@@ -201,7 +226,7 @@
 
     <script src="/static/js/auth.js"></script>
     <script>
-        // Lógica visual específica del Dashboard 
+        // Lógica visual específica del Dashboard que se ejecuta si la sesión existe
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('userSession');
             if (storedSession) {
