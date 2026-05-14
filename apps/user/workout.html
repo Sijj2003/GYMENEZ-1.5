@@ -1,1 +1,123 @@
-fdd
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina | GYMENEZ</title>
+    
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/workout.css">
+</head>
+<body class="min-h-screen">
+
+    <div id="message-box"></div>
+    
+    <div id="finish-screen">
+        <h2 id="finish-message">RUTINA FINALIZADA</h2>
+        
+        <div id="survey-container" class="hidden">
+            <h3 class="text-2xl font-bold text-white mb-6 text-center">Encuesta de Sesión</h3>
+            <form id="routine-survey-form">
+                <div class="mb-5">
+                    <label class="survey-label block mb-2">1. Del 1 al 10, ¿cuánto te costó completar esta rutina?</label>
+                    <select id="costo-rutina" class="survey-input" required>
+                        <option value="">Selecciona</option>
+                        <option value="1">1 (Muy Fácil)</option>
+                        <option value="5">5 (Normal)</option>
+                        <option value="10">10 (Muy Difícil)</option>
+                        </select>
+                </div>
+                <div class="mb-5 p-4 border border-gray-700 rounded-lg">
+                    <label class="survey-label block mb-3">2. ¿Sentiste algún tipo de dolor inusual?</label>
+                    <div class="flex items-center space-x-4 mb-3">
+                        <input type="radio" id="dolor-si" name="sintio-dolor" value="si" class="text-red-500 focus:ring-red-500">
+                        <label for="dolor-si" class="text-white">Sí</label>
+                        <input type="radio" id="dolor-no" name="sintio-dolor" value="no" class="text-green-500 focus:ring-green-500" checked>
+                        <label for="dolor-no" class="text-white">No</label>
+                    </div>
+                    <div id="dolor-details" class="space-y-4 mt-2 hidden">
+                        <div>
+                            <label class="text-gray-400 block mb-1 text-sm">Zona del dolor:</label>
+                            <input type="text" id="zona-dolor" placeholder="Ej: Hombro, Espalda Baja" class="survey-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 block mb-1 text-sm">Tipo de dolor:</label>
+                            <div class="grid grid-cols-2 gap-2 text-white text-sm">
+                                <div><input type="radio" id="tipo-pinchazo" name="tipo-dolor" value="pinchazo"> <label>Pinchazo</label></div>
+                                <div><input type="radio" id="tipo-ardor" name="tipo-dolor" value="ardor"> <label>Ardor</label></div>
+                                <div><input type="radio" id="tipo-otro" name="tipo-dolor" value="otro"> <label>Otro</label></div>
+                            </div>
+                        </div>
+                        <div id="otro-dolor-container" class="hidden">
+                            <label class="text-gray-400 block mb-1 text-sm">Describe el dolor:</label>
+                            <input type="text" id="otro-dolor-desc" class="survey-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center pt-4">
+                    <button type="submit" class="w-full py-3 rounded-xl text-lg font-bold bg-[#FFC300] text-black hover:bg-yellow-500 transition shadow-xl">ENVIAR Y FINALIZAR</button>
+                    <a href="#" id="skip-survey-link" class="text-gray-400 text-sm mt-3 inline-block hover:text-white transition">Omitir encuesta</a>
+                </div>
+            </form>
+        </div>
+        
+        <div id="contact-modal" class="hidden text-center">
+            <h3 class="text-2xl font-bold text-white mb-4">¿Deseas reportar esto a tu entrenador?</h3>
+            <p class="text-gray-300 mb-6">Redireccionando en <span id="timer-count">25</span> segundos...</p>
+            <div class="flex space-x-4 justify-center">
+                <button id="contact-yes-btn" class="px-8 py-3 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-500">Sí</button>
+                <button id="contact-no-btn" class="px-8 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-500">No</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="fireworks-audio" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/download/mixkit-fireworks-whistle-explosion-466.wav" type="audio/wav">
+    </audio>
+
+    <header class="flex justify-between items-center py-4 px-8 mb-4 border-b border-white/5 bg-black/40 backdrop-blur-md">
+        <h1 class="text-xl font-black uppercase tracking-tighter text-border-gray">
+            <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
+        </h1>
+        <a href="/templates/user/routines.html" class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full border border-white/10 text-white hover:bg-white hover:text-black transition duration-300">
+            REGRESAR
+        </a>
+    </header>
+    
+    <section id="routine-detail" class="min-h-screen p-4 sm:p-8 pt-0"> 
+        <div class="max-w-4xl mx-auto">
+            
+            <h2 id="day-title" class="text-4xl md:text-5xl font-black text-center text-[#FFC300] uppercase tracking-tighter mb-8 pb-2 drop-shadow-md">
+                Cargando Rutina...
+            </h2>
+
+            <div id="loading-spinner" class="text-center py-10">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-[#FFC300] border-t-transparent rounded-full"></div>
+                <p class="mt-4 text-gray-400 font-bold uppercase tracking-widest text-xs">Alineando Músculos...</p>
+            </div>
+
+            <div id="exercises-container" class="space-y-4"></div>
+            
+            <div id="finish-routine-container" class="mt-12 text-center hidden pb-10">
+                <button id="finish-routine-btn" class="w-full sm:w-1/2 py-4 rounded-2xl text-sm tracking-widest font-black transition duration-300 uppercase shadow-xl" disabled>
+                    RUTINA TERMINADA
+                </button>
+            </div>
+            
+            <div id="no-data-message" class="hidden text-center py-10 text-gray-400 bg-black/40 rounded-3xl border border-white/5 p-8">
+                <p class="text-2xl tracking-tighter">
+                    <span class="text-[#FFC300] font-black uppercase">¡Día Libre!</span>
+                </p>
+                <p class="mt-2 text-sm">No se encontraron ejercicios asignados. Disfruta tu descanso o contacta a tu entrenador.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="module" src="/static/js/workout.js"></script>
+</body>
+</html>
