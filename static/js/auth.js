@@ -279,6 +279,7 @@ async function handleRegister(e) {
     }
 }
 
+// FUNCIÓN ACTUALIZADA PARA MANEJAR EL NUEVO FORMATO DE TELÉFONO EN FORCE LOGOUT
 async function handleForceLogout(e) {
     e.preventDefault();
     const email = document.getElementById('force-email').value;
@@ -286,8 +287,12 @@ async function handleForceLogout(e) {
     const name = document.getElementById('force-name').value;
     const lastname = document.getElementById('force-lastname').value;
     const dob = document.getElementById('force-dob').value.trim();
-    const phone = document.getElementById('force-phone').value.trim(); 
     const ci = document.getElementById('force-ci').value.trim(); 
+    
+    // Captura de teléfono con prefijo
+    const phonePrefix = document.getElementById('force-phone-prefix').value;
+    const phoneNum = document.getElementById('force-phone-num').value.trim();
+    const phone = `${phonePrefix}-${phoneNum}`;
 
     const btn = document.getElementById('force-logout-btn');
     btn.disabled = true;
@@ -425,7 +430,7 @@ window.onload = function() {
         document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
         document.getElementById('force-dob')?.addEventListener('input', applyDateMask);
         document.getElementById('force-ci')?.addEventListener('input', applyCIMask);
-        document.getElementById('force-phone')?.addEventListener('input', applyPhoneMask);
+        document.getElementById('force-phone-num')?.addEventListener('input', applyPhoneMask); // Listener actualizado
 
         // Botones de Modales
         document.getElementById('register-request-link')?.addEventListener('click', () => openModalSafe('register-modal'));
