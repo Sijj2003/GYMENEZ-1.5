@@ -8,13 +8,13 @@ if (!localDeviceId) {
 }
 
 const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+const SPLASH_DURATION_MS = 3000; 
 
 let CURRENT_USER_SESSION = null; 
 let sessionCheckerInterval = null; 
 let isFirstCheckIgnored = false; 
 
-const WHATSAPP_NUMBER = '+584148780392';
-const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de credenciales';
+// --- LLAMADAS A LA API ---
 
 async function apiLogin(email, password, deviceId) {
     try {
@@ -28,13 +28,14 @@ async function apiLogin(email, password, deviceId) {
         if (response.status === 403) return { success: false, error: data.error || 'Acceso denegado (403).' };
         if (!response.ok || !data.success) {
             if (data.requires_activation) return { success: false, requires_activation: true, email: data.email, message: data.message };
-            return { success: false, error: data.error || 'Error de conexión o credenciales inválidas.' };
+            return { success: false, error: data.error || 'Credenciales inválidas.' };
         }
+        
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         return { success: true, user: data.user };
     } catch (e) {
-        return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica tu conexión.' };
+        return { success: false, error: 'Error de conexión con el servidor.' };
     }
 }
 
@@ -69,20 +70,39 @@ async function apiVerifySession(userId, deviceId) {
             body: JSON.stringify({ userId, deviceId })
         });
         const data = await response.json();
-        if (response.status === 403 || !data.success) return { isValid: false, message: data.error || 'Sesión invalidada remotamente.' };
+        if (response.status === 403 || !data.success) return { isValid: false, message: data.error || 'Sesión invalidada.' };
         return { isValid: true };
     } catch (e) {
         return { isValid: true }; 
     }
 }
 
-const messagebox = document.getElementById('message-box');
+async function apiForceLogout(email, password, deviceId, name, lastname, dob, phone, ci) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, deviceId, name, lastname, dob, phone, ci })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) return { success: false, error: data.error || 'Error al forzar cierre.' };
+        
+        CURRENT_USER_SESSION = data.user;
+        localStorage.setItem('userSession', JSON.stringify(data.user)); 
+        return { success: true, user: data.user };
+    } catch (e) {
+        return { success: false, error: 'No se pudo conectar con el servidor.' };
+    }
+}
+
+// --- UTILIDADES DE INTERFAZ ---
 
 function showMessage(message, type = 'success') {
+    const messagebox = document.getElementById('message-box');
     if(!messagebox) return;
     messagebox.textContent = message;
     messagebox.className = ''; 
-    messagebox.classList.add('transition-none', 'message-' + type);
+    messagebox.classList.add('transition-none', 'message-' + type, 'bg-' + (type === 'success' ? 'green' : 'red') + '-600');
     messagebox.style.opacity = '1';
     messagebox.style.transform = 'translateX(-50%) translateY(0)';
 
@@ -91,22 +111,6 @@ function showMessage(message, type = 'success') {
         messagebox.style.opacity = '0';
         messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
     }, 3000);
-}
-
-function showCenteredMessage(message, durationMs) {
-    const modal = document.getElementById('temp-message-modal');
-    if(!modal) return;
-    document.getElementById('temp-message-text').textContent = message;
-    modal.classList.remove('hidden');
-    void modal.offsetWidth; 
-    modal.style.opacity = '1';
-    modal.querySelector('.glass-panel').style.transform = 'scale(1)';
-
-    setTimeout(() => {
-        modal.style.opacity = '0';
-        modal.querySelector('.glass-panel').style.transform = 'scale(0.9)';
-        setTimeout(() => modal.classList.add('hidden'), 500); 
-    }, durationMs);
 }
 
 function showForceLogoutMessage(message, type = 'error') {
@@ -121,51 +125,8 @@ function showForceLogoutMessage(message, type = 'error') {
     }
 }
 
-// -------------------------------------------------------------
-// 🟢 REVISIÓN DEL HEARTBEAT (SESIÓN ACTIVA) 🟢
-// -------------------------------------------------------------
-const SESSION_CHECK_INTERVAL_MS = 1000; 
+// --- MÁSCARAS INTELIGENTES ---
 
-function startSessionChecker() {
-    if (sessionCheckerInterval) clearInterval(sessionCheckerInterval);
-    isFirstCheckIgnored = true; 
-    checkSessionValidity(); 
-    sessionCheckerInterval = setInterval(checkSessionValidity, SESSION_CHECK_INTERVAL_MS);
-}
-
-function stopSessionChecker() {
-    if (sessionCheckerInterval) {
-        clearInterval(sessionCheckerInterval);
-        sessionCheckerInterval = null;
-    }
-}
-
-async function checkSessionValidity() {
-    if (isFirstCheckIgnored) {
-        isFirstCheckIgnored = false; 
-        return; 
-    }
-    
-    if (!CURRENT_USER_SESSION) {
-        stopSessionChecker(); 
-        window.location.href = '/'; // Expulsar al login
-        return;
-    }
-
-    const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
-    const verification = await apiVerifySession(userId, localDeviceId);
-
-    if (!verification.isValid) {
-        await apiLogout(); 
-        stopSessionChecker(); 
-        alert('Tu sesión ha sido cerrada desde otro dispositivo o por un administrador.');
-        window.location.href = '/'; // Expulsar al login
-    }
-}
-
-// ---------------------------------------------------------------
-// 💡 FUNCIONES DE MÁSCARA AUTOMÁTICA (FECHA, CÉDULA, TELÉFONO) 💡
-// ---------------------------------------------------------------
 function applyDateMask(e) {
     if (e.inputType === 'deleteContentBackward') return; 
     let v = e.target.value.replace(/\D/g, ''); 
@@ -176,18 +137,23 @@ function applyDateMask(e) {
 }
 
 function applyCIMask(e) {
-    let v = e.target.value.replace(/\D/g, ''); 
+    let v = e.target.value.replace(/\D/g, '');
     if (v.length > 8) v = v.substring(0, 8);
-    e.target.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    let formatted = '';
+    let count = 0;
+    for (let i = v.length - 1; i >= 0; i--) {
+        formatted = v[i] + formatted;
+        count++;
+        if (count % 3 === 0 && i !== 0) formatted = '.' + formatted;
+    }
+    e.target.value = formatted;
 }
 
 function applyPhoneMask(e) {
     e.target.value = e.target.value.replace(/\D/g, '').substring(0, 7);
 }
 
-// -------------------------------------------------------------
-// 🟢 LÓGICA DE CONTROLADORES (LOGIN, REGISTER, FORCE LOGOUT) 🟢
-// -------------------------------------------------------------
+// --- CONTROLADORES DE EVENTOS ---
 
 async function handleLogin(e) {
     e.preventDefault();
@@ -209,17 +175,16 @@ async function handleLogin(e) {
         if (response.requires_activation) {
             document.getElementById('activation-email').value = response.email || email;
             document.getElementById('activation-modal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('activation-modal').style.opacity = '1', 10);
             showMessage('Revisa tu correo para el código de seguridad.', 'success');
             return;
         }
         
         if (response.error && response.error.includes('bloqueada')) {
-            blockModal.classList.remove('hidden'); 
+            if(blockModal) blockModal.classList.remove('hidden'); 
             showMessage('Acceso Restringido.', 'error');
-            setTimeout(() => blockModal.classList.add('hidden'), 10000); 
+            setTimeout(() => { if(blockModal) blockModal.classList.add('hidden'); }, 10000); 
         } else if (response.error && (response.error.includes('Sesion activa detectada') || response.error.includes('sesión activa'))) {
-            sessionModal.classList.remove('hidden');
+            if(sessionModal) sessionModal.classList.remove('hidden');
             showMessage('Sesión en uso detectada.', 'error');
             document.getElementById('force-logout-form').classList.add('hidden');
             document.getElementById('modal-options').classList.remove('hidden');
@@ -230,7 +195,7 @@ async function handleLogin(e) {
         return;
     } 
     
-    // 🚩 SI EL LOGIN ES EXITOSO, ENVIAR AL NUEVO DASHBOARD 🚩
+    // 🚩 SI ES ÉXITO, REDIRIGIR AL DASHBOARD 🚩
     window.location.href = '/apps/start/inicio.html';
 }
 
@@ -240,71 +205,235 @@ async function handleForceLogout(e) {
     const password = document.getElementById('login-password').value; 
     const name = document.getElementById('force-name').value;
     const lastname = document.getElementById('force-lastname').value;
-    
     const dob = document.getElementById('force-dob').value.trim();
     const phone = document.getElementById('force-phone').value.trim(); 
     const ci = document.getElementById('force-ci').value.trim(); 
 
     const btn = document.getElementById('force-logout-btn');
-    const modal = document.getElementById('active-session-modal');
-
     btn.disabled = true;
     btn.textContent = 'VERIFICANDO DATOS...';
     showForceLogoutMessage(''); 
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, deviceId: localDeviceId, name, lastname, dob, phone, ci })
-        });
-        const data = await response.json();
+    const response = await apiForceLogout(email, password, localDeviceId, name, lastname, dob, phone, ci);
 
-        if (!response.ok || !data.success) {
-            showForceLogoutMessage('Error: Los datos introducidos no coinciden con tu perfil o clave.', 'error');
-            btn.disabled = false;
-            btn.textContent = 'CONFIRMAR IDENTIDAD';
-            return;
-        }
-
-        CURRENT_USER_SESSION = data.user;
-        localStorage.setItem('userSession', JSON.stringify(data.user)); 
-        
-        modal.classList.add('hidden');
-        showCenteredMessage('La sesión anterior ha sido cerrada. Ingresando...', 3000); 
-        
-        // 🚩 SI FORZAR EL LOGOUT FUE ÉXITOSO, MANDAR AL DASHBOARD DIRECTO 🚩
+    if (response.success) {
+        showMessage('Sesión remota cerrada. Ingresando...', 'success');
+        document.getElementById('active-session-modal').classList.add('hidden');
         setTimeout(() => {
+            // 🚩 SI FORZAR CIERRE ES ÉXITO, REDIRIGIR AL DASHBOARD 🚩
             window.location.href = '/apps/start/inicio.html';
-        }, 3000); 
-
-    } catch (err) {
-        showForceLogoutMessage('Error de conexión.', 'error');
+        }, 1500); 
+    } else {
+        showForceLogoutMessage('Error: Los datos no coinciden con tu perfil.', 'error');
         btn.disabled = false;
         btn.textContent = 'CONFIRMAR IDENTIDAD';
     }
 }
 
-// -------------------------------------------------------------
-// 🟢 GESTIÓN DE RUTAS (INTELIGENCIA DEL SCRIPT) 🟢
-// -------------------------------------------------------------
+async function handleRegister(e) {
+    e.preventDefault();
+    const btn = document.getElementById('reg-submit-btn');
+    const originalText = btn ? btn.textContent : 'Crear Cuenta';
 
-// 🛠 AGREGADO AQUÍ PARA EVITAR EL REFERENCE ERROR 🛠
-const SPLASH_DURATION_MS = 3000; 
+    const ciType = document.getElementById('reg-ci-type').value;
+    const ciNumber = document.getElementById('reg-ci').value.trim();
+    const phonePrefix = document.getElementById('reg-phone-prefix').value;
+    const phoneNum = document.getElementById('reg-phone-num').value.trim();
+
+    const data = {
+        email: document.getElementById('reg-email').value.trim().toLowerCase(),
+        password: document.getElementById('reg-password').value,
+        name: document.getElementById('reg-name').value.trim(),
+        last_name: document.getElementById('reg-lastname').value.trim(),
+        id_number: `${ciType}-${ciNumber}`,        
+        phone_number: `${phonePrefix}-${phoneNum}`,  
+        dob: document.getElementById('reg-dob').value.trim(), 
+        sex: document.getElementById('reg-sex').value
+    };
+
+    if (btn) { btn.disabled = true; btn.textContent = 'PROCESANDO...'; }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.status === 429) {
+            showMessage('Límite de registros alcanzado. Intenta más tarde.', 'error');
+            return; 
+        }
+
+        const res = await response.json();
+        if (response.ok && res.success) {
+            showMessage('¡Perfil creado! Revisa tu correo e inicia sesión.', 'success');
+            document.getElementById('register-modal').classList.add('hidden');
+            e.target.reset(); 
+        } else {
+            showMessage(res.error || 'No se pudo completar el registro.', 'error');
+        }
+    } catch (err) {
+        showMessage('Error de red al intentar registrar.', 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
+    }
+}
+
+async function handleVerifyActivation(e) {
+    e.preventDefault();
+    const email = document.getElementById('activation-email').value;
+    const code = document.getElementById('activation-code').value;
+    const btn = document.getElementById('verify-btn');
+
+    btn.disabled = true;
+    btn.textContent = 'VERIFICANDO...';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/verify-activation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code })
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showMessage('¡Cuenta activada! Ingresando al sistema...', 'success');
+            document.getElementById('activation-modal').classList.add('hidden');
+            document.getElementById('login-btn').click(); 
+        } else {
+            showMessage(data.error || 'Código inválido o expirado.', 'error');
+        }
+    } catch (err) {
+        showMessage('Error al verificar el código.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'AUTENTICAR CÓDIGO';
+    }
+}
+
+// --- VERIFICACIÓN CONSTANTE DEL DASHBOARD ---
+
+async function checkSessionValidity() {
+    if (isFirstCheckIgnored) {
+        isFirstCheckIgnored = false; 
+        return; 
+    }
+    if (!CURRENT_USER_SESSION) {
+        window.location.href = '/'; 
+        return;
+    }
+    const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
+    const verification = await apiVerifySession(userId, localDeviceId);
+
+    if (!verification.isValid) {
+        await apiLogout(); 
+        clearInterval(sessionCheckerInterval);
+        alert('Tu sesión ha sido cerrada desde otro dispositivo o por un administrador.');
+        window.location.href = '/'; 
+    }
+}
+
+// --- INICIALIZACIÓN GLOBAL ---
 
 window.onload = function() {
     const isLoginScreen = document.getElementById('login-screen') !== null;
     const isDashboardScreen = document.getElementById('dashboard-screen') !== null;
     const storedSession = localStorage.getItem('userSession');
 
-    // === LÓGICA PARA LA PÁGINA DE LOGIN (index.html) ===
+    // 1. LÓGICA PARA LA PÁGINA DE LOGIN
     if (isLoginScreen) {
         if (storedSession) {
-            // Ya está logueado, lo mandamos al dashboard
             window.location.href = '/apps/start/inicio.html';
             return;
         }
 
-        // Quitar la pantalla de carga después de 3 segundos
         setTimeout(() => {
-            const splash = document.getElementById('splash-
+            const splash = document.getElementById('splash-screen');
+            if(splash) {
+                splash.style.transition = 'opacity 1s ease-out';
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    const loginScreen = document.getElementById('login-screen');
+                    loginScreen.classList.remove('hidden'); 
+                }, 1000);
+            }
+        }, SPLASH_DURATION_MS);
+
+        // Eventos de Formularios
+        document.getElementById('login-form')?.addEventListener('submit', handleLogin);
+        document.getElementById('force-logout-form')?.addEventListener('submit', handleForceLogout);
+        document.getElementById('register-form')?.addEventListener('submit', handleRegister);
+        document.getElementById('activation-form')?.addEventListener('submit', handleVerifyActivation);
+
+        // Máscaras de Inputs
+        document.getElementById('reg-dob')?.addEventListener('input', applyDateMask);
+        document.getElementById('reg-ci')?.addEventListener('input', applyCIMask);
+        document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
+        document.getElementById('force-dob')?.addEventListener('input', applyDateMask);
+        document.getElementById('force-ci')?.addEventListener('input', applyCIMask);
+        document.getElementById('force-phone')?.addEventListener('input', applyPhoneMask);
+
+        // Botones de Modales
+        document.getElementById('register-request-link')?.addEventListener('click', () => {
+            document.getElementById('register-modal').classList.remove('hidden');
+        });
+        document.getElementById('close-register-modal')?.addEventListener('click', () => {
+            document.getElementById('register-modal').classList.add('hidden');
+        });
+        document.getElementById('modal-cancel-btn')?.addEventListener('click', () => {
+            document.getElementById('active-session-modal').classList.add('hidden');
+            showForceLogoutMessage(''); 
+        });
+        document.getElementById('modal-confirm-btn')?.addEventListener('click', () => {
+            document.getElementById('modal-options').classList.add('hidden');
+            document.getElementById('force-logout-form').classList.remove('hidden');
+            document.getElementById('force-email').value = document.getElementById('login-email').value;
+        });
+        document.getElementById('force-logout-cancel')?.addEventListener('click', () => {
+            document.getElementById('active-session-modal').classList.add('hidden');
+            document.getElementById('modal-options').classList.remove('hidden');
+            document.getElementById('force-logout-form').classList.add('hidden');
+        });
+        
+        // Área Operativa
+        document.getElementById('staff-access-link')?.addEventListener('click', () => {
+            document.getElementById('area-selection-modal').classList.remove('hidden');
+        });
+        document.getElementById('modal-close-btn')?.addEventListener('click', () => {
+            document.getElementById('area-selection-modal').classList.add('hidden');
+        });
+        document.getElementById('close-activation-modal')?.addEventListener('click', () => {
+            document.getElementById('activation-modal').classList.add('hidden');
+        });
+        document.getElementById('forgot-password-link')?.addEventListener('click', () => {
+            window.open('https://wa.me/584148780392?text=Hola%20quisiera%20solicitar%20la%20recuperacion%20de%20credenciales', '_blank');
+        });
+    }
+
+    // 2. LÓGICA PARA LA PÁGINA DEL DASHBOARD (inicio.html)
+    if (isDashboardScreen) {
+        if (!storedSession) {
+            window.location.href = '/';
+            return;
+        }
+        
+        CURRENT_USER_SESSION = JSON.parse(storedSession);
+        
+        // Iniciar vigilancia de sesión
+        isFirstCheckIgnored = true;
+        sessionCheckerInterval = setInterval(checkSessionValidity, 2000);
+
+        // Botón de salir
+        document.getElementById('logout-button')?.addEventListener('click', async () => {
+            const btn = document.getElementById('logout-button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'SALIENDO...';
+            clearInterval(sessionCheckerInterval); 
+            await apiLogout(); 
+            window.location.href = '/';
+        });
+    }
+};
