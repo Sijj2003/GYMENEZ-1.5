@@ -8,7 +8,7 @@ body {
 
 /* Glassmorphism y Bento Grid Base */
 .glass-panel {
-    background: rgba(15, 15, 20, 0.4);
+    background: rgba(15, 15, 20, 0.5);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -16,73 +16,61 @@ body {
 }
 
 .bento-card:hover {
-    transform: translateY(-4px) scale(1.01);
-    border-color: rgba(255, 195, 0, 0.3);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 195, 0, 0.1);
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(255, 195, 0, 0.4);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 195, 0, 0.15);
     z-index: 10;
 }
 
 /* Variantes de color para hover en sinergias */
-.bento-card.hover-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.15); }
-.bento-card.hover-red:hover { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(220, 38, 38, 0.15); }
+.bento-card.hover-green:hover { border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.9), 0 0 30px rgba(16, 185, 129, 0.2); }
+.bento-card.hover-red:hover { border-color: rgba(220, 38, 38, 0.5); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.9), 0 0 30px rgba(220, 38, 38, 0.2); }
 
 /* Fondos para módulos de Sinergia (Cross-selling) */
 .bg-eats {
-    background: linear-gradient(to top, rgba(5,5,5,0.9) 10%, rgba(5,5,5,0.3)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=600');
+    background: linear-gradient(to top, rgba(5,5,5,1) 5%, rgba(5,5,5,0.2)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=600');
     background-size: cover; background-position: center;
 }
 .bg-on {
-    background: linear-gradient(to top, rgba(5,5,5,0.9) 10%, rgba(5,5,5,0.3)), url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=600');
+    background: linear-gradient(to top, rgba(5,5,5,1) 5%, rgba(5,5,5,0.2)), url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=600');
     background-size: cover; background-position: center;
 }
 
-/* Estilos de la Pesa (SVG) */
-.dumbbell-svg {
-    transition: all 0.3s ease;
-}
-.dumbbell-svg .bar, .dumbbell-svg .weight {
-    fill: #4b5563; /* Gris oscuro por defecto */
-    transition: fill 0.3s ease;
-}
-
-/* Animación Hover en las tarjetas de días */
-.day-card:hover .dumbbell-svg .bar, 
-.day-card:hover .dumbbell-svg .weight {
-    fill: #FFC300; /* Se vuelve amarillo al pasar el mouse */
-}
-.day-card:hover .day-name-text {
-    color: #FFC300;
+/* Efectos visuales de texto */
+.day-name-text {
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
 }
 
 /* === ESTILOS PARA EL DÍA ACTUAL (HOY) === */
 @keyframes pulse-emerald {
     0%, 100% {
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(16, 185, 129, 0.05);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), inset 0 0 20px rgba(16, 185, 129, 0.1);
     }
     50% {
-        box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(16, 185, 129, 0.1);
+        box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), inset 0 0 20px rgba(16, 185, 129, 0.2);
     }
 }
 
 .day-card.today {
-    border-color: rgba(16, 185, 129, 0.6) !important; /* Borde Esmeralda */
+    border-color: rgba(16, 185, 129, 0.8) !important; /* Borde Esmeralda Fuerte */
     animation: pulse-emerald 2.5s infinite ease-in-out;
     transform: scale(1.02);
 }
 
-.day-card.today .dumbbell-svg .bar, 
-.day-card.today .dumbbell-svg .weight {
-    fill: #10b981 !important; /* Pesa Esmeralda */
+.day-card.today img {
+    opacity: 0.6 !important;
+    filter: grayscale(0) !important; /* El día actual siempre tiene color */
 }
 
 .day-card.today .day-name-text {
     color: #10b981 !important;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
-/* Animación de entrada suave */
+/* Animación de entrada suave escalonada */
 .fade-in-up {
     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    opacity: 0; transform: translateY(20px);
+    opacity: 0; transform: translateY(30px);
 }
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
