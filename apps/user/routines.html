@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ | Workout Hub</title>
+    
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/routines.css">
+</head>
+<body class="selection:bg-[#FFC300] selection:text-black">
+
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center"></div>
+
+    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-20 -z-10 mix-blend-screen grayscale"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
+
+    <div id="dashboard-screen" class="min-h-screen w-full relative z-10 flex flex-col">
+        
+        <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-xl font-black uppercase tracking-tighter">
+                        <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
+                    </h1>
+                </div>
+                <a href="/apps/start/inicio.html" class="px-6 py-2 rounded-full border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition">
+                    Volver al Hub
+                </a>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto w-full px-6 py-10 flex-grow">
+            
+            <div class="mb-10 fade-in-up" style="animation-delay: 0.1s;">
+                <p class="text-[#FFC300] text-[10px] font-black uppercase tracking-[0.4em] mb-2" id="user-greeting">Centro de Alto Rendimiento</p>
+                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">
+                    Workout <span class="text-white">Hub</span>
+                </h2>
+                <p class="text-gray-400 text-sm mt-4 max-w-xl">Selecciona el día correspondiente a tu plan. Mantén la constancia y registra tus resultados al finalizar cada sesión.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-auto">
+
+                <div class="md:col-span-3 lg:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 fade-in-up" style="animation-delay: 0.2s;">
+                    
+                    <svg class="hidden">
+                        <defs>
+                            <g id="dumbbell-icon">
+                                <rect x="25" y="45" width="50" height="10" rx="3" class="bar"/>
+                                <rect x="10" y="30" width="15" height="40" rx="5" class="weight"/>
+                                <rect x="5" y="35" width="5" height="30" rx="2" class="weight"/>
+                                <rect x="75" y="30" width="15" height="40" rx="5" class="weight"/>
+                                <rect x="90" y="35" width="5" height="30" rx="2" class="weight"/>
+                            </g>
+                        </defs>
+                    </svg>
+
+                    <a href="monday.html" data-day="Lunes" class="glass-panel bento-card day-card rounded-[24px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="today-badge hidden absolute top-0 left-0 w-full bg-emerald-500 text-black text-[9px] font-black py-1 uppercase tracking-widest z-10">Entrenamiento de Hoy</div>
+                        <svg class="w-12 h-12 mb-3 dumbbell-svg" viewBox="0 0 100 100"><use href="#dumbbell-icon"></use></svg>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-gray-300 day-name-text">Lunes</h3>
+                    </a>
+                    
+                    <a href="tuesday.html" data-day="Martes" class="glass-panel bento-card day-card rounded-[24px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="today-badge hidden absolute top-0 left-0 w-full bg-emerald-500 text-black text-[9px] font-black py-1 uppercase tracking-widest z-10">Entrenamiento de Hoy</div>
+                        <svg class="w-12 h-12 mb-3 dumbbell-svg" viewBox="0 0 100 100"><use href="#dumbbell-icon"></use></svg>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-gray-300 day-name-text">Martes</h3>
+                    </a>
+
+                    <a href="wednesday.html" data-day="Miércoles" class="glass-panel bento-card day-card rounded-[24px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="today-badge hidden absolute top-0 left-0 w-full bg-emerald-500 text-black text-[9px] font-black py-1 uppercase tracking-widest z-10">Entrenamiento de Hoy</div>
+                        <svg class="w-12 h-12 mb-3 dumbbell-svg" viewBox="0 0 100 100"><use href="#dumbbell-icon"></use></svg>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-gray-300 day-name-text">Miércoles</h3>
+                    </a>
+
+                    <a href="thursday.html" data-day="Jueves" class="glass-panel bento-card day-card rounded-[24px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="today-badge hidden absolute top-0 left-0 w-full bg-emerald-500 text-black text-[9px] font-black py-1 uppercase tracking-widest z-10">Entrenamiento de Hoy</div>
+                        <svg class="w-12 h-12 mb-3 dumbbell-svg" viewBox="0 0 100 100"><use href="#dumbbell-icon"></use></svg>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-gray-300 day-name-text">Jueves</h3>
+                    </a>
+                    
+                    <a href="friday.html" data-day="Viernes" class="glass-panel bento-card day-card rounded-[24px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="today-badge hidden absolute top-0 left-0 w-full bg-emerald-500 text-black text-[9px] font-black py-1 uppercase tracking-widest z-10">Entrenamiento de Hoy</div>
+                        <svg class="w-12 h-12 mb-3 dumbbell-svg" viewBox="0 0 100 100"><use href="#dumbbell-icon"></use></svg>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-gray-300 day-name-text">Viernes</h3>
+                    </a>
+                    
+                    <a href="saturday.html" data-day="Sábado" class="glass-panel bento-card day-card rounded-[24px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="today-badge hidden absolute top-0 left-0 w-full bg-emerald-500 text-black text-[9px] font-black py-1 uppercase tracking-widest z-10">Entrenamiento de Hoy</div>
+                        <svg class="w-12 h-12 mb-3 dumbbell-svg" viewBox="0 0 100 100"><use href="#dumbbell-icon"></use></svg>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-gray-300 day-name-text">Sábado</h3>
+                    </a>
+                </div>
+
+                <div class="md:col-span-3 lg:col-span-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 fade-in-up" style="animation-delay: 0.4s;">
+                    
+                    <a href="/templates/user/eats.html" class="glass-panel bento-card hover-green rounded-[24px] p-6 bg-eats flex flex-col justify-end min-h-[180px] lg:min-h-[220px]">
+                        <div class="relative z-10">
+                            <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1 block drop-shadow-md">Sinergia Activa</span>
+                            <h3 class="text-xl font-black uppercase tracking-tighter text-white drop-shadow-lg">GYMENEZ EATS</h3>
+                            <p class="text-xs text-gray-200 mt-1 font-medium drop-shadow-md">El 70% del resultado ocurre en la cocina. Potencia tu esfuerzo.</p>
+                        </div>
+                    </a>
+
+                    <a href="/templates/user/on.html" class="glass-panel bento-card hover-red rounded-[24px] p-6 bg-on flex flex-col justify-end min-h-[180px] lg:min-h-[220px]">
+                        <div class="relative z-10">
+                            <span class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-1 block drop-shadow-md">Técnica y Cultura</span>
+                            <h3 class="text-xl font-black uppercase tracking-tighter text-white drop-shadow-lg">GYMENEZ ON</h3>
+                            <p class="text-xs text-gray-200 mt-1 font-medium drop-shadow-md">Perfecciona tu biomecánica y forja una mentalidad de hierro.</p>
+                        </div>
+                    </a>
+
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="text-center py-6 border-t border-white/5 mt-auto">
+            <p class="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/routines.js"></script>
+</body>
+</html>
