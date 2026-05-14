@@ -58,7 +58,7 @@ async function handleAdminLogin(event) {
             showMessage("ACCESO CONCEDIDO. INICIANDO NÚCLEO...");
             // Redirigir al archivo separado del Dashboard
             setTimeout(() => {
-                window.location.href = 'admin_dashboard.html';
+                window.location.href = 'inicio.html';
             }, 1200);
         } else {
             showMessage(data.error || "ACCESO DENEGADO", "error");
@@ -90,7 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (isLoginScreen) {
         // Si ya está logueado, mandarlo al dashboard directamente
         if (storedSession) {
-            window.location.href = 'admin_dashboard.html';
+            window.location.href = 'inicio.html';
             return;
         }
         document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
