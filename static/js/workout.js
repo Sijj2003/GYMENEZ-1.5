@@ -132,7 +132,7 @@ if (closeVideoBtn) {
 function showMessage(message, type = 'success') {
     if (!messagebox) return;
     messagebox.textContent = message;
-    messagebox.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-[10px] font-black tracking-[0.2em] uppercase shadow-2xl z-[9999] transition-all duration-300 text-center border border-white/10';
+    messagebox.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-300 text-center border border-white/10 w-11/12 max-w-[350px]';
     messagebox.classList.add(type === 'success' ? 'bg-emerald-600' : 'bg-red-600', 'text-white');
     messagebox.style.opacity = '1';
     messagebox.style.transform = 'translate(-50%, 0)';
@@ -163,32 +163,32 @@ function renderExercises(exercises) {
 
     exercises.forEach(exercise => {
         const card = document.createElement('div');
-        card.className = 'glass-item-card p-6 md:p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6';
+        card.className = 'glass-item-card p-5 md:p-8 rounded-xl md:rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6';
         
         exercise.status = exercise.status || 'pending'; 
         const cardId = exercise.exerciseName.replace(/\s/g, '-');
         
         card.innerHTML = `
-            <div class="w-full md:w-auto flex-grow"> 
-                <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-2 drop-shadow-md">${exercise.exerciseName || 'Ejercicio'}</h3>
-                <div class="flex gap-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                    <p>Sets: <span class="text-[#FFC300] text-sm">${exercise.sets || '-'}</span></p>
-                    <p>Reps: <span class="text-[#FFC300] text-sm">${exercise.reps || '-'}</span></p>
-                    <p>Peso: <span class="text-[#FFC300] text-sm">${exercise.weight || 'LIBRE'}</span></p>
+            <div class="w-full md:w-auto flex-grow mb-2 md:mb-0"> 
+                <h3 class="text-lg md:text-2xl font-black text-white uppercase tracking-tighter mb-2 drop-shadow-md break-words pr-2">${exercise.exerciseName || 'Ejercicio'}</h3>
+                <div class="flex flex-wrap gap-3 md:gap-6 text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                    <p>Sets: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.sets || '-'}</span></p>
+                    <p>Reps: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.reps || '-'}</span></p>
+                    <p>Peso: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.weight || 'LIBRE'}</span></p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-4 w-full md:w-auto justify-end border-t border-white/5 pt-4 md:border-t-0 md:pt-0">
-                <button onclick="window.openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition group">
-                    <svg class="w-4 h-4 group-hover:text-[#FFC300] transition" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
-                    <span class="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Play</span>
+            <div class="flex items-center space-x-2 md:space-x-4 w-full md:w-auto justify-end border-t border-white/5 pt-4 md:border-t-0 md:pt-0">
+                <button onclick="window.openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition group">
+                    <svg class="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:text-[#FFC300] transition" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
+                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest hidden sm:inline">Play</span>
                 </button>
 
-                <div class="flex space-x-2 bg-black/40 p-1 rounded-xl border border-white/5"> 
-                    <button id="completed-button-${cardId}" onclick="window.toggleExerciseStatus('${exercise.exerciseName.replace(/'/g, "\\'")}', 'completed')" class="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg text-gray-400 hover:text-white transition">
+                <div class="flex space-x-1.5 md:space-x-2 bg-black/40 p-1 rounded-lg md:rounded-xl border border-white/5"> 
+                    <button id="completed-button-${cardId}" onclick="window.toggleExerciseStatus('${exercise.exerciseName.replace(/'/g, "\\'")}', 'completed')" class="px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white transition">
                         Check
                     </button>
-                    <button id="skip-button-${cardId}" onclick="window.toggleExerciseStatus('${exercise.exerciseName.replace(/'/g, "\\'")}', 'skipped')" class="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg text-gray-400 hover:text-white transition">
+                    <button id="skip-button-${cardId}" onclick="window.toggleExerciseStatus('${exercise.exerciseName.replace(/'/g, "\\'")}', 'skipped')" class="px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white transition">
                         Skip
                     </button>
                 </div>
@@ -211,16 +211,16 @@ function updateCardUI(exerciseName, status) {
     
     const card = cBtn.closest('.glass-item-card');
 
-    // Resets
-    cBtn.className = 'px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition';
-    sBtn.className = 'px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition';
+    // Resets (con clases responsivas)
+    cBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition';
+    sBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition';
     card.classList.remove('is-completed', 'is-skipped');
 
     if (status === 'completed') {
-        cBtn.className = 'px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] transition';
+        cBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] transition';
         card.classList.add('is-completed');
     } else if (status === 'skipped') {
-        sBtn.className = 'px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] transition';
+        sBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] transition';
         card.classList.add('is-skipped');
     }
 }
@@ -229,7 +229,7 @@ function updateFinishButtonState() {
     if (!finishRoutineBtn) return;
     const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.status !== 'pending');
     finishRoutineBtn.disabled = !allCompleted;
-    finishRoutineBtn.className = `w-full md:w-2/3 py-5 rounded-2xl text-sm tracking-[0.2em] font-black transition duration-300 uppercase shadow-2xl ${allCompleted ? 'bg-[#FFC300] hover:bg-yellow-400 text-black shadow-[0_0_30px_rgba(255,195,0,0.3)]' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/10'}`;
+    finishRoutineBtn.className = `w-full md:w-2/3 py-4 md:py-5 rounded-xl md:rounded-2xl text-[10px] md:text-sm tracking-[0.2em] font-black transition duration-300 uppercase shadow-2xl ${allCompleted ? 'bg-[#FFC300] hover:bg-yellow-400 text-black shadow-[0_0_30px_rgba(255,195,0,0.3)]' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/10'}`;
 }
 
 window.toggleExerciseStatus = (exerciseName, statusType) => {
