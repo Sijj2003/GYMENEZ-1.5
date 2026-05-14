@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GYMENEZ | Portal del Atleta</title>
-    <link rel="icon" type="image/png" href="mini_logo.png">
-    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/auth.css">
     
     <style>
         body { 
@@ -102,7 +106,7 @@
     <div id="splash-screen" class="fixed inset-0 z-[1000] flex flex-col items-center justify-center">
         <div class="absolute inset-0 ambient-glow opacity-50"></div>
         <div class="text-center z-10 animate-premium-in">
-            <img id="splash-logo" src="LOADING.png" alt="GYMENEZ" class="mx-auto w-56 md:w-72 drop-shadow-2xl">
+            <img id="splash-logo" src="/static/img/logos/LOADING.png" alt="GYMENEZ" class="mx-auto w-56 md:w-72 drop-shadow-2xl">
             <div id="loading-text" class="mt-8 text-[10px] md:text-xs font-black tracking-[0.6em] text-[#FFC300] uppercase animate-text-glow">
                 Iniciando Ecosistema
             </div>
@@ -110,12 +114,12 @@
     </div>
 
     <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-6 relative">
-        <div class="absolute inset-0 bg-[url('FONDO.png')] bg-cover bg-center opacity-10 grayscale mix-blend-overlay pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[url('/static/img/backgrounds/FONDO.png')] bg-cover bg-center opacity-10 grayscale mix-blend-overlay pointer-events-none"></div>
         <div class="ambient-glow opacity-30"></div>
 
         <div class="glass-panel p-8 md:p-12 w-full max-w-md mx-auto rounded-[32px] relative z-10">
             <div class="text-center mb-10">
-                <img id="login-logo-img" src="LOGIN_LOGO.png" alt="GYMENEZ" class="mx-auto w-48 mb-3">
+                <img id="login-logo-img" src="/static/img/logos/LOGIN_LOGO.png" alt="GYMENEZ" class="mx-auto w-48 mb-3">
                 <h2 class="text-gray-500 text-[9px] font-black uppercase tracking-[0.4em]">Autenticación Segura</h2>
             </div>
 
@@ -158,10 +162,10 @@
         <div class="glass-panel p-10 w-full max-w-sm mx-auto rounded-[32px] text-center border-t border-[#FFC300]/30">
             <h3 class="text-lg font-black mb-8 text-white uppercase tracking-[0.3em]">División Operativa</h3>
 
-            <button id="select-trainer-btn" class="w-full py-4 mb-4 rounded-xl bg-white/5 border border-white/5 font-bold text-xs hover:border-[#FFC300] hover:text-[#FFC300] uppercase tracking-widest transition-all">
+            <button id="select-trainer-btn" onclick="window.location.href='/templates/staff/trainer.html'" class="w-full py-4 mb-4 rounded-xl bg-white/5 border border-white/5 font-bold text-xs hover:border-[#FFC300] hover:text-[#FFC300] hover:bg-white/10 uppercase tracking-widest transition-all">
                 Portal Coach
             </button>
-            <button id="select-admin-btn" class="w-full py-4 mb-8 rounded-xl bg-white/5 border border-white/5 font-bold text-xs hover:border-red-500 hover:text-red-500 uppercase tracking-widest transition-all">
+            <button id="select-admin-btn" onclick="window.location.href='/templates/admin/administration.html'" class="w-full py-4 mb-8 rounded-xl bg-white/5 border border-white/5 font-bold text-xs hover:border-red-500 hover:text-red-500 hover:bg-white/10 uppercase tracking-widest transition-all">
                 Portal Admin
             </button>
             <button id="modal-close-btn" class="w-full py-2 text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-widest transition">
@@ -235,7 +239,8 @@
     </div>
 
     <div id="dashboard-screen" class="hidden min-h-screen w-full">
-        <div class="max-w-7xl mx-auto p-6 md:p-10">
+        <div class="absolute inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-30 fixed -z-10"></div>
+        <div class="max-w-7xl mx-auto p-6 md:p-10 relative z-10">
             <header class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
                 <h1 class="text-3xl font-black uppercase tracking-tighter">
                     <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
@@ -243,7 +248,7 @@
                 </h1>
                 
                 <div class="flex items-center space-x-3 bg-white/5 p-1.5 rounded-full border border-white/5">
-                    <a href="templates/user/profile.html" class="px-6 py-2.5 text-[10px] font-black tracking-widest uppercase rounded-full bg-[#FFC300] text-black hover:bg-yellow-400 transition">
+                    <a href="/templates/user/profile.html" class="px-6 py-2.5 text-[10px] font-black tracking-widest uppercase rounded-full bg-[#FFC300] text-black hover:bg-yellow-400 transition">
                         Perfil
                     </a>
                     <button id="logout-button" class="px-6 py-2.5 text-[10px] font-black tracking-widest uppercase rounded-full hover:bg-red-500/20 text-red-400 hover:text-red-300 transition">
@@ -253,7 +258,7 @@
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="templates/user/routines.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
+                <a href="/templates/user/routines.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
                     <svg class="w-10 h-10 text-[#FFC300] mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path></svg>
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-[#FFC300] transition-colors">Workout</h2>
@@ -261,7 +266,7 @@
                     </div>
                 </a>
                 
-                <a href="templates/user/schedule.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
+                <a href="/templates/user/schedule.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
                     <svg class="w-10 h-10 text-[#FFC300] mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h.01M13 11h.01M17 11h.01M7 16h.01M11 16h.01M15 16h.01M6 18h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-[#FFC300] transition-colors">Schedule</h2>
@@ -269,7 +274,7 @@
                     </div>
                 </a>
 
-                <a href="templates/user/goals.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
+                <a href="/templates/user/goals.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
                     <svg class="w-10 h-10 text-[#FFC300] mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-[#FFC300] transition-colors">Goals</h2>
@@ -277,7 +282,7 @@
                     </div>
                 </a>
 
-                <a href="templates/user/eats.html" class="glass-panel p-8 rounded-3xl group hover:border-emerald-400/50 transition-all flex flex-col justify-between h-56">
+                <a href="/templates/user/eats.html" class="glass-panel p-8 rounded-3xl group hover:border-emerald-400/50 transition-all flex flex-col justify-between h-56">
                     <svg class="w-10 h-10 text-emerald-400 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2zM7 7h.01M17 7h.01M12 7h.01"/></svg>
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-emerald-400 transition-colors">Eats</h2>
@@ -285,7 +290,7 @@
                     </div>
                 </a>
 
-                <a href="templates/user/on.html" class="glass-panel p-8 rounded-3xl group hover:border-red-500/50 transition-all flex flex-col justify-between h-56">
+                <a href="/templates/user/on.html" class="glass-panel p-8 rounded-3xl group hover:border-red-500/50 transition-all flex flex-col justify-between h-56">
                     <svg class="w-10 h-10 text-red-500 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.555-4.555A.996.996 0 0019 4H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V9.445L15 14V10z"></path></svg>
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-red-500 transition-colors">ON Streaming</h2>
@@ -293,7 +298,7 @@
                     </div>
                 </a>
                 
-                <a href="templates/user/pulse.html" class="glass-panel p-8 rounded-3xl group hover:border-sky-400/50 transition-all flex flex-col justify-between h-56">
+                <a href="/templates/user/pulse.html" class="glass-panel p-8 rounded-3xl group hover:border-sky-400/50 transition-all flex flex-col justify-between h-56">
                     <svg class="w-10 h-10 text-sky-400 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path></svg>
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-sky-400 transition-colors">Pulse</h2>
@@ -479,6 +484,6 @@
         }
     </script>
 
-    <script src="static/js/auth.js"></script>
+    <script src="/static/js/auth.js"></script>
 </body>
 </html>
