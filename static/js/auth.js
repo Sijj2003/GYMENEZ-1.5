@@ -289,6 +289,9 @@ async function handleForceLogout(e) {
 // 🟢 GESTIÓN DE RUTAS (INTELIGENCIA DEL SCRIPT) 🟢
 // -------------------------------------------------------------
 
+// 🛠 AGREGADO AQUÍ PARA EVITAR EL REFERENCE ERROR 🛠
+const SPLASH_DURATION_MS = 3000; 
+
 window.onload = function() {
     const isLoginScreen = document.getElementById('login-screen') !== null;
     const isDashboardScreen = document.getElementById('dashboard-screen') !== null;
@@ -304,83 +307,4 @@ window.onload = function() {
 
         // Quitar la pantalla de carga después de 3 segundos
         setTimeout(() => {
-            const splash = document.getElementById('splash-screen');
-            if(splash) {
-                splash.style.transition = 'opacity 1s ease-out';
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    document.getElementById('login-screen').classList.remove('hidden'); 
-                    requestAnimationFrame(() => {
-                        document.getElementById('login-screen').style.opacity = '1';
-                    });
-                }, 1000);
-            }
-        }, SPLASH_DURATION_MS);
-
-        // Bindings de Login
-        document.getElementById('login-form')?.addEventListener('submit', handleLogin);
-        document.getElementById('force-logout-form')?.addEventListener('submit', handleForceLogout);
-        
-        // Asignación de Máscaras Automáticas
-        document.getElementById('reg-dob')?.addEventListener('input', applyDateMask);
-        document.getElementById('reg-ci')?.addEventListener('input', applyCIMask);
-        document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
-        
-        document.getElementById('force-dob')?.addEventListener('input', applyDateMask);
-        document.getElementById('force-ci')?.addEventListener('input', applyCIMask);
-        document.getElementById('force-phone')?.addEventListener('input', applyPhoneMask);
-
-        // Botones Generales de Login
-        document.getElementById('register-request-link')?.addEventListener('click', () => {
-            const modal = document.getElementById('register-modal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.style.opacity = '1', 10);
-        });
-        document.getElementById('close-register-modal')?.addEventListener('click', () => {
-            const modal = document.getElementById('register-modal');
-            modal.style.opacity = '0';
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        });
-
-        // Activar Modal Activo
-        document.getElementById('modal-cancel-btn')?.addEventListener('click', () => {
-            document.getElementById('active-session-modal').classList.add('hidden');
-            showForceLogoutMessage(''); 
-        });
-        document.getElementById('modal-confirm-btn')?.addEventListener('click', () => {
-            document.getElementById('modal-options').classList.add('hidden');
-            document.getElementById('force-logout-form').classList.remove('hidden');
-            document.getElementById('force-email').value = document.getElementById('login-email').value;
-        });
-        document.getElementById('force-logout-cancel')?.addEventListener('click', () => {
-            document.getElementById('active-session-modal').classList.add('hidden');
-            document.getElementById('modal-options').classList.remove('hidden');
-            document.getElementById('force-logout-form').classList.add('hidden');
-        });
-    }
-
-    // === LÓGICA PARA LA PÁGINA DEL DASHBOARD (inicio.html) ===
-    if (isDashboardScreen) {
-        if (!storedSession) {
-            // No tiene sesión, lo botamos al login
-            window.location.href = '/';
-            return;
-        }
-
-        // Recuperar la sesión y activar los chequeos
-        CURRENT_USER_SESSION = JSON.parse(storedSession);
-        startSessionChecker();
-
-        // Botón de salir
-        document.getElementById('logout-button')?.addEventListener('click', async () => {
-            const btn = document.getElementById('logout-button');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'SALIENDO...';
-            stopSessionChecker(); 
-            await apiLogout(); 
-            window.location.href = '/';
-        });
-    }
-};
+            const splash = document.getElementById('splash-
