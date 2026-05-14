@@ -276,22 +276,40 @@ function transitionToLogin() {
     }, 1000); 
 }
 
-function formatDateInput(input) {
-    let value = input.value.replace(/\D/g, ''); 
-    
-    if (value.length > 8) { 
-        value = value.substring(0, 8);
-    }
+// ---------------------------------------------------------------
+// 💡 FUNCIONES DE MÁSCARA AUTOMÁTICA (FECHA, CÉDULA, TELÉFONO) 💡
+// ---------------------------------------------------------------
 
-    if (value.length > 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2);
+// Máscara inteligente para fechas (DD/MM/YYYY) que permite borrar sin trabarse
+function applyDateMask(e) {
+    if (e.inputType === 'deleteContentBackward') return; // Permitir borrar
+    let v = e.target.value.replace(/\D/g, ''); 
+    if (v.length > 8) v = v.substring(0, 8);
+    
+    if (v.length >= 5) {
+        e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+    } else if (v.length >= 3) {
+        e.target.value = `${v.substring(0, 2)}/${v.substring(2)}`;
+    } else {
+        e.target.value = v;
     }
-    if (value.length > 5) { 
-        value = value.substring(0, 5) + '/' + value.substring(5);
-    }
-    input.value = value;
 }
 
+// Máscara inteligente para Cédulas (00.000.000)
+function applyCIMask(e) {
+    let v = e.target.value.replace(/\D/g, ''); 
+    if (v.length > 8) v = v.substring(0, 8);
+    // Expresión regular que coloca un punto cada 3 dígitos de derecha a izquierda
+    e.target.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Bloqueo de caracteres en Teléfonos (Solo 7 números)
+function applyPhoneMask(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 7);
+}
+
+
+// --- LLAMADA A LA API (FUERZA DE DESCONEXIÓN) ---
 async function apiForceLogout(email, password, deviceId, name, lastname, dob, phone, ci) {
     console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}.`);
     
@@ -352,7 +370,6 @@ async function handleLogin(e) {
                 blockModal.classList.add('hidden');
             }, 10000); 
         
-        // 🟢 AQUÍ ESTÁ LA CORRECCIÓN CLAVE: Ahora busca la frase exacta de tu backend Python 🟢
         } else if (response.error && (response.error.includes('Sesion activa detectada') || response.error.includes('sesión activa'))) {
             sessionModal.classList.remove('hidden');
             showMessage('Sesión en uso detectada.', 'error');
@@ -382,6 +399,7 @@ async function handleRegister(e) {
     const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
     const originalText = btn ? btn.textContent : 'Crear Cuenta';
 
+    // Capturamos la Cédula exactamente como el usuario la ve (ej. V-12.345.678)
     const ciType = document.getElementById('reg-ci-type').value;
     const ciNumber = document.getElementById('reg-ci').value.trim();
     const fullCI = `${ciType}-${ciNumber}`; 
@@ -455,13 +473,11 @@ async function handleForceLogout(e) {
     const password = document.getElementById('login-password').value; 
     const name = document.getElementById('force-name').value;
     const lastname = document.getElementById('force-lastname').value;
-    const dob = document.getElementById('force-dob').value;
     
-    const phoneInput = document.getElementById('force-phone').value;
-    const phone = phoneInput.replace(/\D/g, ''); 
-    
-    const ciInput = document.getElementById('force-ci').value;
-    const ci = ciInput.replace(/\D/g, ''); 
+    // Estos valores se envían formateados tal cual como los pide el backend
+    const dob = document.getElementById('force-dob').value.trim();
+    const phone = document.getElementById('force-phone').value.trim(); 
+    const ci = document.getElementById('force-ci').value.trim(); 
 
     const btn = document.getElementById('force-logout-btn');
     const modal = document.getElementById('active-session-modal');
@@ -590,6 +606,9 @@ async function handleVerifyActivation(e) {
     }
 }
 
+// ----------------------------------------------------
+// 🚀 INICIALIZACIÓN GLOBAL (WINDOW.ONLOAD)
+// ----------------------------------------------------
 window.onload = function() {
     const storedSession = localStorage.getItem('userSession');
     if (storedSession) {
@@ -601,6 +620,7 @@ window.onload = function() {
         setTimeout(transitionToLogin, SPLASH_DURATION_MS);
     }
 
+    // --- EVENT LISTENERS DE FORMULARIOS Y MODALES ---
     document.getElementById('login-form').addEventListener('submit', handleLogin);
     document.getElementById('logout-button').addEventListener('click', handleLogout);
     document.getElementById('register-form').addEventListener('submit', handleRegister);
@@ -614,6 +634,7 @@ window.onload = function() {
     document.getElementById('select-admin-btn').addEventListener('click', handleSelectAdmin);
     document.getElementById('modal-close-btn').addEventListener('click', handleCloseAreaSelectionModal);
 
+    // --- LÓGICA DEL MODAL DE SESIÓN ACTIVA ---
     const sessionModal = document.getElementById('active-session-modal');
     const form = document.getElementById('force-logout-form');
     const options = document.getElementById('modal-options');
@@ -638,8 +659,30 @@ window.onload = function() {
     });
 
     form.addEventListener('submit', handleForceLogout);
-    document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
     
+    // --- ASIGNACIÓN DE LAS MÁSCARAS AUTOMÁTICAS ---
+    
+    // Registro
+    const regDobInput = document.getElementById('reg-dob');
+    if (regDobInput) regDobInput.addEventListener('input', applyDateMask);
+
+    const regCiInput = document.getElementById('reg-ci');
+    if (regCiInput) regCiInput.addEventListener('input', applyCIMask);
+
+    const regPhoneInput = document.getElementById('reg-phone-num');
+    if (regPhoneInput) regPhoneInput.addEventListener('input', applyPhoneMask);
+
+    // Formulario de Forzar Cierre (Identity Protocol)
+    const forceDobInput = document.getElementById('force-dob');
+    if (forceDobInput) forceDobInput.addEventListener('input', applyDateMask);
+
+    const forceCiInput = document.getElementById('force-ci');
+    if (forceCiInput) forceCiInput.addEventListener('input', applyCIMask);
+
+    const forcePhoneInput = document.getElementById('force-phone');
+    if (forcePhoneInput) forcePhoneInput.addEventListener('input', applyPhoneMask);
+
+    // --- BLOQUEO DE TECLADO PARA MODAL BLOQUEADO ---
     const blockModal = document.getElementById('block-modal');
     document.addEventListener('keydown', function(event) {
         if (blockModal && event.key === "Escape" && !blockModal.classList.contains('hidden')) {
