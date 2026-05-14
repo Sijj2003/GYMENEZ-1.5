@@ -1,1 +1,150 @@
-dhdjh
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ | Mi Perfil Biométrico</title>
+    
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/profile.css">
+</head>
+<body class="selection:bg-[#FFC300] selection:text-black">
+
+    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-20 -z-10 mix-blend-screen grayscale"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
+
+    <div id="dashboard-screen" class="min-h-screen w-full relative z-10 flex flex-col">
+        
+        <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-xl font-black uppercase tracking-tighter">
+                        <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
+                    </h1>
+                </div>
+                <a href="/apps/start/inicio.html" class="px-6 py-2 rounded-full border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition">
+                    Volver al Hub
+                </a>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto w-full px-6 py-10 flex-grow">
+            
+            <div class="mb-10 fade-in-up" style="animation-delay: 0.1s;">
+                <p class="text-[#FFC300] text-[10px] font-black uppercase tracking-[0.4em] mb-2">Expediente del Atleta</p>
+                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">
+                    Perfil <span class="text-white">Biométrico</span>
+                </h2>
+            </div>
+
+            <div id="loading-spinner" class="flex flex-col items-center justify-center py-20 fade-in-up">
+                <div class="w-12 h-12 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mb-4"></div>
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-widest">Sincronizando Data...</p>
+            </div>
+
+            <div id="profile-content" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-auto hidden">
+
+                <div class="md:col-span-2 lg:col-span-2 glass-panel bento-card rounded-[32px] p-8 flex flex-col justify-between relative overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <svg class="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div>
+                        <span id="p-subscription" class="px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-4">--</span>
+                        <h3 id="p-fullname" class="text-3xl font-black uppercase tracking-tighter mb-1 text-white">--</h3>
+                        <p id="p-email" class="text-gray-400 text-sm font-medium">--</p>
+                    </div>
+                    
+                    <div class="mt-8 grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
+                        <div>
+                            <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Nacimiento</p>
+                            <p id="p-dob" class="text-white font-bold text-sm mt-1">--</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Sexo Biológico</p>
+                            <p id="p-sex" class="text-white font-bold text-sm mt-1">--</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Activo Desde</p>
+                            <p id="p-active-since" class="text-emerald-400 font-bold text-sm mt-1">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-1 lg:col-span-2 glass-panel bento-card rounded-[32px] p-8 flex flex-col justify-center relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent fade-in-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-6">Métricas Base</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p id="m-peso" class="text-3xl lg:text-4xl font-black text-[#FFC300] tracking-tighter">--</p>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold tracking-widest mt-1">Peso (KG)</p>
+                        </div>
+                        <div class="border-l border-r border-white/10">
+                            <p id="m-estatura" class="text-3xl lg:text-4xl font-black text-white tracking-tighter">--</p>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold tracking-widest mt-1">Altura (CM)</p>
+                        </div>
+                        <div>
+                            <p id="m-edad" class="text-3xl lg:text-4xl font-black text-white tracking-tighter">--</p>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold tracking-widest mt-1">Edad</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-1 lg:col-span-2 glass-panel bento-card rounded-[32px] p-6 fade-in-up" style="animation-delay: 0.4s;">
+                    <h3 class="text-lg font-black uppercase tracking-tighter text-white mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sky-400"></span> Tren Superior
+                    </h3>
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-6">
+                        <div class="metric-row"><span class="label">Cuello</span><span id="m-cuello" class="value">--</span></div>
+                        <div class="metric-row"><span class="label">Espalda</span><span id="m-espalda" class="value">--</span></div>
+                        <div class="metric-row"><span class="label">Tórax</span><span id="m-torax" class="value">--</span></div>
+                        <div class="metric-row"><span class="label">Abdomen</span><span id="m-abdomen" class="value">--</span></div>
+                        <div class="metric-row"><span class="label">Brazo (D/I)</span><span class="value"><span id="m-brazo_der">--</span> / <span id="m-brazo_izq">--</span></span></div>
+                        <div class="metric-row"><span class="label">Antebrazo (D/I)</span><span class="value"><span id="m-antebrazo_der">--</span> / <span id="m-antebrazo_izq">--</span></span></div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-1 lg:col-span-2 glass-panel bento-card rounded-[32px] p-6 fade-in-up" style="animation-delay: 0.5s;">
+                    <h3 class="text-lg font-black uppercase tracking-tighter text-white mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Tren Inferior
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+                        <div class="metric-row"><span class="label">Cintura</span><span id="m-cintura" class="value">--</span></div>
+                        <div></div> <div class="metric-row"><span class="label">Fémur (D/I)</span><span class="value"><span id="m-femur_der">--</span> / <span id="m-femur_izq">--</span></span></div>
+                        <div class="metric-row"><span class="label">Tibia (D/I)</span><span class="value"><span id="m-tibia_der">--</span> / <span id="m-tibia_izq">--</span></span></div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 lg:col-span-4 glass-panel bento-card border-red-500/20 rounded-[32px] p-8 fade-in-up" style="animation-delay: 0.6s;">
+                    <h3 class="text-lg font-black uppercase tracking-tighter text-red-400 mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Ficha Médica & Observaciones
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2">Alergias</p>
+                            <p id="m-alergias" class="text-sm text-gray-300 leading-relaxed">--</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2">Enfermedades Crónicas</p>
+                            <p id="m-enfermedades" class="text-sm text-gray-300 leading-relaxed">--</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2">Otras Notas</p>
+                            <p id="m-otros" class="text-sm text-gray-300 leading-relaxed">--</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        
+        <footer class="text-center py-6 border-t border-white/5 mt-auto">
+            <p class="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-600">© 2026 GYMENEZ BIOMETRICS</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/profile.js"></script>
+</body>
+</html>
