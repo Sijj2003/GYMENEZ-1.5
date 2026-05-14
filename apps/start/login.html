@@ -3,185 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ | Acceso al Ecosistema</title>
-    <link rel="icon" type="image/png" href="../../static/img/logos/mini_logo.png">
-    <link rel="shortcut icon" type="image/png" href="../../static/img/logos/mini_logo.png">
+    <title>GYMENEZ | Portal del Atleta</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="../../static/css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; }
-        .text-glow { text-shadow: 0 0 20px rgba(255, 195, 0, 0.4); }
-        .card-gradient { background: linear-gradient(145deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.95) 100%); backdrop-filter: blur(20px); }
-        .input-premium { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
-        .input-premium:focus { border-color: #FFC300; box-shadow: 0 0 0 1px rgba(255, 195, 0, 0.5); outline: none; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #030305; 
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Utilidad Glassmorphism Premium */
+        .glass-panel {
+            background: rgba(10, 10, 15, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            border-color: #FFC300;
+            box-shadow: 0 0 0 1px rgba(255, 195, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+            outline: none;
+        }
+
+        /* --- ANIMACIÓN SPLASH MODERNA --- */
+        #splash-screen {
+            background: radial-gradient(circle at center, #11111a 0%, #030305 100%);
+        }
         
-        /* Ocultamos el scrollbar para un look más limpio en los modales */
+        .animate-premium-in {
+            animation: premiumReveal 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .animate-text-glow {
+            animation: textGlow 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes premiumReveal {
+            0% { opacity: 0; filter: blur(20px); transform: scale(0.9) translateY(20px); }
+            100% { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); }
+        }
+
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 10px rgba(255, 195, 0, 0.1); opacity: 0.7; }
+            100% { text-shadow: 0 0 20px rgba(255, 195, 0, 0.6); opacity: 1; }
+        }
+
+        /* Aura de fondo para dar profundidad */
+        .ambient-glow {
+            position: absolute;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(255,195,0,0.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Scrollbar limpio */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        /* Botón principal */
+        .btn-gold {
+            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
+            color: #000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
+        }
+        .btn-gold:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center text-white selection:bg-[#FFC300] selection:text-black relative overflow-hidden">
+<body class="selection:bg-[#FFC300] selection:text-black">
 
-    <div class="absolute inset-0 z-0 pointer-events-none">
-        <img src="../../static/img/backgrounds/FONDO.png" class="w-full h-full object-cover opacity-20 grayscale" alt="Fondo">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent"></div>
-    </div>
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-sm font-bold tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center min-w-[300px]"></div>
 
-    <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] opacity-0 transition-all duration-500 font-bold px-6 py-3 rounded-full text-sm tracking-widest shadow-2xl"></div>
-
-    <div id="splash-screen" class="z-[1000] fixed inset-0 flex items-center justify-center bg-[#050505]">
-        <div class="text-center">
-            <img id="splash-logo" src="../../static/img/logos/LOADING.png" alt="Cargando GYMENEZ" class="mx-auto w-48 md:w-64 animate-pulse">
-            <div id="loading-text" class="mt-8 text-xs font-black tracking-[0.5em] text-[#FFC300] uppercase z-10">
-                Iniciando Ecosistema...
+    <div id="splash-screen" class="fixed inset-0 z-[1000] flex flex-col items-center justify-center">
+        <div class="absolute inset-0 ambient-glow opacity-50"></div>
+        <div class="text-center z-10 animate-premium-in">
+            <img id="splash-logo" src="LOADING.png" alt="GYMENEZ" class="mx-auto w-56 md:w-72 drop-shadow-2xl">
+            <div id="loading-text" class="mt-8 text-[10px] md:text-xs font-black tracking-[0.6em] text-[#FFC300] uppercase animate-text-glow">
+                Iniciando Ecosistema
             </div>
         </div>
     </div>
 
-    <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-6 relative z-10">
-        <div class="card-gradient p-8 md:p-12 w-full max-w-md mx-auto rounded-[40px] shadow-2xl border border-white/5 border-t-[#FFC300]/30 relative overflow-hidden">
-            
-            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-[#FFC300]/10 blur-[60px] rounded-full pointer-events-none"></div>
+    <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-6 relative">
+        <div class="absolute inset-0 bg-[url('FONDO.png')] bg-cover bg-center opacity-10 grayscale mix-blend-overlay pointer-events-none"></div>
+        <div class="ambient-glow opacity-30"></div>
 
-            <div class="text-center mb-10 relative">
-                <img id="login-logo-img" src="../../static/img/logos/LOGIN_LOGO.png" alt="Logo GYMENEZ" class="mx-auto w-48 mb-4">
-                <p class="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Portal de Atletas</p>
+        <div class="glass-panel p-8 md:p-12 w-full max-w-md mx-auto rounded-[32px] relative z-10">
+            <div class="text-center mb-10">
+                <img id="login-logo-img" src="LOGIN_LOGO.png" alt="GYMENEZ" class="mx-auto w-48 mb-3">
+                <h2 class="text-gray-500 text-[9px] font-black uppercase tracking-[0.4em]">Autenticación Segura</h2>
             </div>
 
-            <form id="login-form" class="space-y-6">
+            <form id="login-form" class="space-y-5">
                 <div>
-                    <label for="login-email" class="block text-[10px] font-black tracking-widest text-gray-400 mb-2 uppercase">Identificación</label>
-                    <input type="email" id="login-email" name="email" placeholder="correo@ejemplo.com"
-                           class="w-full input-premium px-5 py-4 rounded-xl text-white text-sm" required>
+                    <label for="login-email" class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">ID Atleta (Correo)</label>
+                    <input type="email" id="login-email" name="email" placeholder="atleta@gymenez.com"
+                           class="w-full glass-input px-5 py-4 rounded-2xl text-white text-sm" required>
                 </div>
                 <div>
-                    <label for="login-password" class="block text-[10px] font-black tracking-widest text-gray-400 mb-2 uppercase">Credencial de Acceso</label>
+                    <label for="login-password" class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Clave de Acceso</label>
                      <input type="password" id="login-password" name="password" placeholder="••••••••"
-                           class="w-full input-premium px-5 py-4 rounded-xl text-white text-sm" required>
+                           class="w-full glass-input px-5 py-4 rounded-2xl text-white text-sm" required>
                 </div>
 
-                <button type="submit" id="login-btn"
-                        class="w-full mt-4 py-4 rounded-xl bg-[#FFC300] text-black font-black text-xs hover:bg-yellow-400 uppercase tracking-[0.3em] transition-all transform active:scale-95 shadow-[0_0_20px_rgba(251,191,36,0.2)]">
-                    INGRESAR
-                </button>
+                <div class="pt-4">
+                    <button type="submit" id="login-btn" class="btn-gold w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.25em]">
+                        Ingresar al Portal
+                    </button>
+                </div>
             </form>
             
-            <div id="login-help-links" class="mt-8 pt-6 border-t border-white/5 flex flex-col gap-4 text-center relative">
-                <span id="register-request-link" class="text-xs font-black tracking-widest text-white hover:text-[#FFC300] transition cursor-pointer uppercase">
-                    Solicitar Acceso
-                </span>
-                <div class="flex justify-between px-2 mt-2">
-                    <span id="staff-access-link" class="text-[9px] font-bold text-gray-500 hover:text-white transition cursor-pointer uppercase tracking-widest">
-                        Staff
-                    </span>
-                    <span id="forgot-password-link" class="text-[9px] font-bold text-gray-500 hover:text-white transition cursor-pointer uppercase tracking-widest">
-                        Recuperar Clave
-                    </span>
+            <div id="login-help-links" class="mt-8 pt-6 border-t border-white/5 flex flex-col gap-4 text-center">
+                <button id="register-request-link" class="text-xs font-bold tracking-widest text-white hover:text-[#FFC300] transition uppercase">
+                    Solicitar Nueva Cuenta
+                </button>
+                <div class="flex justify-between items-center px-2 mt-2">
+                    <button id="staff-access-link" class="text-[9px] font-bold text-gray-500 hover:text-white transition uppercase tracking-[0.2em]">
+                        Acceso Staff
+                    </button>
+                    <button id="forgot-password-link" class="text-[9px] font-bold text-gray-500 hover:text-white transition uppercase tracking-[0.2em]">
+                        Recuperar Credencial
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     
-    <div id="area-selection-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[1100] p-4">
-        <div class="card-gradient p-10 w-full max-w-sm mx-auto rounded-[40px] border border-white/10 text-center">
-            <h3 class="text-lg font-black mb-8 text-white uppercase tracking-[0.3em]">Área Operativa</h3>
+    <div id="area-selection-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[1100] p-4 transition-opacity">
+        <div class="glass-panel p-10 w-full max-w-sm mx-auto rounded-[32px] text-center border-t border-[#FFC300]/30">
+            <h3 class="text-lg font-black mb-8 text-white uppercase tracking-[0.3em]">División Operativa</h3>
 
-            <button id="select-trainer-btn" class="w-full py-4 mb-4 rounded-xl bg-white/5 text-white border border-white/10 font-black text-[10px] hover:border-[#FFC300] hover:text-[#FFC300] hover:bg-white/10 uppercase tracking-widest transition-all">
+            <button id="select-trainer-btn" class="w-full py-4 mb-4 rounded-xl bg-white/5 border border-white/5 font-bold text-xs hover:border-[#FFC300] hover:text-[#FFC300] uppercase tracking-widest transition-all">
                 Portal Coach
             </button>
-
-            <button id="select-admin-btn" class="w-full py-4 mb-8 rounded-xl bg-white/5 text-white border border-white/10 font-black text-[10px] hover:border-red-500 hover:text-red-500 hover:bg-white/10 uppercase tracking-widest transition-all">
+            <button id="select-admin-btn" class="w-full py-4 mb-8 rounded-xl bg-white/5 border border-white/5 font-bold text-xs hover:border-red-500 hover:text-red-500 uppercase tracking-widest transition-all">
                 Portal Admin
             </button>
-
-            <button id="modal-close-btn" class="w-full py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition duration-300">
-                Cancelar
+            <button id="modal-close-btn" class="w-full py-2 text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-widest transition">
+                Cerrar
             </button>
         </div>
     </div>
     
-    <div id="active-session-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[1000] p-4">
-        <div class="card-gradient p-8 md:p-10 w-full max-w-md mx-auto rounded-[40px] border border-red-500/30 text-center max-h-[90vh] overflow-y-auto">
-            <div class="w-16 h-16 mx-auto mb-6 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/30">
+    <div id="active-session-modal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[1000] p-4 transition-opacity">
+        <div class="glass-panel p-8 md:p-10 w-full max-w-md mx-auto rounded-[32px] border-t border-red-500/50 max-h-[90vh] overflow-y-auto">
+            
+            <div class="w-16 h-16 mx-auto mb-6 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
                 <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             </div>
-            <h3 class="text-xl font-black mb-2 text-white uppercase tracking-widest">Sesión en Uso</h3>
-            <p class="text-gray-400 text-sm mb-8 italic">Se ha detectado tu credencial activa en otro dispositivo.</p>
+            
+            <h3 class="text-xl font-black mb-2 text-white text-center uppercase tracking-widest">Sesión en Uso</h3>
+            <p class="text-gray-400 text-xs text-center mb-8 uppercase tracking-wider leading-relaxed">Las credenciales se encuentran activas en otro dispositivo de la red.</p>
             
             <div id="modal-options">
-                <p class="text-xs font-bold text-gray-300 mb-6 uppercase tracking-widest">¿Forzar el cierre y entrar aquí?</p>
+                <p class="text-[10px] font-bold text-gray-300 text-center mb-6 uppercase tracking-[0.2em]">¿Desea forzar la desconexión remota?</p>
                 <div class="flex flex-col gap-3">
-                    <button id="modal-confirm-btn" class="w-full py-4 rounded-xl bg-red-600 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-500 transition shadow-lg shadow-red-600/20">
-                        Sí, Desconectar el otro equipo
+                    <button id="modal-confirm-btn" class="w-full py-4 rounded-xl bg-red-600/90 text-white font-black text-xs uppercase tracking-widest hover:bg-red-500 transition shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                        Ejecutar Desconexión Remota
                     </button>
-                    <button id="modal-cancel-btn" class="w-full py-4 rounded-xl border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white/5 transition">
-                        Cancelar
+                    <button id="modal-cancel-btn" class="w-full py-4 rounded-xl border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:text-white hover:bg-white/5 transition">
+                        Cancelar Operación
                     </button>
                 </div>
             </div>
 
-            <form id="force-logout-form" class="hidden mt-6 text-left space-y-4 border-t border-white/10 pt-6">
-                <p class="text-xs text-[#FFC300] font-bold uppercase tracking-widest text-center mb-6">Verificación de Identidad</p>
-                <div id="force-logout-message" class="hidden p-3 rounded-lg text-xs text-center font-bold uppercase tracking-widest"></div>
+            <form id="force-logout-form" class="hidden mt-6 pt-6 border-t border-white/10 space-y-4">
+                <p class="text-[10px] font-black text-[#FFC300] text-center mb-4 uppercase tracking-[0.3em]">Protocolo de Identidad</p>
+                <div id="force-logout-message" class="hidden p-3 rounded-lg text-xs font-bold text-center uppercase tracking-widest"></div>
 
                 <div>
-                    <input type="email" id="force-email" name="email" readonly class="w-full input-premium px-4 py-3 rounded-xl text-gray-500 cursor-not-allowed text-xs" placeholder="Email">
+                    <input type="email" id="force-email" name="email" readonly class="w-full glass-input px-4 py-3 rounded-xl text-gray-500 text-xs cursor-not-allowed" placeholder="Email Bloqueado">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="force-name" name="name" class="w-full input-premium px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Nombre" required>
-                    <input type="text" id="force-lastname" name="lastname" class="w-full input-premium px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Apellido" required>
+                    <input type="text" id="force-name" name="name" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Nombre" required>
+                    <input type="text" id="force-lastname" name="lastname" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="1er Apellido" required>
                 </div>
                 <div>
-                    <input type="text" id="force-dob" name="dob" maxlength="10" class="w-full input-premium px-4 py-3 rounded-xl text-white text-xs" placeholder="Nacimiento (DD/MM/YYYY)" required>
+                    <input type="text" id="force-dob" name="dob" maxlength="10" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Nacimiento (DD/MM/YYYY)" required>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="force-phone" name="phone" class="w-full input-premium px-4 py-3 rounded-xl text-white text-xs" placeholder="Teléfono" required>
-                    <input type="text" id="force-ci" name="ci" class="w-full input-premium px-4 py-3 rounded-xl text-white text-xs" placeholder="Cédula" required>
+                    <input type="text" id="force-phone" name="phone" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Teléfono" required>
+                    <input type="text" id="force-ci" name="ci" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Cédula" required>
                 </div>
 
-                <div class="mt-8 space-y-3 pt-4">
-                    <button type="submit" id="force-logout-btn" class="w-full py-4 rounded-xl bg-red-600 text-white font-black text-xs uppercase tracking-widest hover:bg-red-500 transition">
-                        Ejecutar Desconexión
+                <div class="pt-6 mt-4 border-t border-white/5">
+                    <button type="submit" id="force-logout-btn" class="w-full py-4 rounded-xl bg-red-600 text-white font-black text-xs uppercase tracking-widest hover:bg-red-500 transition shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                        Confirmar Identidad
                     </button>
-                    <button type="button" id="force-logout-cancel" class="w-full py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition">
-                        Cancelar
+                    <button type="button" id="force-logout-cancel" class="mt-4 w-full text-center text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-widest transition">
+                        Abortar
                     </button>
                 </div>
             </form>
         </div>
     </div>
     
-    <div id="temp-message-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[2000] transition-opacity duration-500 opacity-0 px-4">
-        <div class="card-gradient p-10 w-full max-w-sm mx-auto rounded-[40px] border border-emerald-500/30 text-center transform scale-90 transition-transform duration-500">
+    <div id="temp-message-modal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[2000] transition-opacity duration-500 opacity-0 px-4">
+        <div class="glass-panel p-10 w-full max-w-md mx-auto rounded-[32px] text-center transform scale-90 transition-transform duration-500 border-t border-emerald-500/50">
             <div class="w-16 h-16 mx-auto mb-6 bg-emerald-500/10 rounded-full flex items-center justify-center">
                 <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h3 id="temp-message-text" class="text-xs font-bold text-gray-300 leading-relaxed uppercase tracking-widest">
-                Sesión anterior terminada. Por favor, ingresa de nuevo.
+            <h3 id="temp-message-text" class="text-xs font-bold text-gray-200 uppercase tracking-widest leading-relaxed">
+                Intervención Exitosa. La sesión remota fue terminada.
             </h3>
         </div>
     </div>
 
-    <div id="block-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[2000] hidden flex items-center justify-center p-4">
-        <div class="card-gradient p-10 w-full max-w-sm mx-auto rounded-[40px] border border-red-600/50 text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-red-600"></div>
+    <div id="dashboard-screen" class="hidden min-h-screen w-full">
+        <div class="max-w-7xl mx-auto p-6 md:p-10">
+            <header class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+                <h1 class="text-3xl font-black uppercase tracking-tighter">
+                    <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
+                    <span class="block text-[10px] text-gray-500 tracking-[0.4em] mt-1">Ecosistema Central</span>
+                </h1>
+                
+                <div class="flex items-center space-x-3 bg-white/5 p-1.5 rounded-full border border-white/5">
+                    <a href="templates/user/profile.html" class="px-6 py-2.5 text-[10px] font-black tracking-widest uppercase rounded-full bg-[#FFC300] text-black hover:bg-yellow-400 transition">
+                        Perfil
+                    </a>
+                    <button id="logout-button" class="px-6 py-2.5 text-[10px] font-black tracking-widest uppercase rounded-full hover:bg-red-500/20 text-red-400 hover:text-red-300 transition">
+                        Salir
+                    </button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="templates/user/routines.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
+                    <svg class="w-10 h-10 text-[#FFC300] mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path></svg>
+                    <div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-[#FFC300] transition-colors">Workout</h2>
+                        <p class="text-xs text-gray-400 font-medium">Algoritmos de entrenamiento y progresión física.</p>
+                    </div>
+                </a>
+                
+                <a href="templates/user/schedule.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
+                    <svg class="w-10 h-10 text-[#FFC300] mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h.01M13 11h.01M17 11h.01M7 16h.01M11 16h.01M15 16h.01M6 18h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-[#FFC300] transition-colors">Schedule</h2>
+                        <p class="text-xs text-gray-400 font-medium">Planificación de clases y sesiones grupales.</p>
+                    </div>
+                </a>
+
+                <a href="templates/user/goals.html" class="glass-panel p-8 rounded-3xl group hover:border-[#FFC300]/50 transition-all flex flex-col justify-between h-56">
+                    <svg class="w-10 h-10 text-[#FFC300] mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-[#FFC300] transition-colors">Goals</h2>
+                        <p class="text-xs text-gray-400 font-medium">Seguimiento de objetivos y métricas históricas.</p>
+                    </div>
+                </a>
+
+                <a href="templates/user/eats.html" class="glass-panel p-8 rounded-3xl group hover:border-emerald-400/50 transition-all flex flex-col justify-between h-56">
+                    <svg class="w-10 h-10 text-emerald-400 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2zM7 7h.01M17 7h.01M12 7h.01"/></svg>
+                    <div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-emerald-400 transition-colors">Eats</h2>
+                        <p class="text-xs text-gray-400 font-medium">Nutrición de precisión y optimización metabólica.</p>
+                    </div>
+                </a>
+
+                <a href="templates/user/on.html" class="glass-panel p-8 rounded-3xl group hover:border-red-500/50 transition-all flex flex-col justify-between h-56">
+                    <svg class="w-10 h-10 text-red-500 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.555-4.555A.996.996 0 0019 4H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V9.445L15 14V10z"></path></svg>
+                    <div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-red-500 transition-colors">ON Streaming</h2>
+                        <p class="text-xs text-gray-400 font-medium">Contenido original, documentales y educación deportiva.</p>
+                    </div>
+                </a>
+                
+                <a href="templates/user/pulse.html" class="glass-panel p-8 rounded-3xl group hover:border-sky-400/50 transition-all flex flex-col justify-between h-56">
+                    <svg class="w-10 h-10 text-sky-400 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path></svg>
+                    <div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white mb-2 group-hover:text-sky-400 transition-colors">Pulse</h2>
+                        <p class="text-xs text-gray-400 font-medium">Centro de mensajería, alertas y soporte directo.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="block-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[2000] hidden flex items-center justify-center p-4">
+        <div class="glass-panel p-10 w-full max-w-sm mx-auto rounded-[32px] border border-red-600/30 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
             <svg class="mx-auto h-16 w-16 text-red-600 mb-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
             <h3 class="text-2xl font-black text-white uppercase tracking-widest mb-4">Acceso Denegado</h3>
-            <p class="text-xs text-gray-400 leading-relaxed mb-8 uppercase tracking-wider">
-                Perfil inhabilitado por seguridad o estatus de pago.
+            <p class="text-xs text-gray-400 leading-relaxed mb-6 uppercase tracking-wider">
+                Perfil inhabilitado por directrices de seguridad o estado de facturación.
             </p>
-            <button onclick="window.open('https://wa.me/584148780392', '_blank')" class="w-full py-4 rounded-xl border border-white/10 hover:bg-white/5 text-white text-[10px] font-black uppercase tracking-[0.2em] transition">
-                Contactar Soporte
-            </button>
+            <p class="text-[9px] font-bold text-red-500 uppercase tracking-[0.3em]">
+                CODE: 403_RESTRICTED
+            </p>
         </div>
     </div>
 
-    <div id="register-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-[1100] transition-opacity duration-300 opacity-0 overflow-y-auto py-10 px-4">
-        <div class="card-gradient p-8 md:p-12 w-full max-w-2xl mx-auto rounded-[40px] border border-white/5 my-auto relative">
+    <div id="register-modal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[1100] transition-opacity duration-300 opacity-0 overflow-y-auto py-10 px-4">
+        <div class="glass-panel p-8 md:p-12 w-full max-w-2xl mx-auto rounded-[40px] border border-white/5 my-auto relative">
             
             <button type="button" id="close-register-modal" class="absolute top-8 right-8 text-gray-500 hover:text-white transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -189,66 +327,67 @@
 
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">Crear Perfil</h2>
-                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em]">Integración al ecosistema</p>
+                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em]">Alta de nuevo atleta en el sistema</p>
             </div>
 
             <form id="register-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <div class="md:col-span-2 border-b border-white/5 pb-2 mb-2">
-                    <span class="text-[#FFC300] text-[10px] font-black uppercase tracking-[0.3em]">1. Credenciales</span>
+                    <span class="text-[#FFC300] text-[10px] font-black uppercase tracking-[0.3em]">1. Credenciales de Acceso</span>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Correo Electrónico</label>
-                    <input type="email" id="reg-email" class="w-full input-premium px-4 py-3 rounded-xl text-white text-sm" required>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Correo Electrónico</label>
+                    <input type="email" id="reg-email" class="w-full glass-input px-4 py-3 rounded-xl text-white text-sm" placeholder="usuario@gymenez.com" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Contraseña</label>
-                    <input type="password" id="reg-password" class="w-full input-premium px-4 py-3 rounded-xl text-white text-sm" required>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Contraseña</label>
+                    <input type="password" id="reg-password" class="w-full glass-input px-4 py-3 rounded-xl text-white text-sm" required>
                 </div>
 
                 <div class="md:col-span-2 border-b border-white/5 pb-2 mt-4 mb-2">
                     <span class="text-[#FFC300] text-[10px] font-black uppercase tracking-[0.3em]">2. Biometría e Identidad</span>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Nombre(s)</label>
-                    <input type="text" id="reg-name" class="w-full input-premium px-4 py-3 rounded-xl text-white uppercase text-sm" required>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Nombre(s)</label>
+                    <input type="text" id="reg-name" class="w-full glass-input px-4 py-3 rounded-xl text-white uppercase text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Apellido(s)</label>
-                    <input type="text" id="reg-lastname" class="w-full input-premium px-4 py-3 rounded-xl text-white uppercase text-sm" required>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Apellido(s)</label>
+                    <input type="text" id="reg-lastname" class="w-full glass-input px-4 py-3 rounded-xl text-white uppercase text-sm" required>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Documento de Identidad</label>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Cédula</label>
                     <div class="flex gap-2">
-                        <select id="reg-ci-type" class="w-20 px-2 py-3 rounded-xl input-premium text-white font-bold text-center appearance-none">
+                        <select id="reg-ci-type" class="w-20 px-2 py-3 rounded-xl glass-input text-white font-bold text-center appearance-none">
                             <option value="V">V</option>
                             <option value="E">E</option>
                         </select>
-                        <input type="text" id="reg-ci" class="flex-1 input-premium px-4 py-3 rounded-xl text-white text-sm" placeholder="00.000.000" maxlength="11" required>
+                        <input type="text" id="reg-ci" class="flex-1 glass-input px-4 py-3 rounded-xl text-white text-sm" placeholder="00.000.000" maxlength="11" required>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Teléfono Móvil</label>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Teléfono Móvil</label>
                     <div class="flex gap-2">
-                        <select id="reg-phone-prefix" class="w-24 px-2 py-3 rounded-xl input-premium text-white font-bold text-center appearance-none">
+                        <select id="reg-phone-prefix" class="w-24 px-2 py-3 rounded-xl glass-input text-white font-bold text-center appearance-none">
                             <option value="0414">0414</option>
                             <option value="0424">0424</option>
                             <option value="0412">0412</option>
+                            <option value="0422">0422</option>
                             <option value="0416">0416</option>
                             <option value="0426">0426</option>
                         </select>
-                        <input type="text" id="reg-phone-num" class="flex-1 input-premium px-4 py-3 rounded-xl text-white text-sm" placeholder="1234567" maxlength="7" required>
+                        <input type="text" id="reg-phone-num" class="flex-1 glass-input px-4 py-3 rounded-xl text-white text-sm" placeholder="1234567" maxlength="7" required>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Fecha de Nacimiento</label>
-                    <input type="text" id="reg-dob" class="w-full input-premium px-4 py-3 rounded-xl text-white text-sm" placeholder="DD/MM/YYYY" maxlength="10" required>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Nacimiento</label>
+                    <input type="text" id="reg-dob" class="w-full glass-input px-4 py-3 rounded-xl text-white text-sm" placeholder="DD/MM/YYYY" maxlength="10" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 mb-1 ml-1 uppercase">Sexo Biológico</label>
-                    <select id="reg-sex" class="w-full input-premium px-4 py-3 rounded-xl text-white font-bold appearance-none text-sm">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">Sexo Biológico</label>
+                    <select id="reg-sex" class="w-full glass-input px-4 py-3 rounded-xl text-white font-bold appearance-none text-sm">
                         <option value="Hombre">Hombre</option>
                         <option value="Mujer">Mujer</option>
                         <option value="Otro">Otro</option>
@@ -256,8 +395,8 @@
                 </div>
 
                 <div class="md:col-span-2 pt-6 mt-4 border-t border-white/5">
-                    <button type="submit" id="reg-submit-btn" class="w-full py-4 rounded-xl bg-[#FFC300] text-black font-black text-sm uppercase tracking-[0.2em] hover:bg-yellow-400 transition-all shadow-xl">
-                        FINALIZAR E INTEGRAR
+                    <button type="submit" id="reg-submit-btn" class="btn-gold w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em]">
+                        Registrar en Sistema
                     </button>
                 </div>
             </form>
@@ -267,38 +406,79 @@
     <div id="activation-modal" class="hidden fixed inset-0 z-[1200] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-xl"></div>
 
-        <div class="card-gradient relative w-full max-w-md mx-auto p-10 rounded-[40px] border border-[#FFC300]/20 text-center overflow-hidden">
-            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-[#FFC300]/20 blur-[60px] rounded-full pointer-events-none"></div>
+        <div class="glass-panel relative w-full max-w-md mx-auto p-10 rounded-[40px] border border-[#FFC300]/20 text-center overflow-hidden">
+            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-[#FFC300]/10 blur-[60px] rounded-full pointer-events-none"></div>
 
             <div class="relative mb-8">
-                <div class="w-20 h-20 mx-auto bg-[#FFC300]/10 rounded-2xl flex items-center justify-center border border-[#FFC300]/30">
+                <div class="w-20 h-20 mx-auto bg-[#FFC300]/10 rounded-2xl flex items-center justify-center border border-[#FFC300]/20">
                     <svg class="w-10 h-10 text-[#FFC300] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
                 </div>
             </div>
             
-            <h3 class="text-3xl font-black mb-2 text-white tracking-tighter uppercase">CÓDIGO SHIELD</h3>
-            <p class="text-xs text-gray-400 mb-8 font-medium">Ingresa la clave de 6 dígitos enviada a tu correo.</p>
+            <h3 class="text-3xl font-black mb-2 text-white tracking-tighter uppercase">Código SHIELD</h3>
+            <p class="text-xs text-gray-400 mb-8 font-medium leading-relaxed">Verifica tu identidad ingresando la clave enviada a tu correo.</p>
             
             <form id="activation-form" class="space-y-8 relative z-10">
                 <input type="hidden" id="activation-email">
                 
                 <div>
                     <input type="text" id="activation-code" maxlength="6" placeholder="······"
-                           class="w-full max-w-[280px] mx-auto block px-2 py-4 text-center text-4xl tracking-[0.4em] rounded-2xl bg-black/60 text-[#FFC300] border border-white/10 focus:border-[#FFC300] focus:ring-1 focus:ring-[#FFC300] focus:outline-none font-mono transition-all" required>
+                           class="w-full max-w-[280px] mx-auto block px-2 py-4 text-center text-4xl tracking-[0.4em] rounded-2xl glass-input text-[#FFC300] font-mono transition-all" required>
                 </div>
 
                 <div class="space-y-3">
-                    <button type="submit" id="verify-btn" class="w-full py-4 rounded-xl bg-[#FFC300] text-black font-black text-[11px] uppercase tracking-[0.3em] hover:bg-yellow-400 active:scale-95 transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)]">
-                        Autenticar
+                    <button type="submit" id="verify-btn" class="btn-gold w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                        Autenticar Código
                     </button>
-                    <button type="button" id="close-activation-modal" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition border border-transparent hover:border-white/10 rounded-xl">
-                        Cancelar
+                    <button type="button" id="close-activation-modal" class="w-full py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition">
+                        Volver
                     </button>
                 </div>
             </form>
+            <p class="mt-8 text-[9px] text-gray-600 uppercase tracking-widest font-black">Powered by GYMENEZ SECURITY</p>
         </div>
     </div>
 
-    <script src="../../static/js/auth.js"></script>
+    <script>
+        // --- Formateo Automático de Fecha (DD/MM/YYYY) ---
+        const dobInput = document.getElementById('reg-dob');
+        if (dobInput) {
+            dobInput.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/\D/g, ''); 
+                if (v.length > 8) v = v.slice(0, 8);
+                let final = "";
+                if (v.length > 0) final += v.slice(0, 2);
+                if (v.length > 2) final += '/' + v.slice(2, 4);
+                if (v.length > 4) final += '/' + v.slice(4, 8);
+                e.target.value = final;
+            });
+        }
+
+        // --- Formateo Automático de Cédula (00.000.000) ---
+        const ciInput = document.getElementById('reg-ci');
+        if (ciInput) {
+            ciInput.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/\D/g, ''); 
+                if (v.length > 8) v = v.slice(0, 8);
+                let formatted = "";
+                if (v.length > 0) {
+                    if (v.length <= 2) formatted = v;
+                    else if (v.length <= 5) formatted = v.slice(0, v.length - 3) + '.' + v.slice(v.length - 3);
+                    else formatted = v.slice(0, v.length - 6) + '.' + v.slice(v.length - 6, v.length - 3) + '.' + v.slice(v.length - 3);
+                }
+                e.target.value = formatted;
+            });
+        }
+
+        // --- Bloqueo de letras en Teléfono ---
+        const phoneInput = document.getElementById('reg-phone-num');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7);
+            });
+        }
+    </script>
+
+    <script src="static/js/auth.js"></script>
 </body>
 </html>
