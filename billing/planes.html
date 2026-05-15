@@ -6,75 +6,185 @@
     <title>GYMENEZ | Planes de Suscripción</title>
     <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/auth.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #FFC300 0%, #FFB000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-sky {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glow-gold { box-shadow: 0 0 40px -10px rgba(255, 195, 0, 0.15); }
+        .glow-sky { box-shadow: 0 0 40px -10px rgba(56, 189, 248, 0.1); }
+        
+        /* Animación de entrada */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+    </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden bg-[#030305] text-white">
+<body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden bg-[#030305] text-white min-h-screen flex flex-col">
 
-    <div id="loading-overlay" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="w-12 h-12 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-[#FFC300]">Sincronizando BCV...</p>
+    <div id="loading-overlay" class="fixed inset-0 z-50 bg-[#030305]/90 backdrop-blur-sm flex flex-col items-center justify-center transition-all duration-700">
+        <div class="relative w-16 h-16 mb-6">
+            <div class="absolute inset-0 border-2 border-white/10 rounded-full"></div>
+            <div class="absolute inset-0 border-2 border-[#FFC300] rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/70">Conectando con BCV</p>
     </div>
 
-    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <header class="w-full border-b border-white/5 bg-[#030305]/80 backdrop-blur-xl sticky top-0 z-40 transition-all">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
             <h1 class="text-xl font-black uppercase tracking-tighter"><span class="text-[#FFC300]">GYM</span>ENEZ</h1>
-            <a href="../start/inicio.html" class="px-6 py-2 rounded-full border border-white/10 text-[10px] uppercase tracking-widest font-bold">Volver</a>
+            <a href="../start/inicio.html" class="group px-5 py-2.5 rounded-full border border-white/10 text-[11px] uppercase tracking-widest font-medium text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-300">
+                <span class="flex items-center gap-2">
+                    <svg class="w-3 h-3 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Volver
+                </span>
+            </a>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-12">
-        <div class="text-center mb-12">
-            <h2 class="text-5xl font-black uppercase tracking-tighter">Desbloquea el <span class="text-[#FFC300]">Ecosistema</span></h2>
-            <p class="mt-4 text-gray-400 text-sm">Precios calculados a la Tasa BCV: <span id="tasa-bcv-display" class="font-bold text-emerald-400">Consultando...</span></p>
+    <main class="flex-grow flex flex-col justify-center max-w-7xl mx-auto px-6 py-16 w-full">
+        <div class="text-center mb-16 animate-fade-up opacity-0">
+            <h2 class="text-4xl md:text-6xl font-black tracking-tighter mb-4">Elige tu <span class="text-gradient-gold">Ecosistema</span></h2>
+            <p class="text-gray-400 text-sm md:text-base max-w-2xl mx-auto font-light leading-relaxed">
+                Potencia tus resultados con herramientas diseñadas para atletas exigentes. 
+            </p>
+            <div class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-sm">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <p class="text-xs text-gray-400 font-medium tracking-wide">Tasa BCV hoy: <span id="tasa-bcv-display" class="text-white font-semibold ml-1">Calculando...</span></p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass-panel p-8 rounded-3xl border border-white/10 text-center flex flex-col">
-                <h3 class="text-2xl font-black uppercase tracking-widest text-gray-300">Standard</h3>
-                <p class="text-xs text-gray-500 mt-2">La base del rendimiento.</p>
-                <div class="my-8">
-                    <p class="text-5xl font-black">$13.99</p>
-                    <p class="text-sm font-bold text-[#FFC300] mt-2">Bs. <span id="price-standard" class="calculating">...</span></p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto w-full">
+            
+            <div class="glass-card rounded-[2rem] p-8 border border-white/10 flex flex-col hover:-translate-y-2 hover:border-white/20 transition-all duration-500 animate-fade-up opacity-0 delay-100 group">
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold tracking-tight text-white/90">Standard</h3>
+                    <p class="text-sm text-gray-500 mt-2 font-medium">La base de tu transformación.</p>
                 </div>
-                <ul class="text-xs text-gray-400 space-y-4 mb-8 flex-grow text-left">
-                    <li>✔️ Rutinas Personalizadas</li>
-                    <li>✔️ Atención WhatsApp (8am - 6pm)</li>
-                    <li>❌ Sin histórico de métricas</li>
+                <div class="mb-8">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-semibold text-white/50">$</span>
+                        <span class="text-5xl font-black tracking-tighter text-white">13</span>
+                        <span class="text-xl font-bold text-white/50">.99</span>
+                        <span class="text-sm text-gray-500 ml-1">/mes</span>
+                    </div>
+                    <div class="mt-3 h-6 flex items-center">
+                        <span class="text-xs font-semibold text-gray-400 bg-white/5 px-3 py-1 rounded-md">Bs. <span id="price-standard">...</span></span>
+                    </div>
+                </div>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-gray-300 font-medium">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-gray-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Rutinas Personalizadas
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-gray-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Atención WhatsApp <span class="text-gray-500 text-xs block font-normal mt-0.5">8:00 AM - 6:00 PM</span>
+                    </li>
+                    <li class="flex items-start opacity-40">
+                        <svg class="w-5 h-5 text-gray-600 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Métricas y Progreso
+                    </li>
                 </ul>
-                <button onclick="goToPayment('STANDARD', 13.99)" class="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition">Seleccionar</button>
+                <button onclick="goToPayment('STANDARD', 13.99)" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-semibold text-sm tracking-wide hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                    Comenzar Standard
+                </button>
             </div>
 
-            <div class="glass-panel p-8 rounded-3xl border border-[#FFC300] text-center flex flex-col relative transform md:-translate-y-4 shadow-[0_0_30px_rgba(255,195,0,0.1)]">
-                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#FFC300] text-black text-[9px] font-black uppercase tracking-widest px-4 py-1 rounded-full">Más Popular</div>
-                <h3 class="text-2xl font-black uppercase tracking-widest text-[#FFC300]">Plus</h3>
-                <p class="text-xs text-gray-400 mt-2">El control analítico total.</p>
-                <div class="my-8">
-                    <p class="text-6xl font-black">$17.99</p>
-                    <p class="text-sm font-bold text-[#FFC300] mt-2">Bs. <span id="price-plus" class="calculating">...</span></p>
+            <div class="relative glass-card rounded-[2rem] p-8 border border-[#FFC300]/40 flex flex-col transform md:-translate-y-4 glow-gold hover:-translate-y-6 hover:border-[#FFC300]/70 transition-all duration-500 animate-fade-up opacity-0 delay-200 z-10">
+                <div class="absolute -top-4 left-0 right-0 flex justify-center">
+                    <span class="bg-gradient-to-r from-[#FFC300] to-[#FFB000] text-black text-[10px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full shadow-lg shadow-[#FFC300]/20">
+                        El más elegido
+                    </span>
                 </div>
-                <ul class="text-xs text-gray-300 space-y-4 mb-8 flex-grow text-left">
-                    <li>✔️ Todo lo del Standard</li>
-                    <li>✔️ Histórico de Progreso y Fotos</li>
-                    <li>✔️ GYMENEZ ON (Podcast y Blogs)</li>
+                <div class="mb-8 mt-2">
+                    <h3 class="text-xl font-bold tracking-tight text-[#FFC300]">Plus</h3>
+                    <p class="text-sm text-gray-400 mt-2 font-medium">Control analítico y contenido exclusivo.</p>
+                </div>
+                <div class="mb-8">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-semibold text-[#FFC300]/60">$</span>
+                        <span class="text-6xl font-black tracking-tighter text-white">17</span>
+                        <span class="text-2xl font-bold text-[#FFC300]/80">.99</span>
+                        <span class="text-sm text-gray-500 ml-1">/mes</span>
+                    </div>
+                    <div class="mt-3 h-6 flex items-center">
+                        <span class="text-xs font-bold text-[#FFC300] bg-[#FFC300]/10 px-3 py-1 rounded-md border border-[#FFC300]/20">Bs. <span id="price-plus">...</span></span>
+                    </div>
+                </div>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-gray-200 font-medium">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-[#FFC300] mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Todo lo del plan Standard
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-[#FFC300] mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Histórico de Progreso y Fotos
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-[#FFC300] mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        GYMENEZ ON <span class="text-gray-400 text-xs block font-normal mt-0.5">Podcast y Blogs Exclusivos</span>
+                    </li>
                 </ul>
-                <button onclick="goToPayment('PLUS', 17.99)" class="w-full py-4 rounded-xl bg-[#FFC300] text-black font-black text-xs uppercase tracking-widest hover:bg-yellow-400 shadow-lg transition">Seleccionar Plus</button>
+                <button onclick="goToPayment('PLUS', 17.99)" class="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FFC300] to-[#FFB000] text-black font-bold text-sm tracking-wide shadow-lg shadow-[#FFC300]/20 hover:shadow-[#FFC300]/40 hover:scale-[1.02] transition-all duration-300">
+                    Seleccionar Plus
+                </button>
             </div>
 
-            <div class="glass-panel p-8 rounded-3xl border border-sky-500/50 text-center flex flex-col">
-                <h3 class="text-2xl font-black uppercase tracking-widest text-sky-400">Ultra</h3>
-                <p class="text-xs text-gray-500 mt-2">El Ecosistema 360°</p>
-                <div class="my-8">
-                    <p class="text-5xl font-black">$27.99</p>
-                    <p class="text-sm font-bold text-sky-400 mt-2">Bs. <span id="price-ultra" class="calculating">...</span></p>
+            <div class="glass-card rounded-[2rem] p-8 border border-sky-500/20 flex flex-col hover:-translate-y-2 hover:border-sky-500/40 glow-sky transition-all duration-500 animate-fade-up opacity-0 delay-300">
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold tracking-tight text-sky-400">Ultra</h3>
+                    <p class="text-sm text-gray-500 mt-2 font-medium">El Ecosistema 360° sin límites.</p>
                 </div>
-                <ul class="text-xs text-gray-400 space-y-4 mb-8 flex-grow text-left">
-                    <li>✔️ Todo lo del Plus</li>
-                    <li>✔️ GYMENEZ EATS (Dieta Inteligente)</li>
-                    <li>✔️ Documentales y Clases VIP</li>
+                <div class="mb-8">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-semibold text-sky-400/50">$</span>
+                        <span class="text-5xl font-black tracking-tighter text-white">27</span>
+                        <span class="text-xl font-bold text-sky-400/80">.99</span>
+                        <span class="text-sm text-gray-500 ml-1">/mes</span>
+                    </div>
+                    <div class="mt-3 h-6 flex items-center">
+                        <span class="text-xs font-semibold text-sky-400 bg-sky-500/10 px-3 py-1 rounded-md border border-sky-500/20">Bs. <span id="price-ultra">...</span></span>
+                    </div>
+                </div>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-gray-300 font-medium">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Todo lo del plan Plus
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        GYMENEZ EATS <span class="text-gray-500 text-xs block font-normal mt-0.5">Dieta Inteligente Integrada</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Documentales y Clases VIP
+                    </li>
                 </ul>
-                <button onclick="goToPayment('ULTRA', 27.99)" class="w-full py-4 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-xs uppercase tracking-widest hover:bg-sky-500/20 transition">Seleccionar Ultra</button>
+                <button onclick="goToPayment('ULTRA', 27.99)" class="w-full py-4 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-semibold text-sm tracking-wide hover:bg-sky-500/20 hover:border-sky-500/50 transition-all duration-300">
+                    Descubrir Ultra
+                </button>
             </div>
+
         </div>
     </main>
 
@@ -89,31 +199,54 @@
                 
                 if(data.success) {
                     tasaBcvActual = data.rate;
-                    document.getElementById('tasa-bcv-display').textContent = `1$ = ${tasaBcvActual.toFixed(2)} Bs`;
+                    document.getElementById('tasa-bcv-display').textContent = `${tasaBcvActual.toFixed(2)} Bs`;
                     
-                    // Calcular y formatear con coma y punto
                     const formatBs = (usd) => (usd * tasaBcvActual).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     
-                    document.getElementById('price-standard').textContent = formatBs(13.99);
-                    document.getElementById('price-plus').textContent = formatBs(17.99);
-                    document.getElementById('price-ultra').textContent = formatBs(27.99);
+                    // Efecto de contador rápido opcional (fade in del texto)
+                    const elements = ['price-standard', 'price-plus', 'price-ultra'];
+                    const prices = [13.99, 17.99, 27.99];
                     
-                    document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+                    elements.forEach((id, index) => {
+                        const el = document.getElementById(id);
+                        el.style.opacity = '0';
+                        setTimeout(() => {
+                            el.textContent = formatBs(prices[index]);
+                            el.style.transition = 'opacity 0.5s ease';
+                            el.style.opacity = '1';
+                        }, 100);
+                    });
+                    
+                    // Ocultar overlay de carga suavemente
+                    const overlay = document.getElementById('loading-overlay');
+                    overlay.classList.add('opacity-0');
+                    setTimeout(() => overlay.classList.add('hidden'), 700);
+
                 } else {
-                    alert("Servidores BCV colapsados. Comuníquese por WhatsApp.");
-                    window.location.href = "https://wa.me/584148780392?text=Hola,%20deseo%20pagar%20pero%20el%20sistema%20BCV%20está%20caído.";
+                    handleBcvError();
                 }
             } catch (e) {
-                alert("Error de conexión.");
+                handleBcvError();
             }
         };
 
+        function handleBcvError() {
+            alert("No se pudo sincronizar la tasa del BCV. Te redirigiremos a WhatsApp para asistencia manual.");
+            window.location.href = "https://wa.me/584148780392?text=Hola,%20deseo%20suscribirme%20pero%20el%20sistema%20BCV%20parece%20estar%20caído.";
+        }
+
         function goToPayment(plan, usdPrice) {
-            // Guardamos el plan y el monto en localStorage para que payments.html lo reciba
+            if(tasaBcvActual === 0) return; // Prevenir click si no cargó la tasa
             const bsPrice = (usdPrice * tasaBcvActual).toFixed(2);
             localStorage.setItem('pendingPaymentPlan', plan);
             localStorage.setItem('pendingPaymentBs', bsPrice);
-            window.location.href = 'payments.html';
+            
+            // Efecto visual antes de navegar
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.4s ease';
+            setTimeout(() => {
+                window.location.href = 'payments.html';
+            }, 400);
         }
     </script>
 </body>
