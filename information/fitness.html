@@ -92,51 +92,130 @@
         </div>
     </section>
 
-    <section class="py-20 md:py-32 px-6 md:px-16 bg-[#0a0a0a]">
-        <div class="text-center mb-12 md:mb-20">
-            <h2 class="text-4xl md:text-7xl font-[900] italic tracking-tighter uppercase mb-3 md:mb-4">Elige tu <span class="text-[#FFC300]">Nivel.</span></h2>
-            <p class="text-gray-500 uppercase font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.3em]">Planes adaptados a tu estilo de vida</p>
+    <section class="py-20 md:py-32 px-6 md:px-16 bg-[#050505] border-t border-white/5">
+        <div class="text-center mb-16 md:mb-24">
+            <span class="text-[#FFC300] font-black tracking-[0.4em] text-[9px] md:text-[11px] uppercase mb-3 inline-block opacity-80">Niveles de Optimización</span>
+            <h2 class="text-4xl md:text-7xl font-[900] italic tracking-tighter uppercase mb-4 text-white">Elige tu <span class="text-[#FFC300]">Nivel.</span></h2>
+            <p class="text-gray-500 uppercase font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.3em]">Programas tácticos diseñados para evolucionar con tu propósito</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
             
-            <div class="plan-card bg-[#111] p-6 md:p-10 rounded-[32px] md:rounded-[40px] border border-white/5 flex flex-col">
-                <h3 class="text-xl md:text-2xl font-black italic mb-1 md:mb-2 uppercase">STANDARD</h3>
-                <span class="text-gray-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-6 md:mb-8 italic">Esencial Analítico</span>
-                <ul class="space-y-3 md:space-y-4 mb-8 md:mb-12 flex-grow">
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-gray-300">✓ Entrenador Personalizado</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-gray-300">✓ Chat: 8:00 AM - 7:00 PM</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-gray-300 italic">✓ Mediciones del Momento</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-white/20 line-through italic">✗ Histórico de Métricas</li>
-                </ul>
-                <a href="../templates/app/app.html" class="w-full py-3 md:py-4 border border-white/20 rounded-xl text-center font-black text-[9px] md:text-[10px] uppercase hover:bg-white hover:text-black transition">Seleccionar</a>
+            <div class="plan-card bg-[#0d0d1a]/40 p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-white/5 flex flex-col justify-between transition-all duration-500 hover:border-white/10">
+                <div>
+                    <span class="text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-2 block italic">Acceso Light</span>
+                    <h3 class="text-xl md:text-2xl font-black italic mb-4 uppercase text-white">BÁSICO</h3>
+                    <div class="text-gray-400 font-bold text-sm mb-6 pb-4 border-b border-white/5">Ingreso Gratuito</div>
+                    
+                    <ul class="space-y-4 text-xs font-medium text-gray-400">
+                        <li class="flex items-start text-gray-300">
+                            <span class="text-emerald-400 mr-2">✓</span>
+                            Plan de entrenamiento automatizado adaptado estrictamente a tu edad y peso base.
+                        </li>
+                        <li class="flex items-start text-gray-600 line-through italic">
+                            <span class="text-gray-700 mr-2">✗</span>
+                            Sin personalización perimetral de métricas.
+                        </li>
+                        <li class="flex items-start text-gray-600 line-through italic">
+                            <span class="text-gray-700 mr-2">✗</span>
+                            Restricción total a los módulos avanzados (EATS, ON, Objetivos, Históricos y Analíticas).
+                        </li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="plan-card bg-[#111] p-6 md:p-10 rounded-[32px] md:rounded-[40px] border border-white/10 flex flex-col relative overflow-hidden scale-100 md:scale-105 shadow-2xl">
-                <div class="absolute top-6 right-[-35px] bg-[#FFC300] text-black text-[8px] md:text-[9px] font-black py-1 w-32 text-center rotate-45 uppercase">Popular</div>
-                <h3 class="text-xl md:text-2xl font-black italic mb-1 md:mb-2 uppercase text-[#FFC300]">PLUS</h3>
-                <span class="text-gray-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-6 md:mb-8 italic">Control Evolutivo</span>
-                <ul class="space-y-3 md:space-y-4 mb-8 md:mb-12 flex-grow">
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-white">✓ Entrenador Personalizado</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-white">✓ Chat: 8:00 AM - 7:00 PM</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-white">✓ Histórico de Métricas Full</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-white italic">✓ Analítica de Evolución</li>
-                </ul>
-                <a href="../templates/app/app.html" class="w-full py-3 md:py-4 bg-[#FFC300] text-black rounded-xl text-center font-black text-[9px] md:text-[10px] uppercase hover:bg-yellow-400 transition">Seleccionar</a>
+            <div class="plan-card bg-[#0d0d1a]/40 p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-white/5 flex flex-col justify-between transition-all duration-500 hover:border-[#FFC300]/30">
+                <div>
+                    <span class="text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-2 block italic">Dirección Básica</span>
+                    <h3 class="text-xl md:text-2xl font-black italic mb-4 uppercase text-white">STANDARD</h3>
+                    <div class="text-[#FFC300] font-bold text-sm mb-6 pb-4 border-b border-white/5">Inversión Esencial</div>
+                    
+                    <ul class="space-y-4 text-xs font-medium text-gray-300">
+                        <li class="flex items-start">
+                            <span class="text-[#FFC300] mr-2">✓</span>
+                            Acceso completo a programas de entrenamiento 100% personalizados por el staff.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#FFC300] mr-2">✓</span>
+                            Comunicación bidireccional continua con entrenadores para el ajuste dinámico de rutinas.
+                        </li>
+                        <li class="flex items-start text-gray-500">
+                            <span class="text-gray-600 mr-2">ℹ</span>
+                            Prioridad baja en la cola de atención y respuesta técnica.
+                        </li>
+                        <li class="flex items-start text-gray-600 line-through italic">
+                            <span class="text-gray-700 mr-2">✗</span>
+                            Excluye históricos de lectura, analíticas de evolución y módulos EATS u ON.
+                        </li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="plan-card bg-[#111] p-6 md:p-10 rounded-[32px] md:rounded-[40px] border border-white/5 flex flex-col">
-                <h3 class="text-xl md:text-2xl font-black italic mb-1 md:mb-2 uppercase">ULTRA</h3>
-                <span class="text-gray-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-6 md:mb-8 italic">Ecosistema 360°</span>
-                <ul class="space-y-3 md:space-y-4 mb-8 md:mb-12 flex-grow">
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-[#FFC300]">✓ Soporte: 8:00 AM - 10:00 PM</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-gray-300 italic">✓ GYMENEZ EATS Incluido</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-gray-300 italic">✓ GYMENEZ ON (Premium)</li>
-                    <li class="text-xs md:text-sm font-bold flex gap-3 text-gray-300">✓ Todo el Histórico y Analítica</li>
-                </ul>
-                <a href="../templates/app/app.html" class="w-full py-3 md:py-4 border border-white/20 rounded-xl text-center font-black text-[9px] md:text-[10px] uppercase hover:bg-white hover:text-black transition">Seleccionar</a>
+            <div class="plan-card bg-[#0d0d1a]/60 p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-white/10 flex flex-col justify-between relative overflow-hidden scale-100 lg:scale-105 shadow-2xl transition-all duration-500 hover:border-emerald-500/30">
+                <div class="absolute top-4 right-[-35px] bg-[#FFC300] text-black text-[7px] md:text-[8px] font-black py-0.5 w-28 text-center rotate-45 uppercase tracking-widest">Evolutivo</div>
+                <div>
+                    <span class="text-emerald-400 text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-2 block italic">Control Analítico</span>
+                    <h3 class="text-xl md:text-2xl font-black italic mb-4 uppercase text-white">PLUS</h3>
+                    <div class="text-emerald-400 font-bold text-sm mb-6 pb-4 border-b border-white/5">Optimización Intermedia</div>
+                    
+                    <ul class="space-y-4 text-xs font-medium text-gray-200">
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 mr-2">✓</span>
+                            Incluye todas las ventajas de planificación del ecosistema Standard.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 mr-2">✓</span>
+                            Desbloqueo total de métricas simétricas perimetrales e histórico de analítica avanzada.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 mr-2">✓</span>
+                            Acceso a la plataforma de streaming GYMENEZ ON con un catálogo de contenidos seleccionados.
+                        </li>
+                        <li class="flex items-start text-gray-400">
+                            <span class="text-emerald-500/50 mr-2">ℹ</span>
+                            Prioridad de atención y soporte técnico media en el Pulse Center.
+                        </li>
+                    </ul>
+                </div>
             </div>
 
+            <div class="plan-card bg-[#0d0d1a]/80 p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-sky-500/20 flex flex-col justify-between relative shadow-2xl transition-all duration-500 hover:border-sky-500/40">
+                <div class="absolute top-4 right-[-35px] bg-sky-500 text-white text-[7px] md:text-[8px] font-black py-0.5 w-28 text-center rotate-45 uppercase tracking-widest">Máximo</div>
+                <div>
+                    <span class="text-sky-400 text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-2 block italic">Ecosistema 360°</span>
+                    <h3 class="text-xl md:text-2xl font-black italic mb-4 uppercase text-[#FFC300]">ULTRA</h3>
+                    <div class="text-sky-400 font-bold text-sm mb-6 pb-4 border-b border-white/5">Rendimiento Élite</div>
+                    
+                    <ul class="space-y-4 text-xs font-medium text-gray-100">
+                        <li class="flex items-start">
+                            <span class="text-sky-400 mr-2">✓</span>
+                            Control total e irrestricto de toda la telemetría e historiales del ecosistema previo.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-sky-400 mr-2">✓</span>
+                            Integración completa de GYMENEZ EATS (planificación bioquímica y nutrición de precisión).
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-sky-400 mr-2">✓</span>
+                            Acceso VIP absoluto a todo el catálogo de producciones originales y series de GYMENEZ ON.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-sky-400 mr-2">✓</span>
+                            Prioridad de atención técnica alta, comunicación VIP y actualizaciones de software preferenciales.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-center w-full max-w-lg mx-auto pt-4">
+            <a href="../apps/start/inicio.html" class="block w-full py-5 rounded-2xl bg-white text-black font-[900] text-xs md:text-sm uppercase tracking-[0.3em] text-center shadow-xl shadow-white/5 hover:bg-[#FFC300] hover:shadow-[0_0_40px_rgba(255,195,0,0.4)] transition-all duration-500 transform hover:scale-[1.02] active:scale-[0.99]">
+                Comenzar Mi Transformación
+            </a>
+            <p class="text-gray-600 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] mt-4">
+                Consola Centralizada • Accede al sistema para completar tu registro e iniciar tu suscripción táctica
+            </p>
         </div>
     </section>
 
