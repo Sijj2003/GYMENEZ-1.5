@@ -479,7 +479,6 @@ window.onload = function() {
         document.getElementById('logout-button')?.addEventListener('click', async () => {
             const btn = document.getElementById('logout-button');
             btn.disabled = true;
-            btn.textContent = 'SALIENDO...';
             stopSessionChecker(); 
             await apiLogout(); 
             window.location.href = '/';
