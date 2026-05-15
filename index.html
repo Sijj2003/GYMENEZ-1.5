@@ -80,40 +80,62 @@
             </div>
 
             <div class="grid lg:grid-cols-3 gap-8 md:gap-10">
-                <div class="group relative card-gradient rounded-[32px] md:rounded-[40px] p-8 md:p-10 border border-white/5 hover:border-[#FFC300]/40 transition-all duration-700 hover:-translate-y-4">
-                    <div class="mb-8 md:mb-12 opacity-40 group-hover:opacity-100 transition-opacity">
-                        <svg class="w-12 h-12 md:w-14 md:h-14 text-[#FFC300]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-[900] mb-3 md:mb-4 italic tracking-tight uppercase">GYMENEZ <br> FITNESS</h3>
-                    <p class="text-gray-400 text-xs md:text-sm mb-8 md:mb-10 leading-relaxed">Entrenamiento basado en analítica biológica y seguimiento profesional personalizado.</p>
-                    <a href="information/fitness.html" class="inline-flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-[#FFC300] uppercase italic group-hover:gap-6 transition-all">
-                        Descubrir <span class="text-xl md:text-2xl">→</span>
-                    </a>
-                </div>
-
-                <div class="group relative card-gradient rounded-[32px] md:rounded-[40px] p-8 md:p-10 border border-white/5 hover:border-[#FFC300]/40 transition-all duration-700 hover:-translate-y-4">
-                    <div class="mb-8 md:mb-12 opacity-40 group-hover:opacity-100 transition-opacity text-white">
-                        <svg class="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-[900] mb-3 md:mb-4 italic tracking-tight uppercase text-[#FFC300]">GYMENEZ <br> EATS</h3>
-                    <p class="text-gray-400 text-xs md:text-sm mb-8 md:mb-10 leading-relaxed">Nutrición de precisión diseñada bioquímicamente para potenciar tu propósito deportivo.</p>
-                    <a href="information/eats.html" class="inline-flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-white uppercase italic group-hover:gap-6 transition-all">
-                        Descubrir <span class="text-xl md:text-2xl text-[#FFC300]">→</span>
-                    </a>
-                </div>
-
-                <div class="group relative card-gradient rounded-[32px] md:rounded-[40px] p-8 md:p-10 border border-white/5 hover:border-red-600/40 transition-all duration-700 hover:-translate-y-4">
-                    <div class="mb-8 md:mb-12 opacity-40 group-hover:opacity-100 transition-opacity text-red-600">
-                        <svg class="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 10l4.555-4.555A.996.996 0 0019 4H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V9.445L15 14V10z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-[900] mb-3 md:mb-4 italic tracking-tight uppercase text-white">GYMENEZ <br> ON</h3>
-                    <p class="text-gray-400 text-xs md:text-sm mb-8 md:mb-10 leading-relaxed">Streaming exclusivo con cultura de hierro que redefine el ADN de un atleta moderno.</p>
-                    <a href="information/on.html" class="inline-flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-red-600 uppercase italic group-hover:gap-6 transition-all">
-                        Ver Ahora <span class="text-xl md:text-2xl text-white">→</span>
-                    </a>
-                </div>
+    
+    <a href="information/fitness.html" class="group relative overflow-hidden rounded-[32px] md:rounded-[40px] border border-white/10 hover:border-[#FFC300]/50 transition-all duration-700 min-h-[420px] flex flex-col justify-end p-8 md:p-10 block shadow-2xl">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800" class="w-full h-full object-cover opacity-30 group-hover:opacity-50 group-hover:scale-110 transition-all duration-1000 grayscale group-hover:grayscale-0" alt="GYMENEZ Fitness">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent"></div>
+        </div>
+        <div class="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
+            <div class="mb-4 flex items-center gap-3 opacity-70 group-hover:opacity-100 transition-opacity">
+                <span class="w-8 h-[2px] bg-[#FFC300]"></span>
+                <span class="text-[9px] font-black tracking-[0.3em] uppercase text-[#FFC300]">Módulo 01</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-[900] mb-3 italic tracking-tight uppercase text-white drop-shadow-lg">GYMENEZ <br> FITNESS</h3>
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed font-light">Entrenamiento basado en analítica biológica y seguimiento profesional personalizado.</p>
+            <div class="flex items-center gap-3 text-[11px] font-black tracking-[0.2em] text-white uppercase italic opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                Explorar Rendimiento <span class="text-[#FFC300] text-xl">→</span>
             </div>
         </div>
+    </a>
+
+    <a href="information/eats.html" class="group relative overflow-hidden rounded-[32px] md:rounded-[40px] border border-white/10 hover:border-emerald-500/50 transition-all duration-700 min-h-[420px] flex flex-col justify-end p-8 md:p-10 block shadow-2xl">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800" class="w-full h-full object-cover opacity-30 group-hover:opacity-50 group-hover:scale-110 transition-all duration-1000 grayscale group-hover:grayscale-0" alt="GYMENEZ Eats">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent"></div>
+        </div>
+        <div class="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
+            <div class="mb-4 flex items-center gap-3 opacity-70 group-hover:opacity-100 transition-opacity">
+                <span class="w-8 h-[2px] bg-emerald-500"></span>
+                <span class="text-[9px] font-black tracking-[0.3em] uppercase text-emerald-500">Módulo 02</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-[900] mb-3 italic tracking-tight uppercase text-white drop-shadow-lg">GYMENEZ <br> EATS</h3>
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed font-light">Nutrición de precisión diseñada bioquímicamente para potenciar tu propósito deportivo.</p>
+            <div class="flex items-center gap-3 text-[11px] font-black tracking-[0.2em] text-white uppercase italic opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                Descubrir Nutrición <span class="text-emerald-500 text-xl">→</span>
+            </div>
+        </div>
+    </a>
+
+    <a href="information/on.html" class="group relative overflow-hidden rounded-[32px] md:rounded-[40px] border border-white/10 hover:border-red-600/50 transition-all duration-700 min-h-[420px] flex flex-col justify-end p-8 md:p-10 block shadow-2xl">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800" class="w-full h-full object-cover opacity-30 group-hover:opacity-50 group-hover:scale-110 transition-all duration-1000 grayscale group-hover:grayscale-0" alt="GYMENEZ ON">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent"></div>
+        </div>
+        <div class="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
+            <div class="mb-4 flex items-center gap-3 opacity-70 group-hover:opacity-100 transition-opacity">
+                <span class="w-8 h-[2px] bg-red-600"></span>
+                <span class="text-[9px] font-black tracking-[0.3em] uppercase text-red-600">Módulo 03</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-[900] mb-3 italic tracking-tight uppercase text-white drop-shadow-lg">GYMENEZ <br> ON</h3>
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed font-light">Streaming exclusivo con cultura de hierro que redefine el ADN de un atleta moderno.</p>
+            <div class="flex items-center gap-3 text-[11px] font-black tracking-[0.2em] text-white uppercase italic opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                Iniciar Streaming <span class="text-red-600 text-xl">→</span>
+            </div>
+        </div>
+    </a>
+
+</div>
     </section>
 
     <footer class="py-16 md:py-24 text-center border-t border-white/5 bg-[#050505]">
