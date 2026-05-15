@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ | Planes de Suscripción</title>
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden bg-[#030305] text-white">
+
+    <div id="loading-overlay" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="w-12 h-12 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mb-4"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-[#FFC300]">Sincronizando BCV...</p>
+    </div>
+
+    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-black uppercase tracking-tighter"><span class="text-[#FFC300]">GYM</span>ENEZ</h1>
+            <a href="../start/inicio.html" class="px-6 py-2 rounded-full border border-white/10 text-[10px] uppercase tracking-widest font-bold">Volver</a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-black uppercase tracking-tighter">Desbloquea el <span class="text-[#FFC300]">Ecosistema</span></h2>
+            <p class="mt-4 text-gray-400 text-sm">Precios calculados a la Tasa BCV: <span id="tasa-bcv-display" class="font-bold text-emerald-400">Consultando...</span></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-panel p-8 rounded-3xl border border-white/10 text-center flex flex-col">
+                <h3 class="text-2xl font-black uppercase tracking-widest text-gray-300">Standard</h3>
+                <p class="text-xs text-gray-500 mt-2">La base del rendimiento.</p>
+                <div class="my-8">
+                    <p class="text-5xl font-black">$13.99</p>
+                    <p class="text-sm font-bold text-[#FFC300] mt-2">Bs. <span id="price-standard" class="calculating">...</span></p>
+                </div>
+                <ul class="text-xs text-gray-400 space-y-4 mb-8 flex-grow text-left">
+                    <li>✔️ Rutinas Personalizadas</li>
+                    <li>✔️ Atención WhatsApp (8am - 6pm)</li>
+                    <li>❌ Sin histórico de métricas</li>
+                </ul>
+                <button onclick="goToPayment('STANDARD', 13.99)" class="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition">Seleccionar</button>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl border border-[#FFC300] text-center flex flex-col relative transform md:-translate-y-4 shadow-[0_0_30px_rgba(255,195,0,0.1)]">
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#FFC300] text-black text-[9px] font-black uppercase tracking-widest px-4 py-1 rounded-full">Más Popular</div>
+                <h3 class="text-2xl font-black uppercase tracking-widest text-[#FFC300]">Plus</h3>
+                <p class="text-xs text-gray-400 mt-2">El control analítico total.</p>
+                <div class="my-8">
+                    <p class="text-6xl font-black">$17.99</p>
+                    <p class="text-sm font-bold text-[#FFC300] mt-2">Bs. <span id="price-plus" class="calculating">...</span></p>
+                </div>
+                <ul class="text-xs text-gray-300 space-y-4 mb-8 flex-grow text-left">
+                    <li>✔️ Todo lo del Standard</li>
+                    <li>✔️ Histórico de Progreso y Fotos</li>
+                    <li>✔️ GYMENEZ ON (Podcast y Blogs)</li>
+                </ul>
+                <button onclick="goToPayment('PLUS', 17.99)" class="w-full py-4 rounded-xl bg-[#FFC300] text-black font-black text-xs uppercase tracking-widest hover:bg-yellow-400 shadow-lg transition">Seleccionar Plus</button>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl border border-sky-500/50 text-center flex flex-col">
+                <h3 class="text-2xl font-black uppercase tracking-widest text-sky-400">Ultra</h3>
+                <p class="text-xs text-gray-500 mt-2">El Ecosistema 360°</p>
+                <div class="my-8">
+                    <p class="text-5xl font-black">$27.99</p>
+                    <p class="text-sm font-bold text-sky-400 mt-2">Bs. <span id="price-ultra" class="calculating">...</span></p>
+                </div>
+                <ul class="text-xs text-gray-400 space-y-4 mb-8 flex-grow text-left">
+                    <li>✔️ Todo lo del Plus</li>
+                    <li>✔️ GYMENEZ EATS (Dieta Inteligente)</li>
+                    <li>✔️ Documentales y Clases VIP</li>
+                </ul>
+                <button onclick="goToPayment('ULTRA', 27.99)" class="w-full py-4 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-xs uppercase tracking-widest hover:bg-sky-500/20 transition">Seleccionar Ultra</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "https://sijj2003.pythonanywhere.com";
+        let tasaBcvActual = 0;
+
+        window.onload = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/bcv-rate`);
+                const data = await res.json();
+                
+                if(data.success) {
+                    tasaBcvActual = data.rate;
+                    document.getElementById('tasa-bcv-display').textContent = `1$ = ${tasaBcvActual.toFixed(2)} Bs`;
+                    
+                    // Calcular y formatear con coma y punto
+                    const formatBs = (usd) => (usd * tasaBcvActual).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    
+                    document.getElementById('price-standard').textContent = formatBs(13.99);
+                    document.getElementById('price-plus').textContent = formatBs(17.99);
+                    document.getElementById('price-ultra').textContent = formatBs(27.99);
+                    
+                    document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+                } else {
+                    alert("Servidores BCV colapsados. Comuníquese por WhatsApp.");
+                    window.location.href = "https://wa.me/584148780392?text=Hola,%20deseo%20pagar%20pero%20el%20sistema%20BCV%20está%20caído.";
+                }
+            } catch (e) {
+                alert("Error de conexión.");
+            }
+        };
+
+        function goToPayment(plan, usdPrice) {
+            // Guardamos el plan y el monto en localStorage para que payments.html lo reciba
+            const bsPrice = (usdPrice * tasaBcvActual).toFixed(2);
+            localStorage.setItem('pendingPaymentPlan', plan);
+            localStorage.setItem('pendingPaymentBs', bsPrice);
+            window.location.href = 'payments.html';
+        }
+    </script>
+</body>
+</html>
