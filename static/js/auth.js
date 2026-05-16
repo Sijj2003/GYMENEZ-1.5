@@ -1,5 +1,7 @@
 // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
 const DEVICE_ID_KEY = 'gymen_device_id';
+const AUTH_TOKEN_KEY = 'gymen_auth_token'; // 🔐 Bóveda segura para el Pasaporte JWT
+
 let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
 
 if (!localDeviceId) {
@@ -18,14 +20,26 @@ const WHATSAPP_NUMBER = '+584148780392';
 const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de credenciales';
 
 // =======================================================
-// --- LLAMADAS A LA API ---
+// 🛡️ INTERCEPTOR DE CABECERAS ZERO TRUST 
+// =======================================================
+function getAuthHeaders() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    return {
+        'Content-Type': 'application/json',
+        // Inyectamos el Token Criptográfico si existe en la bóveda
+        'Authorization': token ? `Bearer ${token}` : ''
+    };
+}
+
+// =======================================================
+// --- LLAMADAS A LA API BLINDADAS ---
 // =======================================================
 
 async function apiLogin(email, password, deviceId) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/login`, { 
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' }, // El login inicial no lleva token
             body: JSON.stringify({ email, password, deviceId })
         });
         const data = await response.json();
@@ -36,8 +50,11 @@ async function apiLogin(email, password, deviceId) {
             return { success: false, error: data.error || 'Credenciales inválidas.' };
         }
         
+        // ✅ ÉXITO: Guardamos el usuario y el NUEVO TOKEN Criptográfico expedido por el núcleo
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
+        localStorage.setItem(AUTH_TOKEN_KEY, data.token); // Guardamos el pasaporte criptográfico
+        
         return { success: true, user: data.user };
     } catch (e) {
         return { success: false, error: 'Error de conexión con el servidor.' };
@@ -54,7 +71,7 @@ async function apiLogout() {
         if (userId) {
             await fetch(`${API_BASE_URL}/api/logout`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(), // 🛡️ Enviamos el token firmado para validar el cierre
                 body: JSON.stringify({ userId: userId, deviceId: localDeviceId })
             });
         }
@@ -63,6 +80,7 @@ async function apiLogout() {
     } finally {
         CURRENT_USER_SESSION = null;
         localStorage.removeItem('userSession'); 
+        localStorage.removeItem(AUTH_TOKEN_KEY); // 🗑️ Destruimos el pasaporte del almacenamiento local
         return { success: true }; 
     }
 }
@@ -71,14 +89,18 @@ async function apiVerifySession(userId, deviceId) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/verify_session`, { 
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(), // 🛡️ Enviamos el token al Heartbeat continuo
             body: JSON.stringify({ userId, deviceId })
         });
         const data = await response.json();
+        
+        // Si el servidor responde 401 Unauthorized (Token alterado, caducado o robado)
+        if (response.status === 401) return { isValid: false, message: data.error || 'Sesión expirada o token inválido.' };
         if (response.status === 403 || !data.success) return { isValid: false, message: data.error || 'Sesión invalidada.' };
+        
         return { isValid: true };
     } catch (e) {
-        return { isValid: true }; 
+        return { isValid: true }; // En caso de desconexión de red temporal, no expulsamos al atleta
     }
 }
 
@@ -94,6 +116,9 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
         
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
+        if (data.token) {
+            localStorage.setItem(AUTH_TOKEN_KEY, data.token); // Almacenamos el nuevo token si se expide
+        }
         return { success: true, user: data.user };
     } catch (e) {
         return { success: false, error: 'No se pudo conectar con el servidor.' };
@@ -132,7 +157,6 @@ function showForceLogoutMessage(message, type = 'error') {
     }
 }
 
-// Manejo seguro de Modales (Evita el "Freeze" de pantalla)
 function openModalSafe(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
@@ -225,7 +249,6 @@ async function handleLogin(e) {
         return;
     } 
     
-    // 🚩 SI ES ÉXITO, REDIRIGIR AL DASHBOARD
     window.location.href = '/apps/start/inicio.html';
 }
 
@@ -279,7 +302,6 @@ async function handleRegister(e) {
     }
 }
 
-// FUNCIÓN ACTUALIZADA PARA MANEJAR EL NUEVO FORMATO DE TELÉFONO EN FORCE LOGOUT
 async function handleForceLogout(e) {
     e.preventDefault();
     const email = document.getElementById('force-email').value;
@@ -289,7 +311,6 @@ async function handleForceLogout(e) {
     const dob = document.getElementById('force-dob').value.trim();
     const ci = document.getElementById('force-ci').value.trim(); 
     
-    // Captura de teléfono con prefijo
     const phonePrefix = document.getElementById('force-phone-prefix').value;
     const phoneNum = document.getElementById('force-phone-num').value.trim();
     const phone = `${phonePrefix}-${phoneNum}`;
@@ -393,7 +414,6 @@ window.onload = function() {
     const isDashboardScreen = document.getElementById('dashboard-screen') !== null;
     const storedSession = localStorage.getItem('userSession');
 
-    // 1. LÓGICA PARA LA PÁGINA DE LOGIN (index.html)
     if (isLoginScreen) {
         if (storedSession) {
             window.location.href = '/apps/start/inicio.html';
@@ -409,7 +429,6 @@ window.onload = function() {
                     splash.style.display = 'none';
                     const loginScreen = document.getElementById('login-screen');
                     loginScreen.classList.remove('hidden'); 
-                    // Fuerza al renderizado a mostrar el fadeIn
                     requestAnimationFrame(() => {
                         loginScreen.classList.remove('opacity-0');
                         loginScreen.classList.add('opacity-100');
@@ -418,21 +437,18 @@ window.onload = function() {
             }
         }, SPLASH_DURATION_MS);
 
-        // Eventos de Formularios
         document.getElementById('login-form')?.addEventListener('submit', handleLogin);
         document.getElementById('force-logout-form')?.addEventListener('submit', handleForceLogout);
         document.getElementById('register-form')?.addEventListener('submit', handleRegister);
         document.getElementById('activation-form')?.addEventListener('submit', handleVerifyActivation);
 
-        // Máscaras de Inputs
         document.getElementById('reg-dob')?.addEventListener('input', applyDateMask);
         document.getElementById('reg-ci')?.addEventListener('input', applyCIMask);
         document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
         document.getElementById('force-dob')?.addEventListener('input', applyDateMask);
         document.getElementById('force-ci')?.addEventListener('input', applyCIMask);
-        document.getElementById('force-phone-num')?.addEventListener('input', applyPhoneMask); // Listener actualizado
+        document.getElementById('force-phone-num')?.addEventListener('input', applyPhoneMask);
 
-        // Botones de Modales
         document.getElementById('register-request-link')?.addEventListener('click', () => openModalSafe('register-modal'));
         document.getElementById('close-register-modal')?.addEventListener('click', () => closeModalSafe('register-modal'));
 
@@ -465,7 +481,6 @@ window.onload = function() {
         });
     }
 
-    // 2. LÓGICA PARA LA PÁGINA DEL DASHBOARD (inicio.html)
     if (isDashboardScreen) {
         if (!storedSession) {
             window.location.href = '/';
@@ -475,7 +490,6 @@ window.onload = function() {
         CURRENT_USER_SESSION = JSON.parse(storedSession);
         startSessionChecker();
 
-        // Botón de salir
         document.getElementById('logout-button')?.addEventListener('click', async () => {
             const btn = document.getElementById('logout-button');
             btn.disabled = true;
