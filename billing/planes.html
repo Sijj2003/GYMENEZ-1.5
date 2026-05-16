@@ -6,121 +6,156 @@
     <title>GYMENEZ | Planes de Suscripción</title>
     <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/auth.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #030305; color: white;}
-        
-        /* Glassmorphism Pro */
-        .premium-card {
-            background: rgba(20, 20, 25, 0.6);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #050505; /* Fondo negro profundo */
+            color: white;
+            overflow-x: hidden;
         }
+        
+        /* Contenedor de Scroll Horizontal para Móviles */
+        .plans-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            gap: 1.5rem;
+            padding-bottom: 2rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        /* Ocultar barra de scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Tarjeta de Plan */
+        .premium-card {
+            background: linear-gradient(145deg, #111115 0%, #0a0a0c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2rem;
+            min-width: 85vw; /* Casi el ancho completo en móvil */
+            scroll-snap-align: center;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        @media (min-width: 768px) {
+            .plans-carousel {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                overflow-x: visible;
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .premium-card { min-width: 0; }
+        }
+
+        @media (min-width: 1024px) {
+            .plans-carousel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+
+        /* Glow Effects Específicos (Amarillo y Blanco) */
+        .glow-white:hover { border-color: rgba(255, 255, 255, 0.4); box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); transform: translateY(-5px); }
+        .glow-yellow { border-color: rgba(255, 195, 0, 0.3); box-shadow: 0 0 40px rgba(255, 195, 0, 0.1); }
+        .glow-yellow:hover { border-color: rgba(255, 195, 0, 0.8); box-shadow: 0 0 50px rgba(255, 195, 0, 0.2); transform: translateY(-5px); }
+        
+        .glow-ultra { border-color: #FFC300; box-shadow: 0 0 50px rgba(255, 195, 0, 0.2); }
+        .glow-ultra:hover { box-shadow: 0 0 60px rgba(255, 195, 0, 0.3); transform: scale(1.02); }
 
         /* Menú Horizontal */
         .plan-tab {
-            transition: all 0.3s ease;
             position: relative;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
+        .plan-tab.active { color: #FFC300; text-shadow: 0 0 10px rgba(255,195,0,0.5); }
         .plan-tab.active::after {
             content: '';
             position: absolute;
-            bottom: -2px;
+            bottom: -4px;
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: currentColor;
+            background-color: #FFC300;
             border-radius: 2px;
+            box-shadow: 0 0 8px #FFC300;
         }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Glow animations */
+
+        /* Animaciones */
         @keyframes reveal {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .reveal { animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .reveal { animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden min-h-screen flex flex-col">
+<body class="selection:bg-[#FFC300] selection:text-black">
 
-    <div id="loading-overlay" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-all duration-700">
+    <div id="loading-overlay" class="fixed inset-0 z-50 bg-[#050505] flex flex-col items-center justify-center transition-all duration-700">
         <div class="relative w-12 h-12">
             <div class="absolute inset-0 border-2 border-white/5 rounded-full"></div>
             <div class="absolute inset-0 border-2 border-[#FFC300] rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <p class="mt-4 text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">Sincronizando Ecosistema</p>
+        <p class="mt-4 text-[10px] font-bold uppercase tracking-[0.4em] text-[#FFC300]">Sincronizando Ecosistema</p>
     </div>
 
-    <header class="w-full border-b border-white/5 bg-[#030305]/60 backdrop-blur-xl sticky top-0 z-40">
+    <header class="w-full border-b border-white/10 bg-[#050505]/80 backdrop-blur-xl sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-6 py-4 md:py-6 flex justify-between items-center">
-            <h1 class="text-xl md:text-2xl font-black uppercase tracking-tighter"><span class="text-[#FFC300]">GYM</span>ENEZ</h1>
-            <a href="../apps/start/inicio.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest px-5 py-2 rounded-full border border-white/10 hover:bg-white/5 transition-all">Volver</a>
+            <h1 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">
+                <span class="text-[#FFC300]">GYM</span>ENEZ
+            </h1>
+            <a href="../apps/start/inicio.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#FFC300] border border-[#FFC300]/30 px-5 py-2 rounded-full hover:bg-[#FFC300] hover:text-black transition-all">
+                Volver
+            </a>
         </div>
     </header>
 
-    <main class="flex-grow flex flex-col items-center px-4 py-10 md:py-16 w-full max-w-5xl mx-auto reveal opacity-0">
+    <main class="flex-grow flex flex-col items-center px-0 md:px-4 py-8 md:py-16 w-full max-w-7xl mx-auto reveal opacity-0">
         
-        <div class="text-center mb-8 md:mb-12">
-            <span class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-2 block">Suscripción y Mejoras</span>
-            <h2 class="text-3xl md:text-5xl font-black tracking-tighter leading-tight uppercase italic">
-                Niveles de <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500">Optimización</span>
+        <div class="text-center mb-8 px-4">
+            <span class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#FFC300] mb-3 block">Suscripción y Mejoras</span>
+            <h2 class="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-tight uppercase italic text-white drop-shadow-lg">
+                Niveles de <span class="text-[#FFC300]">Optimización</span>
             </h2>
             
-            <div class="mt-4 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 shadow-inner">
+            <div class="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#111] border border-white/10 shadow-inner">
                 <span class="flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <p class="text-[9px] md:text-[10px] font-semibold text-gray-400 tracking-wide uppercase">Tasa Oficial BCV: <span id="tasa-bcv-display" class="text-white ml-1 font-bold">Cargando...</span></p>
+                <p class="text-[9px] md:text-[10px] font-black text-gray-300 tracking-widest uppercase">
+                    Tasa Oficial BCV: <span id="tasa-bcv-display" class="text-[#FFC300] ml-1">Cargando...</span>
+                </p>
             </div>
         </div>
 
-        <div class="w-full flex overflow-x-auto no-scrollbar justify-start md:justify-center border-b border-white/10 mb-8 md:mb-12">
-            <div class="flex space-x-6 md:space-x-12 px-4 pb-2">
-                <button onclick="selectPlan('BASICO')" id="tab-BASICO" class="plan-tab text-gray-500 hover:text-gray-300 font-black uppercase tracking-widest text-xs md:text-sm py-2">Básico</button>
-                <button onclick="selectPlan('STANDARD')" id="tab-STANDARD" class="plan-tab text-gray-500 hover:text-gray-300 font-black uppercase tracking-widest text-xs md:text-sm py-2">Standard</button>
-                <button onclick="selectPlan('PLUS')" id="tab-PLUS" class="plan-tab text-gray-500 hover:text-gray-300 font-black uppercase tracking-widest text-xs md:text-sm py-2">Plus</button>
-                <button onclick="selectPlan('ULTRA')" id="tab-ULTRA" class="plan-tab text-gray-500 hover:text-gray-300 font-black uppercase tracking-widest text-xs md:text-sm py-2">Ultra</button>
+        <!-- Menú Horizontal de Navegación (Sticky on mobile) -->
+        <div class="w-full flex overflow-x-auto no-scrollbar justify-start md:justify-center border-b border-white/10 mb-6 md:mb-12 sticky top-[70px] md:static bg-[#050505]/90 backdrop-blur-md z-30">
+            <div class="flex space-x-8 px-6 py-4 md:py-2">
+                <button onclick="scrollToPlan('BASICO')" id="tab-BASICO" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Básico</button>
+                <button onclick="scrollToPlan('STANDARD')" id="tab-STANDARD" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Standard</button>
+                <button onclick="scrollToPlan('PLUS')" id="tab-PLUS" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs active">Plus</button>
+                <button onclick="scrollToPlan('ULTRA')" id="tab-ULTRA" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Ultra</button>
             </div>
         </div>
 
-        <div id="plan-card" class="premium-card w-full rounded-[2rem] p-6 md:p-10 flex flex-col shadow-2xl relative overflow-hidden transition-all duration-500">
-            <div id="plan-glow" class="absolute -top-20 -right-20 w-64 h-64 blur-[80px] rounded-full opacity-20 pointer-events-none transition-colors duration-500"></div>
-            
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 border-b border-white/5 pb-8 relative z-10">
-                <div>
-                    <span id="plan-tag" class="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border mb-3 inline-block transition-colors duration-300">...</span>
-                    <h3 id="plan-name" class="text-3xl md:text-4xl font-black italic tracking-tighter uppercase transition-colors duration-300">...</h3>
-                    <p id="plan-current-badge" class="hidden mt-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded w-max border border-emerald-400/20">Tu Plan Actual</p>
-                </div>
-                
-                <div class="text-left md:text-right">
-                    <div class="flex items-baseline gap-1 justify-start md:justify-end">
-                        <span class="text-xl font-medium text-gray-400">$</span>
-                        <span id="plan-price-usd" class="text-5xl font-black tracking-tighter">...</span>
-                        <span class="text-xl font-bold text-gray-400">/mes</span>
-                    </div>
-                    <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">Bs. <span id="plan-price-bs">...</span></p>
-                    
-                    <button id="action-btn" class="mt-4 w-full md:w-auto px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all transform active:scale-95 shadow-xl">
-                        Cargando...
-                    </button>
-                </div>
-            </div>
-
-            <div class="relative z-10">
-                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Características del Plan</h4>
-                <div id="features-list" class="space-y-3">
-                    </div>
-            </div>
+        <!-- Contenedor Carrusel / Grid de Planes -->
+        <div id="plans-carousel" class="plans-carousel w-full">
+            <!-- Las tarjetas se generan dinámicamente aquí -->
         </div>
 
-        <p class="mt-16 text-gray-600 text-[8px] md:text-[9px] uppercase tracking-[0.3em] font-bold text-center">Gimenez Ecosystem &copy; 2026 • Modificación de planes instantánea</p>
+        <p class="mt-12 text-gray-600 text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-black text-center px-4">
+            Gymenez Ecosystem &copy; 2026 • Modificación de planes instantánea
+        </p>
     </main>
 
     <script>
@@ -128,86 +163,77 @@
         let tasaBcvActual = 0;
         let currentUserPlan = 'BASICO'; 
         let currentUserId = null;
-        let activeTab = 'PLUS'; 
 
-        const plansData = {
-            'BASICO': {
+        const plansData = [
+            {
                 id: 'BASICO',
                 name: 'BÁSICO',
                 priceUSD: 0.00,
                 tag: 'Acceso Light',
-                colorClass: 'text-gray-300',
-                bgClass: 'bg-gray-400',
-                borderClass: 'border-gray-500',
-                glowClass: 'bg-gray-500',
-                btnClass: 'bg-gray-200 text-black hover:bg-white',
+                highlightColor: 'text-white',
+                cardClass: 'glow-white',
+                btnClass: 'bg-[#1a1a1a] text-white border border-white/20 hover:bg-white hover:text-black',
                 features: [
-                    { name: 'Plan de Entrenamiento', value: 'Automatizado', icon: 'check', color: 'text-gray-300' },
-                    { name: 'Comunicación con Entrenador', value: 'No disponible', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Histórico de Métricas', value: 'No disponible', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Plataforma GYMENEZ ON', value: 'Restringido', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Nutrición GYMENEZ EATS', value: 'Restringido', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Prioridad de Soporte', value: 'Nula', icon: 'info', color: 'text-gray-500' }
+                    { name: 'Plan de Entrenamiento', value: 'Automatizado', active: true },
+                    { name: 'Acompañamiento Técnico', value: 'No disponible', active: false },
+                    { name: 'Histórico de Métricas', value: 'No disponible', active: false },
+                    { name: 'Gymenez ON (Streaming)', value: 'Restringido', active: false },
+                    { name: 'Gymenez EATS (Nutrición)', value: 'Restringido', active: false },
+                    { name: 'Prioridad Soporte', value: 'Baja', active: false }
                 ]
             },
-            'STANDARD': {
+            {
                 id: 'STANDARD',
                 name: 'STANDARD',
                 priceUSD: 13.99,
                 tag: 'Dirección Básica',
-                colorClass: 'text-white',
-                bgClass: 'bg-white',
-                borderClass: 'border-white/50',
-                glowClass: 'bg-white',
-                btnClass: 'bg-white text-black hover:bg-gray-200 shadow-white/20',
+                highlightColor: 'text-white',
+                cardClass: 'glow-white',
+                btnClass: 'bg-white text-black hover:bg-gray-200',
                 features: [
-                    { name: 'Plan de Entrenamiento', value: '100% Personalizado', icon: 'check', color: 'text-white' },
-                    { name: 'Comunicación con Entrenador', value: 'Continua', icon: 'check', color: 'text-white' },
-                    { name: 'Histórico de Métricas', value: 'No disponible', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Plataforma GYMENEZ ON', value: 'Restringido', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Nutrición GYMENEZ EATS', value: 'Restringido', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Prioridad de Soporte', value: 'Baja', icon: 'info', color: 'text-gray-400' }
+                    { name: 'Plan de Entrenamiento', value: '100% Personalizado', active: true },
+                    { name: 'Acompañamiento Técnico', value: 'Continuo', active: true },
+                    { name: 'Histórico de Métricas', value: 'No disponible', active: false },
+                    { name: 'Gymenez ON (Streaming)', value: 'Restringido', active: false },
+                    { name: 'Gymenez EATS (Nutrición)', value: 'Restringido', active: false },
+                    { name: 'Prioridad Soporte', value: 'Media', active: true }
                 ]
             },
-            'PLUS': {
+            {
                 id: 'PLUS',
                 name: 'PLUS',
                 priceUSD: 17.99,
                 tag: 'Control Analítico',
-                colorClass: 'text-[#FFC300]',
-                bgClass: 'bg-[#FFC300]',
-                borderClass: 'border-[#FFC300]/50',
-                glowClass: 'bg-[#FFC300]',
-                btnClass: 'bg-[#FFC300] text-black hover:bg-[#FFD700] shadow-[#FFC300]/20',
+                highlightColor: 'text-[#FFC300]',
+                cardClass: 'glow-yellow',
+                btnClass: 'bg-[#FFC300] text-black hover:bg-[#FFD700] shadow-[0_0_20px_rgba(255,195,0,0.3)]',
                 features: [
-                    { name: 'Plan de Entrenamiento', value: '100% Personalizado', icon: 'check', color: 'text-[#FFC300]' },
-                    { name: 'Comunicación con Entrenador', value: 'Continua', icon: 'check', color: 'text-[#FFC300]' },
-                    { name: 'Histórico de Métricas', value: 'Simétricas y Avanzadas', icon: 'check', color: 'text-[#FFC300]' },
-                    { name: 'Plataforma GYMENEZ ON', value: 'Catálogo Seleccionado', icon: 'check', color: 'text-[#FFC300]' },
-                    { name: 'Nutrición GYMENEZ EATS', value: 'Restringido', icon: 'cross', color: 'text-gray-600' },
-                    { name: 'Prioridad de Soporte', value: 'Media', icon: 'info', color: 'text-gray-300' }
+                    { name: 'Plan de Entrenamiento', value: '100% Personalizado', active: true },
+                    { name: 'Acompañamiento Técnico', value: 'Continuo', active: true },
+                    { name: 'Histórico de Métricas', value: 'Simétricas y Avanzadas', active: true },
+                    { name: 'Gymenez ON (Streaming)', value: 'Catálogo Seleccionado', active: true },
+                    { name: 'Gymenez EATS (Nutrición)', value: 'Restringido', active: false },
+                    { name: 'Prioridad Soporte', value: 'Alta', active: true }
                 ]
             },
-            'ULTRA': {
+            {
                 id: 'ULTRA',
                 name: 'ULTRA',
                 priceUSD: 27.99,
                 tag: 'Ecosistema 360°',
-                colorClass: 'text-sky-400',
-                bgClass: 'bg-sky-400',
-                borderClass: 'border-sky-400/50',
-                glowClass: 'bg-sky-500',
-                btnClass: 'bg-sky-500 text-white hover:bg-sky-400 shadow-sky-500/20',
+                highlightColor: 'text-[#FFC300]',
+                cardClass: 'glow-ultra',
+                btnClass: 'bg-[#FFC300] text-black hover:bg-[#FFD700] shadow-[0_0_30px_rgba(255,195,0,0.4)]',
                 features: [
-                    { name: 'Plan de Entrenamiento', value: 'Personalizado + Ajustes Dinámicos', icon: 'check', color: 'text-sky-400' },
-                    { name: 'Comunicación con Entrenador', value: 'VIP Bidireccional', icon: 'check', color: 'text-sky-400' },
-                    { name: 'Histórico de Métricas', value: 'Control Total', icon: 'check', color: 'text-sky-400' },
-                    { name: 'Plataforma GYMENEZ ON', value: 'Acceso VIP Ilimitado', icon: 'check', color: 'text-sky-400' },
-                    { name: 'Nutrición GYMENEZ EATS', value: 'Planificación Bioquímica', icon: 'check', color: 'text-sky-400' },
-                    { name: 'Prioridad de Soporte', value: 'Alta / Preferencial', icon: 'info', color: 'text-sky-300' }
+                    { name: 'Plan de Entrenamiento', value: 'Personalizado + Ajustes', active: true },
+                    { name: 'Acompañamiento Técnico', value: 'VIP Bidireccional', active: true },
+                    { name: 'Histórico de Métricas', value: 'Control Total', active: true },
+                    { name: 'Gymenez ON (Streaming)', value: 'Acceso VIP Ilimitado', active: true },
+                    { name: 'Gymenez EATS (Nutrición)', value: 'Planificación Bioquímica', active: true },
+                    { name: 'Prioridad Soporte', value: 'Máxima', active: true }
                 ]
             }
-        };
+        ];
 
         window.onload = async () => {
             // Verificar Sesión y Perfil
@@ -220,11 +246,6 @@
                     const dataProfile = await resProfile.json();
                     if (dataProfile.success && dataProfile.profile) {
                         currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
-                        // Seleccionar por defecto un plan superior al actual si es posible
-                        if (currentUserPlan === 'BASICO') activeTab = 'STANDARD';
-                        else if (currentUserPlan === 'STANDARD') activeTab = 'PLUS';
-                        else if (currentUserPlan === 'PLUS') activeTab = 'ULTRA';
-                        else activeTab = 'ULTRA';
                     }
                 } catch (e) {
                     console.error("No se pudo obtener el perfil.");
@@ -243,86 +264,130 @@
                 console.warn("Fallo tasa BCV");
             }
 
-            selectPlan(activeTab);
+            renderCards();
+            setupScrollObserver();
 
+            // Desplazar automáticamente al plan recomendado (PLUS) o al plan actual si es mayor
             setTimeout(() => {
+                let targetPlan = 'PLUS';
+                if (currentUserPlan === 'ULTRA') targetPlan = 'ULTRA';
+                scrollToPlan(targetPlan);
                 document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
             }, 500);
         };
 
-        function getIconSVG(type, colorClass) {
-            if (type === 'check') {
-                return `<svg class="w-5 h-5 flex-shrink-0 ${colorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-            } else if (type === 'cross') {
-                return `<svg class="w-5 h-5 flex-shrink-0 ${colorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-            } else {
-                return `<svg class="w-5 h-5 flex-shrink-0 ${colorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        function renderCards() {
+            const container = document.getElementById('plans-carousel');
+            container.innerHTML = '';
+
+            plansData.forEach(plan => {
+                const isCurrentPlan = (plan.id === currentUserPlan);
+                const priceWhole = Math.floor(plan.priceUSD);
+                const priceDec = (plan.priceUSD % 1).toFixed(2).substring(2);
+                const bsPrice = tasaBcvActual > 0 ? (plan.priceUSD * tasaBcvActual).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '...';
+                
+                let buttonHTML = '';
+                if (isCurrentPlan) {
+                    buttonHTML = `<button disabled class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] bg-[#1a1a1a] text-[#FFC300] border border-[#FFC300]/30 cursor-default shadow-inner">Plan Actual Activo</button>`;
+                } else if (plan.priceUSD === 0) {
+                    buttonHTML = `<button disabled class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] bg-[#1a1a1a] text-white border border-white/10 cursor-default">Incluido Gratis</button>`;
+                } else {
+                    const actionText = (currentUserPlan === 'BASICO') ? 'Obtener Nivel' : 'Cambiar a Nivel';
+                    buttonHTML = `<button onclick="goToPayment('${plan.id}', ${plan.priceUSD})" class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all transform active:scale-95 ${plan.btnClass}">${actionText} ${plan.name}</button>`;
+                }
+
+                const featuresHTML = plan.features.map(f => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors">
+                        <div class="flex items-center gap-3">
+                            ${f.active 
+                                ? `<svg class="w-4 h-4 flex-shrink-0 ${plan.highlightColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`
+                                : `<svg class="w-4 h-4 flex-shrink-0 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`
+                            }
+                            <span class="text-[10px] md:text-xs font-bold ${f.active ? 'text-white' : 'text-gray-500 line-through'}">${f.name}</span>
+                        </div>
+                        <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest ${f.active ? plan.highlightColor : 'text-gray-600'} text-right w-1/2 md:w-auto truncate">${f.value}</span>
+                    </div>
+                `).join('');
+
+                const cardHTML = `
+                    <div id="card-${plan.id}" class="premium-card p-6 md:p-8 ${plan.cardClass}">
+                        ${plan.id === 'ULTRA' ? `<div class="absolute -top-10 -right-10 w-40 h-40 bg-[#FFC300]/10 blur-[50px] rounded-full pointer-events-none"></div>` : ''}
+                        
+                        <div class="mb-6 relative z-10">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/10 bg-[#111] ${plan.highlightColor}">${plan.tag}</span>
+                                ${isCurrentPlan ? `<span class="text-[8px] font-black uppercase tracking-widest text-[#111] bg-[#FFC300] px-2 py-1 rounded shadow-[0_0_10px_rgba(255,195,0,0.5)]">Tu Plan</span>` : ''}
+                            </div>
+                            <h3 class="text-3xl md:text-4xl font-black italic tracking-tighter uppercase ${plan.highlightColor}">${plan.name}</h3>
+                        </div>
+                        
+                        <div class="mb-8 relative z-10">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-xl font-medium text-gray-500">$</span>
+                                <span class="text-5xl font-black tracking-tighter text-white">${priceWhole}</span>
+                                <span class="text-xl font-bold text-gray-500">.${priceDec}</span>
+                                <span class="text-xs font-bold text-gray-600 ml-1">/mes</span>
+                            </div>
+                            <p class="text-[9px] font-black text-[#FFC300] mt-2 uppercase tracking-widest">Bs. ${bsPrice}</p>
+                        </div>
+
+                        <div class="space-y-2 flex-grow relative z-10">
+                            ${featuresHTML}
+                        </div>
+
+                        ${buttonHTML}
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        function scrollToPlan(planId) {
+            const container = document.getElementById('plans-carousel');
+            const targetCard = document.getElementById(`card-${planId}`);
+            
+            if (targetCard && container) {
+                // Desplazamiento suave hacia la tarjeta
+                const scrollLeft = targetCard.offsetLeft - container.offsetLeft - (container.clientWidth / 2) + (targetCard.clientWidth / 2);
+                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+                updateActiveTab(planId);
             }
         }
 
-        function selectPlan(planId) {
-            const data = plansData[planId];
-            activeTab = planId;
-
-            // Actualizar Tabs
-            Object.keys(plansData).forEach(key => {
-                const tab = document.getElementById(`tab-${key}`);
-                tab.className = `plan-tab font-black uppercase tracking-widest text-xs md:text-sm py-2 ${key === planId ? plansData[key].colorClass + ' active' : 'text-gray-500 hover:text-gray-300'}`;
+        function updateActiveTab(planId) {
+            document.querySelectorAll('.plan-tab').forEach(tab => {
+                if (tab.id === `tab-${planId}`) {
+                    tab.classList.add('active');
+                    tab.classList.remove('text-gray-500');
+                } else {
+                    tab.classList.remove('active');
+                    tab.classList.add('text-gray-500');
+                }
             });
+        }
 
-            // Actualizar UI de Tarjeta
-            const card = document.getElementById('plan-card');
-            card.className = `premium-card w-full rounded-[2rem] p-6 md:p-10 flex flex-col shadow-2xl relative overflow-hidden transition-all duration-500 border border-white/5 hover:${data.borderClass}`;
-            
-            document.getElementById('plan-glow').className = `absolute -top-20 -right-20 w-64 h-64 blur-[80px] rounded-full opacity-10 pointer-events-none transition-colors duration-500 ${data.glowClass}`;
-            
-            const tag = document.getElementById('plan-tag');
-            tag.textContent = data.tag;
-            tag.className = `text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border mb-3 inline-block transition-colors duration-300 ${data.colorClass} ${data.borderClass} ${data.bgClass.replace('bg-', 'bg-opacity-10 bg-')}`;
-            
-            const name = document.getElementById('plan-name');
-            name.textContent = data.name;
-            name.className = `text-3xl md:text-4xl font-black italic tracking-tighter uppercase transition-colors duration-300 ${data.colorClass}`;
+        function setupScrollObserver() {
+            const container = document.getElementById('plans-carousel');
+            const options = {
+                root: container,
+                rootMargin: '0px',
+                threshold: 0.6 // La tarjeta debe estar 60% visible para activarse
+            };
 
-            const isCurrentPlan = (planId === currentUserPlan);
-            document.getElementById('plan-current-badge').classList.toggle('hidden', !isCurrentPlan);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const planId = entry.target.id.replace('card-', '');
+                        updateActiveTab(planId);
+                    }
+                });
+            }, options);
 
-            // Precios
-            const priceWhole = Math.floor(data.priceUSD);
-            const priceDec = (data.priceUSD % 1).toFixed(2).substring(2);
-            document.getElementById('plan-price-usd').innerHTML = `${priceWhole}<span class="text-2xl">.${priceDec}</span>`;
-            
-            const bsPrice = tasaBcvActual > 0 ? (data.priceUSD * tasaBcvActual).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '...';
-            document.getElementById('plan-price-bs').textContent = bsPrice;
-
-            // Botón
-            const btn = document.getElementById('action-btn');
-            if (isCurrentPlan) {
-                btn.textContent = 'Plan Actual Activo';
-                btn.className = 'mt-4 w-full md:w-auto px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl bg-gray-800 text-gray-500 cursor-default border border-white/10';
-                btn.onclick = null;
-            } else if (data.priceUSD === 0) {
-                btn.textContent = 'Incluido Gratis';
-                btn.className = 'mt-4 w-full md:w-auto px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl bg-gray-800 text-gray-400 cursor-default border border-white/10';
-                btn.onclick = null;
-            } else {
-                const actionText = (currentUserPlan === 'BASICO') ? 'Obtener Nivel' : 'Cambiar a Nivel';
-                btn.textContent = `${actionText} ${data.name}`;
-                btn.className = `mt-4 w-full md:w-auto px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all transform active:scale-95 shadow-xl ${data.btnClass}`;
-                btn.onclick = () => goToPayment(data.id, data.priceUSD);
-            }
-
-            // Características
-            const list = document.getElementById('features-list');
-            list.innerHTML = data.features.map(f => `
-                <div class="flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5">
-                    <div class="flex items-center gap-3">
-                        ${getIconSVG(f.icon, f.color)}
-                        <span class="text-xs md:text-sm font-medium ${f.icon === 'cross' ? 'text-gray-500 line-through' : 'text-gray-200'}">${f.name}</span>
-                    </div>
-                    <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider ${f.color} text-right w-1/2 md:w-auto truncate">${f.value}</span>
-                </div>
-            `).join('');
+            plansData.forEach(plan => {
+                const card = document.getElementById(`card-${plan.id}`);
+                if (card) observer.observe(card);
+            });
         }
 
         function goToPayment(plan, usdPrice) {
