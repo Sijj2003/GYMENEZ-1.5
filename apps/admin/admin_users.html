@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ - Gestión de Usuarios</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* 💡 Define el color de acento amarillo de tu marca */
+        .GYM-YELLOW { color: #FFC300; }
+        .bg-GYM-YELLOW { background-color: #FFC300; }
+        .hover\:bg-GYM-YELLOW-dark:hover { background-color: #FFB300; }
+        .border-GYM-YELLOW { border-color: #FFC300; }
+        .focus\:ring-GYM-YELLOW:focus { --tw-ring-color: #FFC300; }
+        .focus\:border-GYM-YELLOW:focus { border-color: #FFC300; }
+
+        /* Estilos base del Administrador */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a; 
+            background-image: url('FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background-color: rgba(13, 13, 26, 0.9); 
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content-container {
+            background-color: rgba(18, 18, 30, 0.95); 
+            backdrop-filter: blur(3px);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        /* Estilo para la tabla */
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-table th {
+            background-color: #1a1a2e; 
+            font-weight: 600;
+            color: #94a3b8; 
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        /* Modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.85); 
+        }
+        
+        .modal-content {
+            background-color: #1a1a2e;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+            max-height: calc(100vh - 40px); 
+            overflow-y: auto; 
+        }
+        
+        .modal-content::-webkit-scrollbar { width: 8px; height: 8px; }
+        .modal-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .modal-content::-webkit-scrollbar-track { background: #1a1a2e; }
+
+        .modal-content input, .modal-content select {
+             background-color: #1a1a2e;
+             border: 1px solid #334155;
+             color: #e5e7eb;
+        }
+        .modal-content input:focus, .modal-content select:focus {
+            border-color: #FFC300; 
+            ring: 1px;
+            ring-color: #FFC300; 
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="dashboard-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white">
+                <span class="GYM-YELLOW">GYM</span>ENEZ
+            </h1>
+            <nav class="space-x-4">
+                <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    ← Regresar
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="content-container mt-8">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-3">
+                <h2 class="text-xl font-semibold text-white">Lista de Usuarios</h2>
+                <button id="add-user-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg text-sm transition duration-150 ease-in-out">
+                    + Añadir Usuario
+                </button>
+            </div>
+            <div class="mb-6">
+                <input type="text" id="user-search-input" placeholder="Buscar por Nombre, Email o Cédula..." 
+                       class="w-full p-3 rounded-lg bg-[#1a1a2e] border border-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-GYM-YELLOW focus:border-GYM-YELLOW transition duration-150">
+            </div>
+            <div class="overflow-x-auto rounded-lg border border-gray-700">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="rounded-tl-lg">Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Suscripción</th>
+                            <th>Activo Desde</th>
+                            <th class="rounded-tr-lg">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="text-sm text-gray-300 divide-y divide-gray-800">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-80 modal-backdrop hidden z-[1010] flex justify-center p-4 overflow-y-auto">
+        <div class="modal-content w-full max-w-2xl p-6 rounded-xl transform transition-all duration-300 scale-100">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
+                <h3 id="modal-title" class="text-2xl font-semibold text-white">Añadir Nuevo Usuario</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-GYM-YELLOW text-3xl leading-none transition-colors duration-200">&times;</button>
+            </div>
+
+            <form id="user-form" class="space-y-6">
+                <input type="hidden" id="user-id-field" name="id">
+                <input type="hidden" id="is-edit-mode" value="false">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300">Nombre(s) <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" name="name" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="Se convertirá a MAYÚSCULAS">
+                    </div>
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-gray-300">Apellido(s) <span class="text-red-500">*</span></label>
+                        <input type="text" id="last_name" name="last_name" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="Se convertirá a MAYÚSCULAS">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="ejemplo@correo.com">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300">Contraseña <span id="password-req" class="text-red-500">*</span></label>
+                        <input type="password" id="password" name="password" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" required placeholder="Mínimo 6 caracteres (solo requerido en creación)">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="id_number_prefix" class="block text-sm font-medium text-gray-300">Cédula <span class="text-red-500">*</span></label>
+                        <div class="flex mt-1 rounded-lg overflow-hidden border border-gray-600 focus-within:border-GYM-YELLOW focus-within:ring-1 focus-within:ring-GYM-YELLOW">
+                            <select id="id_number_prefix" name="id_number_prefix" required class="bg-gray-700/50 p-3 text-white w-20 border-none focus:outline-none focus:ring-0">
+                                <option value="V">V</option>
+                                <option value="E">E</option>
+                            </select>
+                            <input type="text" id="id_number" name="id_number" required class="w-full bg-[#1a1a2e] p-3 text-white border-none focus:outline-none focus:ring-0" placeholder="Ej: 12.345.678">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="phone_prefix" class="block text-sm font-medium text-gray-300">Teléfono <span class="text-red-500">*</span></label>
+                        <div class="flex mt-1 rounded-lg overflow-hidden border border-gray-600 focus-within:border-GYM-YELLOW focus-within:ring-1 focus-within:ring-GYM-YELLOW">
+                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 p-3 text-white w-24 sm:w-28 border-none focus:outline-none focus:ring-0">
+                                <option value="0414">0414</option>
+                                <option value="0424">0424</option>
+                                <option value="0412">0412</option>
+                                <option value="0422">0422</option>
+                                <option value="0416">0416</option>
+                                <option value="0426">0426</option>
+                            </select>
+                            <input type="tel" id="phone_number_body" name="phone_number_body" required class="w-full bg-[#1a1a2e] p-3 text-white border-none focus:outline-none focus:ring-0" placeholder="Ej: 1234567">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label for="dob" class="block text-sm font-medium text-gray-300">Fecha Nacimiento</label>
+                        <input type="date" id="dob" name="dob" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                    </div>
+                    <div>
+                        <label for="sex" class="block text-sm font-medium text-gray-300">Sexo</label>
+                        <select id="sex" name="sex" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="subscription_level" class="block text-sm font-medium text-gray-300">Suscripción</label>
+                        <select id="subscription_level" name="subscription_level" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                            <option value="BASICO">BASICO</option>
+                            <option value="STANDARD">STANDARD</option>
+                            <option value="PLUS">PLUS</option>
+                            <option value="ULTRA">ULTRA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="activo_desde" class="block text-sm font-medium text-gray-300">Activo Desde</label>
+                    <input type="date" id="activo_desde" name="activo_desde" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                    <p class="text-xs text-gray-500 mt-1">Dejar vacío para usar la fecha de hoy.</p>
+                </div>
+
+                <div class="pt-6 flex justify-end space-x-3 border-t border-gray-700">
+                    <button type="button" id="cancel-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-5 rounded-lg transition duration-200 ease-in-out" onclick="document.getElementById('user-modal').classList.add('hidden')">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submit-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-bold py-2 px-5 rounded-lg transition duration-200 ease-in-out">
+                        Crear Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/user'; 
+        let allUsersData = [];
+
+        // =============================================================
+        // FUNCIONES DE SEGURIDAD (Obtener Token)
+        // =============================================================
+        function getAuthHeaders() {
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                throw new Error('No hay sesión de administrador activa.');
+            }
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        // =============================================================
+        // FUNCIONES DE FORMATO Y UTILIDAD
+        // =============================================================
+        function formatToUpperCase(inputString) {
+            if (!inputString) return '';
+            return inputString.toUpperCase().trim();
+        }
+
+        function formatIdNumber(value) {
+            const digits = value.replace(/\D/g, '');
+            if (digits.length === 0) return '';
+            
+            let formatted = '';
+            let count = 0;
+            for (let i = digits.length - 1; i >= 0; i--) {
+                formatted = digits[i] + formatted;
+                count++;
+                if (count % 3 === 0 && i !== 0) {
+                    formatted = '.' + formatted;
+                }
+            }
+            return formatted;
+        }
+
+        function formatDateForBackend(dateValue) {
+            if (!dateValue) return '';
+            const parts = dateValue.split('-'); // [YYYY, MM, DD]
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateValue;
+        }
+
+        // =============================================================
+        // LÓGICA DE LA TABLA (READ - Leer)
+        // =============================================================
+        async function fetchAllUsers() {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 GYM-YELLOW">Cargando datos...</td></tr>';
+            
+            try {
+                // 🔴 APLICANDO SEGURIDAD: getAuthHeaders() inyecta el Token
+                const response = await fetch(API_BASE_URL.replace('/user', '/users'), { 
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.users) {
+                    allUsersData = data.users; 
+                    const userSearchInput = document.getElementById('user-search-input');
+                    filterUsersTable(userSearchInput ? userSearchInput.value : '');
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
+                    allUsersData = [];
+                }
+
+            } catch (error) {
+                console.error("Error de red al obtener usuarios:", error);
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión. Permiso denegado.</td></tr>';
+                allUsersData = [];
+            }
+        }
+
+        function renderUsersTable(usersToRender) {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = ''; 
+
+            if (usersToRender.length === 0) {
+                const searchTerm = document.getElementById('user-search-input').value;
+                const message = searchTerm.trim() !== '' 
+                    ? `No se encontraron resultados para "${searchTerm}".` 
+                    : 'No hay usuarios registrados.';
+
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-400">${message}</td></tr>`;
+                return;
+            }
+
+            usersToRender.forEach(user => {
+                const row = tableBody.insertRow();
+                row.classList.add('hover:bg-gray-800/50'); 
+                
+                function displayDate(dateValue) {
+                    if (!dateValue || dateValue === 'N/A') return 'N/A';
+                    return String(dateValue).split('T')[0]; 
+                }
+                
+                row.insertCell().textContent = user.full_name || 'N/A';
+                row.insertCell().textContent = user.email || 'N/A';
+                row.insertCell().textContent = user.id_number || 'N/A'; 
+                row.insertCell().textContent = user.phone_number || 'N/A';
+                
+                const subCell = row.insertCell();
+                subCell.textContent = user.subscription_level || 'STANDARD';
+                subCell.classList.add('font-semibold');
+                subCell.style.color = (user.subscription_level === 'PLUS' || user.subscription_level === 'ULTRA') ? '#FFC300' : '#E5E7EB';
+
+                row.insertCell().textContent = displayDate(user.activo_desde);
+
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('whitespace-nowrap', 'text-sm', 'text-gray-500');
+                
+                const divContainer = document.createElement('div');
+                divContainer.classList.add('flex', 'space-x-2', 'items-center');
+
+                const blockBtn = document.createElement('button');
+                const isBlocked = user.is_blocked === true; 
+                
+                blockBtn.textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
+                blockBtn.classList.add('font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out', 'p-1', 'rounded');
+
+                if (isBlocked) {
+                    blockBtn.classList.add('text-white', 'bg-green-600', 'hover:bg-green-500');
+                } else {
+                    blockBtn.classList.add('text-white', 'bg-red-600', 'hover:bg-red-500');
+                }
+                
+                blockBtn.addEventListener('click', () => handleBlockUser(user.id, isBlocked));
+                divContainer.appendChild(blockBtn);
+
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Editar';
+                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out');
+                editBtn.onclick = () => openModalForEdit(user);
+                divContainer.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out', 'ml-2');
+                deleteBtn.onclick = () => deleteUser(user.id, user.full_name);
+                divContainer.appendChild(deleteBtn);
+                
+                actionsCell.appendChild(divContainer);
+            });
+        }
+
+        // =============================================================
+        // 🔍 LÓGICA DE BÚSQUEDA 
+        // =============================================================
+        function filterUsersTable(searchTerm) {
+            const normalizedSearch = searchTerm.toLowerCase().trim();
+
+            if (normalizedSearch === '') {
+                renderUsersTable(allUsersData);
+                return;
+            }
+
+            const filteredUsers = allUsersData.filter(user => {
+                const fullName = (user.full_name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                const idNumber = (user.id_number || '').toLowerCase(); 
+                
+                return fullName.includes(normalizedSearch) || 
+                       email.includes(normalizedSearch) || 
+                       idNumber.includes(normalizedSearch);
+            });
+
+            renderUsersTable(filteredUsers);
+        }
+
+        // =============================================================
+        // LÓGICA DEL MODAL (CREATE/UPDATE)
+        // =============================================================
+        function openModalForCreate() {
+            const form = document.getElementById('user-form');
+            form.reset(); 
+            document.getElementById('modal-title').textContent = 'Añadir Nuevo Usuario';
+            document.getElementById('user-id-field').value = '';
+            document.getElementById('is-edit-mode').value = 'false';
+            document.getElementById('submit-btn').textContent = 'Crear Usuario';
+            
+            document.getElementById('email').removeAttribute('disabled');
+            document.getElementById('password').required = true;
+            document.getElementById('password-req').classList.remove('hidden');
+            document.getElementById('password').placeholder = 'Mínimo 6 caracteres (solo requerido en creación)';
+            document.getElementById('id_number').value = ''; 
+            document.getElementById('phone_number_body').value = '';
+            document.getElementById('id_number_prefix').value = 'V';
+            document.getElementById('phone_prefix').value = '0414';
+
+            document.getElementById('user-modal').classList.remove('hidden');
+        }
+
+        function openModalForEdit(user) {
+            const form = document.getElementById('user-form');
+            form.reset(); 
+            
+            document.getElementById('modal-title').textContent = `Editar Usuario: ${user.full_name || user.email}`;
+            document.getElementById('user-id-field').value = user.id;
+            document.getElementById('is-edit-mode').value = 'true';
+            document.getElementById('submit-btn').textContent = 'Guardar Cambios';
+
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('email').setAttribute('disabled', 'true'); 
+
+            document.getElementById('password').required = false;
+            document.getElementById('password-req').classList.add('hidden');
+            document.getElementById('password').placeholder = 'Dejar vacío para no cambiar';
+
+            document.getElementById('name').value = user.name || '';
+            document.getElementById('last_name').value = user.last_name || '';
+            document.getElementById('sex').value = user.sex || 'Otro';
+            document.getElementById('subscription_level').value = user.subscription_level || 'STANDARD';
+
+            if (user.id_number && user.id_number.includes('-')) {
+                const [prefix, number] = user.id_number.split('-');
+                document.getElementById('id_number_prefix').value = prefix || 'V';
+                document.getElementById('id_number').value = number || ''; 
+            } else {
+                document.getElementById('id_number_prefix').value = 'V';
+                document.getElementById('id_number').value = user.id_number || '';
+            }
+            
+            if (user.phone_number && user.phone_number.includes('-')) {
+                const [prefix, number] = user.phone_number.split('-');
+                document.getElementById('phone_prefix').value = prefix || '0414';
+                document.getElementById('phone_number_body').value = number || '';
+            } else {
+                document.getElementById('phone_prefix').value = '0414';
+                document.getElementById('phone_number_body').value = user.phone_number || '';
+            }
+
+            function formatStringDateToInput(dateStr) {
+                if (!dateStr || dateStr === 'N/A') return '';
+                const parts = dateStr.split('/'); 
+                if (parts.length === 3) {
+                    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                }
+                return dateStr.split('T')[0]; 
+            }
+            
+            document.getElementById('dob').value = formatStringDateToInput(user.dob);
+            document.getElementById('activo_desde').value = formatStringDateToInput(user.activo_desde);
+
+            const idNumberInput = document.getElementById('id_number');
+            idNumberInput.value = formatIdNumber(idNumberInput.value);
+
+            document.getElementById('user-modal').classList.remove('hidden');
+        }
+
+        async function handleUserFormSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const isEditMode = document.getElementById('is-edit-mode').value === 'true';
+            const userId = document.getElementById('user-id-field').value;
+
+            const name = formatToUpperCase(form.name.value);
+            const lastName = formatToUpperCase(form.last_name.value);
+            
+            const idNumberPrefix = form.id_number_prefix.value;
+            const idNumberFormatted = formatIdNumber(form.id_number.value); 
+            const fullIdNumber = idNumberPrefix + '-' + idNumberFormatted; 
+
+            const phonePrefix = form.phone_prefix.value;
+            const phoneNumberBody = form.phone_number_body.value.replace(/\D/g, ''); 
+            const fullPhoneNumber = phonePrefix + '-' + phoneNumberBody;
+
+            const formData = {
+                id: userId,
+                name: name,
+                last_name: lastName,
+                full_name: `${name} ${lastName}`, 
+                email: form.email.value,
+                password: form.password.value,
+                id_number: fullIdNumber, 
+                phone_number: fullPhoneNumber,
+                sex: form.sex.value,
+                subscription_level: form.subscription_level.value,
+                dob: formatDateForBackend(form.dob.value), 
+                activo_desde: formatDateForBackend(form.activo_desde.value)
+            };
+            
+            if (isEditMode) delete formData.email; 
+            if (isEditMode && !formData.password) delete formData.password;
+            
+            if (!isEditMode && !formData.password) {
+                alert("La contraseña es obligatoria para crear un nuevo usuario.");
+                return;
+            }
+
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_BASE_URL}/${userId}` : API_BASE_URL;
+
+            try {
+                // 🔴 APLICANDO SEGURIDAD: getAuthHeaders() inyecta el Token
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    const errorMessage = errorText.includes('error') ? JSON.parse(errorText).error : errorText.substring(0, 150) + '...';
+                    throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`${isEditMode ? 'Edición' : 'Creación'} de usuario exitosa: ${data.message}`);
+                    document.getElementById('user-modal').classList.add('hidden');
+                    fetchAllUsers(); 
+                } else {
+                    alert(`Error al ${isEditMode ? 'editar' : 'crear'} usuario: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Error de red al procesar el usuario: ${error.message}`);
+                console.error(error);
+            }
+        }
+        
+        // =============================================================
+        // LÓGICA DE ELIMINACIÓN (DELETE)
+        // =============================================================
+        async function deleteUser(userId, fullName) {
+            if (!confirm(`¿Está seguro de que desea ELIMINAR permanentemente a ${fullName}? Esta acción es irreversible.`)) {
+                return;
+            }
+
+            try {
+                // 🔴 APLICANDO SEGURIDAD: getAuthHeaders() inyecta el Token
+                const response = await fetch(`${API_BASE_URL}/${userId}`, { 
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Usuario ${fullName} eliminado con éxito!`);
+                    fetchAllUsers();
+                } else {
+                    alert(`Error al eliminar: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Error de red al eliminar el usuario.`);
+            }
+        }
+
+        // =============================================================
+        // 🚫 LÓGICA DE BLOQUEO / DESBLOQUEO (TOGGLE BLOCK) 
+        // =============================================================
+        async function handleBlockUser(userId, currentState) {
+            const newBlockedState = !currentState;
+            const action = newBlockedState ? 'bloquear' : 'desbloquear';
+            
+            if (!confirm(`¿Está seguro que desea ${action} al usuario ID: ${userId}?`)) {
+                return;
+            }
+
+            try {
+                // 🔴 APLICANDO SEGURIDAD: getAuthHeaders() inyecta el Token
+                const response = await fetch(`${API_BASE_URL}/block/${userId}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ is_blocked: newBlockedState }),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    const errorMessage = errorText.includes('error') ? JSON.parse(errorText).error : errorText.substring(0, 150) + '...';
+                    throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Usuario ${action} con éxito. El nuevo estado es: ${data.is_blocked ? 'BLOQUEADO' : 'DESBLOQUEADO'}`);
+                    fetchAllUsers(); 
+                } else {
+                    alert(`Error al ${action}: ${data.error}`);
+                }
+            } catch (error) {
+                console.error(`Error al ${action} usuario:`, error);
+                alert(`Error de red al intentar ${action}: ${error.message}`);
+            }
+        }
+
+        // =============================================================
+        // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) 
+        // =============================================================
+        function handleNavigateBack() {
+            window.location.href = 'administration.html'; 
+        }
+
+        // --- INICIALIZACIÓN ---
+        window.onload = function() {
+            const storedSession = localStorage.getItem('adminSession');
+            const storedToken = localStorage.getItem('admin_token');
+            
+            if (!storedSession || !storedToken) {
+                window.location.href = 'administration.html'; 
+                return;
+            }
+
+            // =============================================================
+            // ⭐️ CORRECCIÓN DEL CURSOR EN TIEMPO REAL (Cédula) 
+            // =============================================================
+            const idNumberInput = document.getElementById('id_number');
+            if (idNumberInput) {
+                idNumberInput.addEventListener('input', function() {
+                    const oldFormattedValue = this.value;
+                    const oldCursorPos = this.selectionStart;
+                    
+                    const rawValue = oldFormattedValue.replace(/\D/g, '');
+                    const newFormattedValue = formatIdNumber(rawValue);
+                    
+                    const oldNonDigitCount = (oldFormattedValue.match(/\./g) || []).length;
+                    const newNonDigitCount = (newFormattedValue.match(/\./g) || []).length;
+                    
+                    const netDotChange = newNonDigitCount - oldNonDigitCount;
+                    
+                    this.value = newFormattedValue;
+                    
+                    const newCursorPos = oldCursorPos + netDotChange;
+                    this.setSelectionRange(newCursorPos, newCursorPos);
+                });
+                
+                idNumberInput.value = formatIdNumber(idNumberInput.value);
+            }
+
+            fetchAllUsers();
+
+            // LISTENERS GLOBALES
+            document.getElementById('back-btn').addEventListener('click', handleNavigateBack);
+            document.getElementById('add-user-btn').addEventListener('click', openModalForCreate);
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                document.getElementById('user-modal').classList.add('hidden');
+            });
+            document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
+            
+            const userSearchInput = document.getElementById('user-search-input');
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', (event) => {
+                    filterUsersTable(event.target.value);
+                });
+            }
+        };
+    </script>
+</body>
+</html>
