@@ -13,8 +13,6 @@ const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
 const SPLASH_DURATION_MS = 3000; 
 
 let CURRENT_USER_SESSION = null; 
-let sessionCheckerInterval = null; 
-let isFirstCheckIgnored = false; 
 
 const WHATSAPP_NUMBER = '+584148780392';
 const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de credenciales';
@@ -39,7 +37,7 @@ async function apiLogin(email, password, deviceId) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/login`, { 
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }, // El login inicial no lleva token
+            headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email, password, deviceId })
         });
         const data = await response.json();
@@ -50,10 +48,10 @@ async function apiLogin(email, password, deviceId) {
             return { success: false, error: data.error || 'Credenciales inválidas.' };
         }
         
-        // ✅ ÉXITO: Guardamos el usuario y el NUEVO TOKEN Criptográfico expedido por el núcleo
+        // ✅ ÉXITO: Guardamos el usuario y el NUEVO TOKEN Criptográfico
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
-        localStorage.setItem(AUTH_TOKEN_KEY, data.token); // Guardamos el pasaporte criptográfico
+        localStorage.setItem(AUTH_TOKEN_KEY, data.token); 
         
         return { success: true, user: data.user };
     } catch (e) {
@@ -71,7 +69,7 @@ async function apiLogout() {
         if (userId) {
             await fetch(`${API_BASE_URL}/api/logout`, {
                 method: 'POST',
-                headers: getAuthHeaders(), // 🛡️ Enviamos el token firmado para validar el cierre
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ userId: userId, deviceId: localDeviceId })
             });
         }
@@ -80,27 +78,8 @@ async function apiLogout() {
     } finally {
         CURRENT_USER_SESSION = null;
         localStorage.removeItem('userSession'); 
-        localStorage.removeItem(AUTH_TOKEN_KEY); // 🗑️ Destruimos el pasaporte del almacenamiento local
+        localStorage.removeItem(AUTH_TOKEN_KEY); 
         return { success: true }; 
-    }
-}
-
-async function apiVerifySession(userId, deviceId) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/verify_session`, { 
-            method: 'POST',
-            headers: getAuthHeaders(), // 🛡️ Enviamos el token al Heartbeat continuo
-            body: JSON.stringify({ userId, deviceId })
-        });
-        const data = await response.json();
-        
-        // Si el servidor responde 401 Unauthorized (Token alterado, caducado o robado)
-        if (response.status === 401) return { isValid: false, message: data.error || 'Sesión expirada o token inválido.' };
-        if (response.status === 403 || !data.success) return { isValid: false, message: data.error || 'Sesión invalidada.' };
-        
-        return { isValid: true };
-    } catch (e) {
-        return { isValid: true }; // En caso de desconexión de red temporal, no expulsamos al atleta
     }
 }
 
@@ -117,13 +96,86 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         if (data.token) {
-            localStorage.setItem(AUTH_TOKEN_KEY, data.token); // Almacenamos el nuevo token si se expide
+            localStorage.setItem(AUTH_TOKEN_KEY, data.token);
         }
         return { success: true, user: data.user };
     } catch (e) {
         return { success: false, error: 'No se pudo conectar con el servidor.' };
     }
 }
+
+// =======================================================
+// --- VIGILANTE INTELIGENTE Y UNIVERSAL DE SESIÓN ---
+// =======================================================
+
+function isTokenExpiredLocally() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) return true;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const tiempoActual = Math.floor(Date.now() / 1000);
+        return tiempoActual >= payload.exp;
+    } catch (e) {
+        return true; 
+    }
+}
+
+async function checkSessionGlobal() {
+    const userSessionRaw = localStorage.getItem('userSession');
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+
+    if (!userSessionRaw || !token) return;
+
+    try {
+        const user = JSON.parse(userSessionRaw);
+        const userId = user.id || user._id;
+
+        const response = await fetch(`${API_BASE_URL}/api/verify_session`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ userId: userId, deviceId: localDeviceId })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401 || response.status === 403 || !data.success) {
+            console.warn("🚨 Bloqueo activado:", data.error || data.message);
+            CURRENT_USER_SESSION = null;
+            localStorage.removeItem('userSession');
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            alert(data.error || data.message || 'Tu sesión ha expirado o fue cerrada por seguridad.');
+            window.location.href = '/apps/start/login.html';
+        }
+    } catch (e) {
+        console.error("Vigilante falló al contactar al servidor, reintentará luego.");
+    }
+}
+
+function startSmartSessionWatcher() {
+    if (!localStorage.getItem('userSession') || !localStorage.getItem(AUTH_TOKEN_KEY)) return;
+
+    // Reloj Silencioso: 0 peticiones, revisa cada 2 minutos
+    setInterval(() => {
+        if (isTokenExpiredLocally()) {
+            CURRENT_USER_SESSION = null;
+            localStorage.removeItem('userSession');
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            alert('Tu sesión ha expirado por el paso del tiempo. Por favor, ingresa nuevamente.');
+            window.location.href = '/apps/start/login.html';
+        }
+    }, 120000);
+
+    // Sensor de Foco: Solo pregunta al servidor si regresan a la pestaña
+    document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState === 'visible' && !isTokenExpiredLocally()) {
+            await checkSessionGlobal();
+        }
+    });
+}
+
+// Encender automáticamente en CUALQUIER página
+window.addEventListener('DOMContentLoaded', startSmartSessionWatcher);
+
 
 // =======================================================
 // --- UTILIDADES DE INTERFAZ Y MODALES ---
@@ -368,53 +420,16 @@ async function handleVerifyActivation(e) {
 }
 
 // =======================================================
-// --- HEARTBEAT Y VERIFICACIÓN CONTINUA ---
-// =======================================================
-
-function startSessionChecker() {
-    if (sessionCheckerInterval) clearInterval(sessionCheckerInterval);
-    isFirstCheckIgnored = true; 
-    checkSessionValidity(); 
-    sessionCheckerInterval = setInterval(checkSessionValidity, 2000);
-}
-
-function stopSessionChecker() {
-    if (sessionCheckerInterval) {
-        clearInterval(sessionCheckerInterval);
-        sessionCheckerInterval = null;
-    }
-}
-
-async function checkSessionValidity() {
-    if (isFirstCheckIgnored) {
-        isFirstCheckIgnored = false; 
-        return; 
-    }
-    if (!CURRENT_USER_SESSION) {
-        window.location.href = '/'; 
-        return;
-    }
-    const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
-    const verification = await apiVerifySession(userId, localDeviceId);
-
-    if (!verification.isValid) {
-        stopSessionChecker();
-        await apiLogout(); 
-        
-        // 🔐 SOLUCIÓN: Usamos el mensaje real del backend en lugar de una alerta fija
-        alert(verification.message || 'Tu sesión ha expirado.');
-        window.location.href = '/'; 
-    }
-}
-
-// =======================================================
 // --- INICIALIZACIÓN GLOBAL (ONLOAD) ---
 // =======================================================
 
 window.onload = function() {
     const isLoginScreen = document.getElementById('login-screen') !== null;
-    const isDashboardScreen = document.getElementById('dashboard-screen') !== null;
     const storedSession = localStorage.getItem('userSession');
+
+    if (storedSession) {
+        CURRENT_USER_SESSION = JSON.parse(storedSession);
+    }
 
     if (isLoginScreen) {
         if (storedSession) {
@@ -483,21 +498,11 @@ window.onload = function() {
         });
     }
 
-    if (isDashboardScreen) {
-        if (!storedSession) {
-            window.location.href = '/';
-            return;
-        }
-        
-        CURRENT_USER_SESSION = JSON.parse(storedSession);
-        startSessionChecker();
-
-        document.getElementById('logout-button')?.addEventListener('click', async () => {
-            const btn = document.getElementById('logout-button');
-            btn.disabled = true;
-            stopSessionChecker(); 
-            await apiLogout(); 
-            window.location.href = '/';
-        });
-    }
+    // Funcionalidad global: Botón de cerrar sesión
+    document.getElementById('logout-button')?.addEventListener('click', async () => {
+        const btn = document.getElementById('logout-button');
+        btn.disabled = true;
+        await apiLogout(); 
+        window.location.href = '/apps/start/login.html';
+    });
 };
