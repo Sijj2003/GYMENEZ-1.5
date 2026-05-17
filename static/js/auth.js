@@ -18,13 +18,39 @@ const WHATSAPP_NUMBER = '+584148780392';
 const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de credenciales';
 
 // =======================================================
-// 🛡️ INTERCEPTOR DE CABECERAS ZERO TRUST 
+// 🚪 FUNCIÓN GLOBAL DE EXPULSIÓN PROFESIONAL
+// =======================================================
+function forceGlobalLogout(reason) {
+    CURRENT_USER_SESSION = null;
+    localStorage.removeItem('userSession');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    alert(reason || "Tu sesión ha expirado por seguridad. Vuelve a ingresar.");
+    window.location.href = '/apps/start/login.html';
+}
+
+// =======================================================
+// 🛡️ INTERCEPTOR GLOBAL DE PETICIONES (EL ESCUDO ACTIVO)
+// =======================================================
+const originalFetch = window.fetch;
+window.fetch = async function(...args) {
+    const response = await originalFetch.apply(this, args);
+    
+    // Si CUALQUIER petición en CUALQUIER página recibe un 401 (Acceso Denegado) del servidor...
+    if (response.status === 401) {
+        console.warn("🚨 Interceptor detectó un 401 del servidor. Expulsando...");
+        forceGlobalLogout("Tu sesión ha expirado en el servidor. Por favor, inicia sesión nuevamente.");
+    }
+    
+    return response;
+};
+
+// =======================================================
+// 🛡️ GENERADOR DE CABECERAS ZERO TRUST 
 // =======================================================
 function getAuthHeaders() {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     return {
         'Content-Type': 'application/json',
-        // Inyectamos el Token Criptográfico si existe en la bóveda
         'Authorization': token ? `Bearer ${token}` : ''
     };
 }
@@ -48,7 +74,6 @@ async function apiLogin(email, password, deviceId) {
             return { success: false, error: data.error || 'Credenciales inválidas.' };
         }
         
-        // ✅ ÉXITO: Guardamos el usuario y el NUEVO TOKEN Criptográfico
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         localStorage.setItem(AUTH_TOKEN_KEY, data.token); 
@@ -136,39 +161,42 @@ async function checkSessionGlobal() {
             body: JSON.stringify({ userId: userId, deviceId: localDeviceId })
         });
 
+        // 🚨 Ojo: Si responde 401, el Interceptor Global de arriba ya lo atrapó y expulsó al usuario.
+        // Aquí solo atrapamos otros problemas como cuentas bloqueadas (403) o éxito en false.
         const data = await response.json();
 
-        if (response.status === 401 || response.status === 403 || !data.success) {
-            console.warn("🚨 Bloqueo activado:", data.error || data.message);
-            CURRENT_USER_SESSION = null;
-            localStorage.removeItem('userSession');
-            localStorage.removeItem(AUTH_TOKEN_KEY);
-            alert(data.error || data.message || 'Tu sesión ha expirado o fue cerrada por seguridad.');
-            window.location.href = '/apps/start/login.html';
+        if (response.status === 403 || !data.success) {
+            forceGlobalLogout(data.error || data.message || 'Tu sesión fue cerrada por seguridad.');
         }
     } catch (e) {
-        console.error("Vigilante falló al contactar al servidor, reintentará luego.");
+        console.error("Vigilante falló al contactar al servidor.");
     }
 }
 
 function startSmartSessionWatcher() {
     if (!localStorage.getItem('userSession') || !localStorage.getItem(AUTH_TOKEN_KEY)) return;
 
-    // Reloj Silencioso: 0 peticiones, revisa cada 2 minutos
+    // 1. CHEQUEO INMEDIATO AL CARGAR LA PÁGINA (Evita que páginas carguen vacías)
+    if (isTokenExpiredLocally()) {
+        forceGlobalLogout('Tu sesión expiró. Por favor, ingresa nuevamente.');
+        return;
+    }
+
+    // 2. Reloj Silencioso: 0 peticiones, revisa cada 1 minuto (60000 ms)
     setInterval(() => {
         if (isTokenExpiredLocally()) {
-            CURRENT_USER_SESSION = null;
-            localStorage.removeItem('userSession');
-            localStorage.removeItem(AUTH_TOKEN_KEY);
-            alert('Tu sesión ha expirado por el paso del tiempo. Por favor, ingresa nuevamente.');
-            window.location.href = '/apps/start/login.html';
+            forceGlobalLogout('Tu tiempo de sesión ha terminado. Por favor, ingresa nuevamente.');
         }
-    }, 120000);
+    }, 60000);
 
-    // Sensor de Foco: Solo pregunta al servidor si regresan a la pestaña
+    // 3. Sensor de Foco: Solo pregunta al servidor si regresan a la pestaña
     document.addEventListener("visibilitychange", async () => {
-        if (document.visibilityState === 'visible' && !isTokenExpiredLocally()) {
-            await checkSessionGlobal();
+        if (document.visibilityState === 'visible') {
+            if (isTokenExpiredLocally()) {
+                forceGlobalLogout('Tu sesión expiró mientras estabas inactivo.');
+            } else {
+                await checkSessionGlobal();
+            }
         }
     });
 }
