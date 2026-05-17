@@ -11,7 +11,7 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #050505; /* Fondo negro profundo */
+            background-color: #050505; 
             color: white;
             overflow-x: hidden;
         }
@@ -38,7 +38,7 @@
             background: linear-gradient(145deg, #111115 0%, #0a0a0c 100%);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 2rem;
-            min-width: 85vw; /* Casi el ancho completo en móvil */
+            min-width: 85vw; 
             scroll-snap-align: center;
             flex-shrink: 0;
             display: flex;
@@ -159,7 +159,9 @@
         let tasaBcvActual = 0;
         let currentUserPlan = 'BASICO'; 
         let currentUserId = null;
-        let plansData = []; // Catálogo dinámico desde el servidor
+        
+        // 🔄 El array nace vacío. El backend dicta cuáles son los planes y sus precios.
+        let plansData = []; 
 
         window.onload = async () => {
             const storedSession = localStorage.getItem('userSession');
@@ -174,7 +176,7 @@
                 const user = JSON.parse(storedSession);
                 currentUserId = user.id || user._id; 
                 
-                // 1. 🛡️ Peticiones secuenciales-paralelas controladas para identificar al culpable exacto
+                // 1. 🛡️ Peticiones controladas al servidor
                 let dataProfile = { success: false };
                 try {
                     const resProfile = await fetch(`${API_URL}/api/profile/me`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -186,7 +188,7 @@
                 try {
                     const resCatalog = await fetch(`${API_URL}/api/plans/catalog`);
                     if (resCatalog.ok) dataCatalog = await resCatalog.json();
-                    else console.error("Fallo Catálogo (¿Existe la ruta?):", resCatalog.status);
+                    else console.error("Fallo Catálogo:", resCatalog.status);
                 } catch(e) { console.error("Error de red en Catálogo:", e); }
 
                 let dataBcv = { success: false };
@@ -201,10 +203,11 @@
                     currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
                 }
 
+                // Llenamos la variable local con la verdad del servidor
                 if (dataCatalog.success && dataCatalog.plans) {
                     plansData = dataCatalog.plans;
                 } else {
-                    throw new Error("El Catálogo de membresías No Esta Disponible");
+                    throw new Error("El Catálogo de membresías devolvió error. Contacte a soporte.");
                 }
 
                 if (dataBcv.success) {
