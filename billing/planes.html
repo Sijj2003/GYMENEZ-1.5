@@ -11,7 +11,7 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #050505; 
+            background-color: #050505; /* Fondo negro profundo */
             color: white;
             overflow-x: hidden;
         }
@@ -159,7 +159,7 @@
         let tasaBcvActual = 0;
         let currentUserPlan = 'BASICO'; 
         let currentUserId = null;
-        let plansData = []; // 🔄 El array ahora nace vacío y se llena desde el Servidor Core
+        let plansData = []; // Catálogo dinámico desde el servidor
 
         window.onload = async () => {
             const storedSession = localStorage.getItem('userSession');
@@ -174,40 +174,50 @@
                 const user = JSON.parse(storedSession);
                 currentUserId = user.id || user._id; 
                 
-                // 1. 🛡️ Petición síncrona paralela: Traer perfil y Catálogo de Planes Oficial del Servidor
-                const [resProfile, resCatalog, resBcv] = await Promise.all([
-                    fetch(`${API_URL}/api/profile/me`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch(`${API_URL}/api/plans/catalog`), // Endpoint público del catálogo
-                    fetch(`${API_URL}/api/bcv-rate`)
-                ]);
+                // 1. 🛡️ Peticiones secuenciales-paralelas controladas para identificar al culpable exacto
+                let dataProfile = { success: false };
+                try {
+                    const resProfile = await fetch(`${API_URL}/api/profile/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (resProfile.ok) dataProfile = await resProfile.json();
+                    else console.error("Fallo Perfil:", resProfile.status);
+                } catch(e) { console.error("Error de red en Perfil:", e); }
 
-                const dataProfile = await resProfile.json();
-                const dataCatalog = await resCatalog.json();
-                const dataBcv = await resBcv.json();
+                let dataCatalog = { success: false };
+                try {
+                    const resCatalog = await fetch(`${API_URL}/api/plans/catalog`);
+                    if (resCatalog.ok) dataCatalog = await resCatalog.json();
+                    else console.error("Fallo Catálogo (¿Existe la ruta?):", resCatalog.status);
+                } catch(e) { console.error("Error de red en Catálogo:", e); }
+
+                let dataBcv = { success: false };
+                try {
+                    const resBcv = await fetch(`${API_URL}/api/bcv-rate`);
+                    if (resBcv.ok) dataBcv = await resBcv.json();
+                    else console.error("Fallo Tasa BCV:", resBcv.status);
+                } catch(e) { console.error("Error de red en Tasa BCV:", e); }
                 
-                // Cargar nivel del usuario
+                // 2. Procesar datos obtenidos
                 if (dataProfile.success && dataProfile.profile) {
                     currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
                 }
 
-                // 🔄 CARGA DEL CATÁLOGO DINÁMICO
                 if (dataCatalog.success && dataCatalog.plans) {
                     plansData = dataCatalog.plans;
                 } else {
-                    throw new Error("Catálogo de membresías no disponible.");
+                    throw new Error("El Catálogo de membresías devolvió un error o un 404. ¿Añadiste la ruta en finance_routes.py y recargaste PythonAnywhere?");
                 }
 
-                // Cargar Tasa Cambiaria Oficial
                 if (dataBcv.success) {
                     tasaBcvActual = dataBcv.rate;
                     document.getElementById('tasa-bcv-display').textContent = `${tasaBcvActual.toFixed(2)} BS`;
+                } else {
+                    document.getElementById('tasa-bcv-display').textContent = `ERR BCV`;
                 }
 
-                // 2. Ejecutar renderizado dinámico con la data del Core
+                // 3. Ejecutar renderizado
                 renderCards();
                 setupScrollObserver();
 
-                // Desplazar automáticamente al plan recomendado (PLUS) o al plan actual si es mayor
                 setTimeout(() => {
                     let targetPlan = 'PLUS';
                     if (currentUserPlan === 'ULTRA') targetPlan = 'ULTRA';
@@ -217,7 +227,7 @@
 
             } catch (e) {
                 console.error("Fallo crítico en sincronización de pasarela:", e);
-                alert("Error perimetral: Sincronización cambiaria o de catálogo caída. Contacte a soporte técnico.");
+                alert(e.message);
                 window.location.href = '../apps/start/inicio.html';
             }
         };
@@ -314,7 +324,11 @@
 
         function setupScrollObserver() {
             const container = document.getElementById('plans-carousel');
-            const options = { root: container, rootMargin: '0px', threshold: 0.6 };
+            const options = {
+                root: container,
+                rootMargin: '0px',
+                threshold: 0.6 
+            };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
