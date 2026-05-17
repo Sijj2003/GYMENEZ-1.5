@@ -110,15 +110,15 @@
                 <div class="space-y-4 flex-grow relative z-10">
                     <div class="p-4 rounded-xl bg-[#0a0a0c] border border-white/10">
                         <p class="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">Banco Receptor</p>
-                        <p class="text-base md:text-lg font-black text-white uppercase tracking-wide">Banesco (0134)</p>
+                        <p id="deposito-banco" class="text-base md:text-lg font-black text-white uppercase tracking-wide">Cargando Banco...</p>
                     </div>
 
                     <div class="p-4 rounded-xl bg-[#0a0a0c] border border-white/10 flex justify-between items-center group transition-all hover:border-[#FFC300]/50 hover:shadow-[0_0_15px_rgba(255,195,0,0.1)]">
                         <div>
                             <p class="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">Rif / Cédula de Identidad</p>
-                            <p class="text-base md:text-lg font-black text-white tracking-wider">V-21.050.291</p>
+                            <p id="deposito-rif" class="text-base md:text-lg font-black text-white tracking-wider">--</p>
                         </div>
-                        <button onclick="copyToClipboard('21050291')" class="w-10 h-10 rounded-lg border border-white/10 bg-[#111] flex items-center justify-center text-white hover:text-[#FFC300] hover:border-[#FFC300] hover:bg-[#FFC300]/10 transition-all active:scale-90">
+                        <button onclick="copyToClipboard(document.getElementById('deposito-rif').textContent.replace(/[^0-9VvEe-]/g, ''))" class="w-10 h-10 rounded-lg border border-white/10 bg-[#111] flex items-center justify-center text-white hover:text-[#FFC300] hover:border-[#FFC300] hover:bg-[#FFC300]/10 transition-all active:scale-90">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
                     </div>
@@ -126,9 +126,9 @@
                     <div class="p-4 rounded-xl bg-[#0a0a0c] border border-white/10 flex justify-between items-center group transition-all hover:border-[#FFC300]/50 hover:shadow-[0_0_15px_rgba(255,195,0,0.1)]">
                         <div>
                             <p class="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">Teléfono Afiliado (Pago Móvil)</p>
-                            <p class="text-base md:text-lg font-black text-white tracking-widest">0414-8780392</p>
+                            <p id="deposito-telefono" class="text-base md:text-lg font-black text-white tracking-widest">--</p>
                         </div>
-                        <button onclick="copyToClipboard('04148780392')" class="w-10 h-10 rounded-lg border border-white/10 bg-[#111] flex items-center justify-center text-white hover:text-[#FFC300] hover:border-[#FFC300] hover:bg-[#FFC300]/10 transition-all active:scale-90">
+                        <button onclick="copyToClipboard(document.getElementById('deposito-telefono').textContent.replace(/[^0-9]/g, ''))" class="w-10 h-10 rounded-lg border border-white/10 bg-[#111] flex items-center justify-center text-white hover:text-[#FFC300] hover:border-[#FFC300] hover:bg-[#FFC300]/10 transition-all active:scale-90">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
                     </div>
@@ -200,7 +200,7 @@
             window.location.href = '/apps/start/login.html';
         }
 
-        window.onload = () => {
+        window.onload = async () => {
             document.getElementById('display-plan-name').textContent = `Plan ${planName}`;
             
             const montoFormateado = parseFloat(montoBs).toLocaleString('es-VE', {
@@ -208,6 +208,25 @@
                 maximumFractionDigits: 2
             });
             document.getElementById('monto').value = montoFormateado;
+
+            // 🛡️ Obtener coordenadas inmutables del servidor
+            try {
+                const resCoordinates = await fetch(`${API_BASE_URL}/api/payments/coordinates`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const dataCoords = await resCoordinates.json();
+                
+                if (dataCoords.success && dataCoords.coordinates) {
+                    document.getElementById('deposito-banco').textContent = dataCoords.coordinates.banco;
+                    document.getElementById('deposito-rif').textContent = dataCoords.coordinates.rif;
+                    document.getElementById('deposito-telefono').textContent = dataCoords.coordinates.telefono;
+                } else {
+                    throw new Error("No se pudieron validar los datos de destino.");
+                }
+            } catch (error) {
+                console.error("Fallo de contingencia bancaria:", error);
+                showMessage("Error perimetral: No se pudo verificar la cuenta destino oficial. Intente más tarde.", "error");
+            }
 
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
@@ -261,12 +280,12 @@
             btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-[#FFC300]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> PROCESANDO...`;
 
             try {
-                // 🛡️ Petición Segura con Token. Ya NO enviamos el Monto ni el UserId
+                // 🛡️ Solo enviamos datos de la transacción. El monto se calcula en el backend.
                 const response = await fetch(`${API_BASE_URL}/api/payments/report`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // 🔐 Inyectamos el Token JWT
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         plan: planName,
