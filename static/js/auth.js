@@ -22,7 +22,7 @@ const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de cr
 function forceGlobalLogout(reason) {
     CURRENT_USER_SESSION = null;
     localStorage.removeItem('userSession');
-    localStorage.removeItem('gymen_session_exp'); // 🚀 Limpieza de la marca de tiempo local
+    localStorage.removeItem('gymen_session_exp'); 
     alert(reason || "Tu sesión ha expirado por seguridad. Vuelve a ingresar.");
     window.location.href = '/apps/start/login.html';
 }
@@ -32,14 +32,11 @@ function forceGlobalLogout(reason) {
 // =======================================================
 const originalFetch = window.fetch;
 window.fetch = async function(...args) {
-    // 🔴 SOLUCIÓN MAESTRA FASE 4: Forzamos centralizadamente que todas las peticiones
-    // incluyan las cookies seguras cross-origin ('include') automáticamente.
     if (typeof args[1] === 'undefined') args[1] = {};
     if (typeof args[1].credentials === 'undefined') args[1].credentials = 'include';
     
     const response = await originalFetch.apply(this, args);
     
-    // Si CUALQUIER petición en CUALQUIER página recibe un 401 (Acceso Denegado) del servidor...
     if (response.status === 401) {
         console.warn("🚨 Interceptor detectó un 401 del servidor. Expulsando...");
         forceGlobalLogout("Tu sesión ha expirado en el servidor. Por favor, inicia sesión nuevamente.");
@@ -52,7 +49,6 @@ window.fetch = async function(...args) {
 // 🛡️ GENERADOR DE CABECERAS ZERO TRUST (OPTIMIZADO)
 // =======================================================
 function getAuthHeaders() {
-    // Ya no enviamos Authorization manual. El navegador adjunta la cookie HttpOnly de forma transparente.
     return {
         'Content-Type': 'application/json'
     };
@@ -80,7 +76,6 @@ async function apiLogin(email, password, deviceId) {
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         
-        // 🚀 FASE 4: Seteamos expiración local legible (480 minutos = 8 horas de tu env.txt)
         const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
         localStorage.setItem('gymen_session_exp', tiempoExpiracion);
         
@@ -127,7 +122,6 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         
-        // 🚀 Seteamos expiración local para el kick remoto (8 horas)
         const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
         localStorage.setItem('gymen_session_exp', tiempoExpiracion);
         
@@ -144,7 +138,6 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
 function isTokenExpiredLocally() {
     const exp = localStorage.getItem('gymen_session_exp');
     if (!exp) return true;
-    // 🚀 Comprobación matemática basada en tiempo absoluto
     return Date.now() >= parseInt(exp);
 }
 
@@ -177,20 +170,17 @@ async function checkSessionGlobal() {
 function startSmartSessionWatcher() {
     if (!localStorage.getItem('userSession') || !localStorage.getItem('gymen_session_exp')) return;
 
-    // 1. CHEQUEO INMEDIATO AL CARGAR LA PÁGINA
     if (isTokenExpiredLocally()) {
         forceGlobalLogout('Tu sesión expiró. Por favor, ingresa nuevamente.');
         return;
     }
 
-    // 2. Reloj Silencioso: Revisa cada 1 minuto (60000 ms) sin saturar de peticiones HTTP
     setInterval(() => {
         if (isTokenExpiredLocally()) {
             forceGlobalLogout('Tu tiempo de sesión ha terminado. Por favor, ingresa nuevamente.');
         }
     }, 60000);
 
-    // 3. Sensor de Foco: Revalida con el backend si el atleta regresa a la pestaña
     document.addEventListener("visibilitychange", async () => {
         if (document.visibilityState === 'visible') {
             if (isTokenExpiredLocally()) {
@@ -202,9 +192,7 @@ function startSmartSessionWatcher() {
     });
 }
 
-// Encender automáticamente en CUALQUIER página
 window.addEventListener('DOMContentLoaded', startSmartSessionWatcher);
-
 
 // =======================================================
 // --- UTILIDADES DE INTERFAZ Y MODALES ---
@@ -307,6 +295,10 @@ function applyCIMask(e) {
     input.value = formatted;
     const newCursorPos = oldCursorPos + netChange;
     input.setSelectionRange(newCursorPos, newCursorPos);
+}
+
+function applyPhoneMask(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 7);
 }
 
 // =======================================================
@@ -548,7 +540,6 @@ window.onload = function() {
         });
     }
 
-    // Funcionalidad global: Botón de cerrar sesión
     document.getElementById('logout-button')?.addEventListener('click', async () => {
         const btn = document.getElementById('logout-button');
         btn.disabled = true;
