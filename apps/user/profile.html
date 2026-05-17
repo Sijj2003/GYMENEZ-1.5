@@ -225,14 +225,16 @@
             }
         }
 
-        // Verificar Nivel de Suscripción
+        // Verificar Nivel de Suscripción (Seguridad Zero Trust)
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('userSession');
-            if (storedSession) {
-                const user = JSON.parse(storedSession);
-                const userId = user.id || user._id;
+            const token = localStorage.getItem('gymen_auth_token'); // 🔐 Extraemos el Token
 
-                fetch(`${URL_API}/api/profile/${userId}`)
+            if (storedSession && token) {
+                // 🛡️ Petición a la ruta segura '/me' inyectando el Pasaporte
+                fetch(`${URL_API}/api/profile/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success && data.profile) {
@@ -246,6 +248,8 @@
                         console.error("Error obteniendo perfil para candados:", err);
                         applyProfileLocks('No Suscrito');
                     });
+            } else {
+                applyProfileLocks('No Suscrito');
             }
         });
     </script>
