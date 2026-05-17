@@ -3,11 +3,22 @@
 const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
 /**
+ * Función Helper para obtener el Pasaporte Criptográfico (Token) del LocalStorage
+ */
+function getBearerToken() {
+    const token = localStorage.getItem('gymen_auth_token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+/**
  * Llama a la API para obtener el perfil del usuario (datos básicos).
  */
-async function apiFetchProfileData(userId) {
+async function apiFetchProfileData() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`); 
+        // Apunta a la ruta segura /me y envía el Token
+        const response = await fetch(`${API_BASE_URL}/api/profile/me`, { 
+            headers: getBearerToken() 
+        }); 
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         const data = await response.json();
         return { success: true, profile: data.profile };
@@ -20,9 +31,12 @@ async function apiFetchProfileData(userId) {
 /**
  * Llama a la API para obtener las métricas del usuario.
  */
-async function apiFetchMetrics(userId) {
+async function apiFetchMetrics() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/metrics/${userId}`);
+        // Apunta a la ruta segura /me y envía el Token
+        const response = await fetch(`${API_BASE_URL}/api/metrics/me`, { 
+            headers: getBearerToken() 
+        });
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         return await response.json();
     } catch (e) {
@@ -87,13 +101,11 @@ async function loadProfileData() {
     }
     
     try {
-        const userSession = JSON.parse(storedSession);
-        const userId = userSession._id || userSession.id;
-
-        // Ejecutamos ambas peticiones al mismo tiempo para mayor fluidez
+        // Ejecutamos ambas peticiones al mismo tiempo para mayor fluidez.
+        // Como el Backend ahora extrae el ID desde el Token, ya no necesitamos pasar el userId.
         const [profileRes, metricsRes] = await Promise.all([
-            apiFetchProfileData(userId),
-            apiFetchMetrics(userId)
+            apiFetchProfileData(),
+            apiFetchMetrics()
         ]);
 
         if (profileRes.success) {
