@@ -1,6 +1,5 @@
 // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
 const DEVICE_ID_KEY = 'gymen_device_id';
-const AUTH_TOKEN_KEY = 'gymen_auth_token'; // 🔐 Bóveda segura para el Pasaporte JWT
 
 let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
 
@@ -23,16 +22,21 @@ const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de cr
 function forceGlobalLogout(reason) {
     CURRENT_USER_SESSION = null;
     localStorage.removeItem('userSession');
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem('gymen_session_exp'); // 🚀 Limpieza de la marca de tiempo local
     alert(reason || "Tu sesión ha expirado por seguridad. Vuelve a ingresar.");
     window.location.href = '/apps/start/login.html';
 }
 
 // =======================================================
-// 🛡️ INTERCEPTOR GLOBAL DE PETICIONES (EL ESCUDO ACTIVO)
+// 🛡️ INTERCEPTOR GLOBAL DE PETICIONES (COOKIE EDITION)
 // =======================================================
 const originalFetch = window.fetch;
 window.fetch = async function(...args) {
+    // 🔴 SOLUCIÓN MAESTRA FASE 4: Forzamos centralizadamente que todas las peticiones
+    // incluyan las cookies seguras cross-origin ('include') automáticamente.
+    if (typeof args[1] === 'undefined') args[1] = {};
+    if (typeof args[1].credentials === 'undefined') args[1].credentials = 'include';
+    
     const response = await originalFetch.apply(this, args);
     
     // Si CUALQUIER petición en CUALQUIER página recibe un 401 (Acceso Denegado) del servidor...
@@ -45,13 +49,12 @@ window.fetch = async function(...args) {
 };
 
 // =======================================================
-// 🛡️ GENERADOR DE CABECERAS ZERO TRUST 
+// 🛡️ GENERADOR DE CABECERAS ZERO TRUST (OPTIMIZADO)
 // =======================================================
 function getAuthHeaders() {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    // Ya no enviamos Authorization manual. El navegador adjunta la cookie HttpOnly de forma transparente.
     return {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
+        'Content-Type': 'application/json'
     };
 }
 
@@ -76,7 +79,10 @@ async function apiLogin(email, password, deviceId) {
         
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
-        localStorage.setItem(AUTH_TOKEN_KEY, data.token); 
+        
+        // 🚀 FASE 4: Seteamos expiración local legible (480 minutos = 8 horas de tu env.txt)
+        const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
+        localStorage.setItem('gymen_session_exp', tiempoExpiracion);
         
         return { success: true, user: data.user };
     } catch (e) {
@@ -103,7 +109,7 @@ async function apiLogout() {
     } finally {
         CURRENT_USER_SESSION = null;
         localStorage.removeItem('userSession'); 
-        localStorage.removeItem(AUTH_TOKEN_KEY); 
+        localStorage.removeItem('gymen_session_exp'); 
         return { success: true }; 
     }
 }
@@ -120,9 +126,11 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
         
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
-        if (data.token) {
-            localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-        }
+        
+        // 🚀 Seteamos expiración local para el kick remoto (8 horas)
+        const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
+        localStorage.setItem('gymen_session_exp', tiempoExpiracion);
+        
         return { success: true, user: data.user };
     } catch (e) {
         return { success: false, error: 'No se pudo conectar con el servidor.' };
@@ -134,22 +142,17 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
 // =======================================================
 
 function isTokenExpiredLocally() {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!token) return true;
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const tiempoActual = Math.floor(Date.now() / 1000);
-        return tiempoActual >= payload.exp;
-    } catch (e) {
-        return true; 
-    }
+    const exp = localStorage.getItem('gymen_session_exp');
+    if (!exp) return true;
+    // 🚀 Comprobación matemática basada en tiempo absoluto
+    return Date.now() >= parseInt(exp);
 }
 
 async function checkSessionGlobal() {
     const userSessionRaw = localStorage.getItem('userSession');
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const exp = localStorage.getItem('gymen_session_exp');
 
-    if (!userSessionRaw || !token) return;
+    if (!userSessionRaw || !exp) return;
 
     try {
         const user = JSON.parse(userSessionRaw);
@@ -161,8 +164,6 @@ async function checkSessionGlobal() {
             body: JSON.stringify({ userId: userId, deviceId: localDeviceId })
         });
 
-        // 🚨 Ojo: Si responde 401, el Interceptor Global de arriba ya lo atrapó y expulsó al usuario.
-        // Aquí solo atrapamos otros problemas como cuentas bloqueadas (403) o éxito en false.
         const data = await response.json();
 
         if (response.status === 403 || !data.success) {
@@ -174,22 +175,22 @@ async function checkSessionGlobal() {
 }
 
 function startSmartSessionWatcher() {
-    if (!localStorage.getItem('userSession') || !localStorage.getItem(AUTH_TOKEN_KEY)) return;
+    if (!localStorage.getItem('userSession') || !localStorage.getItem('gymen_session_exp')) return;
 
-    // 1. CHEQUEO INMEDIATO AL CARGAR LA PÁGINA (Evita que páginas carguen vacías)
+    // 1. CHEQUEO INMEDIATO AL CARGAR LA PÁGINA
     if (isTokenExpiredLocally()) {
         forceGlobalLogout('Tu sesión expiró. Por favor, ingresa nuevamente.');
         return;
     }
 
-    // 2. Reloj Silencioso: 0 peticiones, revisa cada 1 minuto (60000 ms)
+    // 2. Reloj Silencioso: Revisa cada 1 minuto (60000 ms) sin saturar de peticiones HTTP
     setInterval(() => {
         if (isTokenExpiredLocally()) {
             forceGlobalLogout('Tu tiempo de sesión ha terminado. Por favor, ingresa nuevamente.');
         }
     }, 60000);
 
-    // 3. Sensor de Foco: Solo pregunta al servidor si regresan a la pestaña
+    // 3. Sensor de Foco: Revalida con el backend si el atleta regresa a la pestaña
     document.addEventListener("visibilitychange", async () => {
         if (document.visibilityState === 'visible') {
             if (isTokenExpiredLocally()) {
@@ -274,7 +275,6 @@ function applyDateMask(e) {
     if (v.length >= 5) formatted = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
     else if (v.length >= 3) formatted = `${v.substring(0, 2)}/${v.substring(2)}`;
     
-    // Cálculo inteligente del cursor
     const oldNonDigitCount = (oldVal.match(/\//g) || []).length;
     const newNonDigitCount = (formatted.match(/\//g) || []).length;
     const netChange = newNonDigitCount - oldNonDigitCount;
@@ -300,7 +300,6 @@ function applyCIMask(e) {
         if (count % 3 === 0 && i !== 0) formatted = '.' + formatted;
     }
     
-    // Cálculo inteligente del cursor
     const oldNonDigitCount = (oldVal.match(/\./g) || []).length;
     const newNonDigitCount = (formatted.match(/\./g) || []).length;
     const netChange = newNonDigitCount - oldNonDigitCount;
@@ -308,10 +307,6 @@ function applyCIMask(e) {
     input.value = formatted;
     const newCursorPos = oldCursorPos + netChange;
     input.setSelectionRange(newCursorPos, newCursorPos);
-}
-
-function applyPhoneMask(e) {
-    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 7);
 }
 
 // =======================================================
