@@ -316,7 +316,6 @@
             
             if (storedSession) {
                 const user = JSON.parse(storedSession);
-                const userId = user.id || user._id;
                 
                 const firstName = user.name ? user.name.split(' ')[0] : 'Atleta';
                 document.getElementById('welcome-name').textContent = firstName;
@@ -325,8 +324,11 @@
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
-                // 3. Fetch Nivel Suscripción
-                fetch(`${API_BASE_URL}/api/profile/${userId}`)
+                // 3. Fetch Nivel Suscripción protegido con Token JWT
+                const token = localStorage.getItem('gymen_auth_token');
+                fetch(`${API_BASE_URL}/api/profile/me`, {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success && data.profile) {
