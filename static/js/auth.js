@@ -258,21 +258,40 @@ function closeModalSafe(modalId) {
 }
 
 // =======================================================
-// --- MÁSCARAS INTELIGENTES ---
+// --- MÁSCARAS INTELIGENTES (UX Optimizada) ---
 // =======================================================
 
 function applyDateMask(e) {
     if (e.inputType === 'deleteContentBackward') return; 
-    let v = e.target.value.replace(/\D/g, ''); 
+    const input = e.target;
+    const oldCursorPos = input.selectionStart;
+    const oldVal = input.value;
+    
+    let v = oldVal.replace(/\D/g, ''); 
     if (v.length > 8) v = v.substring(0, 8);
-    if (v.length >= 5) e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
-    else if (v.length >= 3) e.target.value = `${v.substring(0, 2)}/${v.substring(2)}`;
-    else e.target.value = v;
+    
+    let formatted = v;
+    if (v.length >= 5) formatted = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+    else if (v.length >= 3) formatted = `${v.substring(0, 2)}/${v.substring(2)}`;
+    
+    // Cálculo inteligente del cursor
+    const oldNonDigitCount = (oldVal.match(/\//g) || []).length;
+    const newNonDigitCount = (formatted.match(/\//g) || []).length;
+    const netChange = newNonDigitCount - oldNonDigitCount;
+    
+    input.value = formatted;
+    const newCursorPos = oldCursorPos + netChange;
+    input.setSelectionRange(newCursorPos, newCursorPos);
 }
 
 function applyCIMask(e) {
-    let v = e.target.value.replace(/\D/g, '');
+    const input = e.target;
+    const oldCursorPos = input.selectionStart;
+    const oldVal = input.value;
+    
+    let v = oldVal.replace(/\D/g, '');
     if (v.length > 8) v = v.substring(0, 8);
+    
     let formatted = '';
     let count = 0;
     for (let i = v.length - 1; i >= 0; i--) {
@@ -280,7 +299,15 @@ function applyCIMask(e) {
         count++;
         if (count % 3 === 0 && i !== 0) formatted = '.' + formatted;
     }
-    e.target.value = formatted;
+    
+    // Cálculo inteligente del cursor
+    const oldNonDigitCount = (oldVal.match(/\./g) || []).length;
+    const newNonDigitCount = (formatted.match(/\./g) || []).length;
+    const netChange = newNonDigitCount - oldNonDigitCount;
+    
+    input.value = formatted;
+    const newCursorPos = oldCursorPos + netChange;
+    input.setSelectionRange(newCursorPos, newCursorPos);
 }
 
 function applyPhoneMask(e) {
