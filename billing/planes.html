@@ -138,7 +138,6 @@
             </div>
         </div>
 
-        <!-- Menú Horizontal de Navegación (Sticky on mobile) -->
         <div class="w-full flex overflow-x-auto no-scrollbar justify-start md:justify-center border-b border-white/10 mb-6 md:mb-12 sticky top-[70px] md:static bg-[#050505]/90 backdrop-blur-md z-30">
             <div class="flex space-x-8 px-6 py-4 md:py-2">
                 <button onclick="scrollToPlan('BASICO')" id="tab-BASICO" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Básico</button>
@@ -148,10 +147,8 @@
             </div>
         </div>
 
-        <!-- Contenedor Carrusel / Grid de Planes -->
         <div id="plans-carousel" class="plans-carousel w-full">
-            <!-- Las tarjetas se generan dinámicamente aquí -->
-        </div>
+            </div>
 
         <p class="mt-12 text-gray-600 text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-black text-center px-4">
             Gymenez Ecosystem &copy; 2026 • Modificación de planes instantánea
@@ -236,23 +233,30 @@
         ];
 
         window.onload = async () => {
-            // Verificar Sesión y Perfil
+            // Verificar Sesión, Perfil y TOKEN JWT
             const storedSession = localStorage.getItem('userSession');
-            if (storedSession) {
+            const token = localStorage.getItem('gymen_auth_token'); // 🔐 Extraemos Pasaporte
+
+            if (storedSession && token) {
                 try {
                     const user = JSON.parse(storedSession);
-                    currentUserId = user.id || user._id;
-                    const resProfile = await fetch(`${API_URL}/api/profile/${currentUserId}`);
+                    currentUserId = user.id || user._id; // Mantenemos el ID para otras lógicas
+                    
+                    // 🛡️ Apunta a la ruta /me inyectando el Token
+                    const resProfile = await fetch(`${API_URL}/api/profile/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
                     const dataProfile = await resProfile.json();
+                    
                     if (dataProfile.success && dataProfile.profile) {
                         currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
                     }
                 } catch (e) {
-                    console.error("No se pudo obtener el perfil.");
+                    console.error("No se pudo obtener el perfil.", e);
                 }
             }
 
-            // Tasa BCV
+            // Tasa BCV (Esta ruta es pública, no requiere token)
             try {
                 const res = await fetch(`${API_URL}/api/bcv-rate`);
                 const data = await res.json();
@@ -372,7 +376,7 @@
             const options = {
                 root: container,
                 rootMargin: '0px',
-                threshold: 0.6 // La tarjeta debe estar 60% visible para activarse
+                threshold: 0.6 
             };
 
             const observer = new IntersectionObserver((entries) => {
