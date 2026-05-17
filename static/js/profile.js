@@ -37,6 +37,13 @@ async function apiFetchMetrics() {
         const response = await fetch(`${API_BASE_URL}/api/metrics/me`, { 
             headers: getBearerToken() 
         });
+
+        // 🛡️ MANEJO ELEGANTE DEL ESCUDO (403 FORBIDDEN)
+        // Si el backend nos rebota por no tener plan PLUS, devolvemos un estado controlado
+        if (response.status === 403) {
+            return { success: false, isForbidden: true, message: 'Módulo restringido por plan.' };
+        }
+
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         return await response.json();
     } catch (e) {
@@ -102,7 +109,6 @@ async function loadProfileData() {
     
     try {
         // Ejecutamos ambas peticiones al mismo tiempo para mayor fluidez.
-        // Como el Backend ahora extrae el ID desde el Token, ya no necesitamos pasar el userId.
         const [profileRes, metricsRes] = await Promise.all([
             apiFetchProfileData(),
             apiFetchMetrics()
@@ -112,7 +118,8 @@ async function loadProfileData() {
             renderProfile(profileRes.profile);
         }
 
-        if (metricsRes.success && metricsRes.metrics) {
+        // Si la petición a métricas fue exitosa Y NO está restringida, las renderizamos
+        if (metricsRes.success && metricsRes.metrics && !metricsRes.isForbidden) {
             renderMetrics(metricsRes.metrics);
         }
 
