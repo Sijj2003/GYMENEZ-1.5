@@ -54,7 +54,11 @@ async function handleAdminLogin(event) {
         const data = await response.json();
         
         if (response.ok && data.success) {
+            // Guardar datos de sesión visual
             localStorage.setItem('adminSession', JSON.stringify(data.admin));
+            // 🔴 CRÍTICO: Guardar el token de seguridad para las siguientes peticiones
+            localStorage.setItem('admin_token', data.token);
+
             showMessage("ACCESO CONCEDIDO. INICIANDO NÚCLEO...");
             // Redirigir al archivo separado del Dashboard
             setTimeout(() => {
@@ -73,7 +77,10 @@ async function handleAdminLogin(event) {
 }
 
 function handleLogout() {
+    // Eliminar tanto la sesión visual como el token criptográfico
     localStorage.removeItem('adminSession');
+    localStorage.removeItem('admin_token');
+    
     // Redirigir de vuelta al login
     window.location.href = 'login.html';
 }
@@ -85,21 +92,25 @@ window.addEventListener('DOMContentLoaded', () => {
     const isLoginScreen = document.getElementById('admin-login-form') !== null;
     const isDashboardScreen = document.getElementById('admin-name-display') !== null;
     const storedSession = localStorage.getItem('adminSession');
+    const storedToken = localStorage.getItem('admin_token');
 
     // 1. Si estamos en la página de Login
     if (isLoginScreen) {
-        // Si ya está logueado, mandarlo al dashboard directamente
-        if (storedSession) {
+        // Si ya está logueado y tiene token, mandarlo al dashboard directamente
+        if (storedSession && storedToken) {
             window.location.href = 'inicio.html';
             return;
         }
+        // Si faltaba el token pero había sesión fantasma, limpiarla por seguridad
+        if (storedSession && !storedToken) handleLogout();
+
         document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
     }
 
     // 2. Si estamos en el Dashboard
     if (isDashboardScreen) {
-        // Si NO está logueado, patearlo al login
-        if (!storedSession) {
+        // Si NO está logueado o falta el token, patearlo al login
+        if (!storedSession || !storedToken) {
             window.location.href = 'login.html';
             return;
         }
