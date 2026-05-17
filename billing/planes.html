@@ -11,7 +11,7 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #050505; /* Fondo negro profundo */
+            background-color: #050505; 
             color: white;
             overflow-x: hidden;
         }
@@ -63,7 +63,7 @@
             .plans-carousel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
 
-        /* Glow Effects Específicos (Amarillo y Blanco) */
+        /* Glow Effects Específicos */
         .glow-white:hover { border-color: rgba(255, 255, 255, 0.4); box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); transform: translateY(-5px); }
         .glow-yellow { border-color: rgba(255, 195, 0, 0.3); box-shadow: 0 0 40px rgba(255, 195, 0, 0.1); }
         .glow-yellow:hover { border-color: rgba(255, 195, 0, 0.8); box-shadow: 0 0 50px rgba(255, 195, 0, 0.2); transform: translateY(-5px); }
@@ -147,8 +147,7 @@
             </div>
         </div>
 
-        <div id="plans-carousel" class="plans-carousel w-full">
-            </div>
+        <div id="plans-carousel" class="plans-carousel w-full"></div>
 
         <p class="mt-12 text-gray-600 text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-black text-center px-4">
             Gymenez Ecosystem &copy; 2026 • Modificación de planes instantánea
@@ -160,124 +159,67 @@
         let tasaBcvActual = 0;
         let currentUserPlan = 'BASICO'; 
         let currentUserId = null;
-
-        const plansData = [
-            {
-                id: 'BASICO',
-                name: 'BÁSICO',
-                priceUSD: 0.00,
-                tag: 'Acceso Light',
-                highlightColor: 'text-white',
-                cardClass: 'glow-white',
-                btnClass: 'bg-[#1a1a1a] text-white border border-white/20 hover:bg-white hover:text-black',
-                features: [
-                    { name: 'Plan de Entrenamiento', value: 'Automatizado', active: true },
-                    { name: 'Acompañamiento Técnico', value: 'No disponible', active: false },
-                    { name: 'Histórico de Métricas', value: 'No disponible', active: false },
-                    { name: 'Gymenez ON (Streaming)', value: 'Restringido', active: false },
-                    { name: 'Gymenez EATS (Nutrición)', value: 'Restringido', active: false },
-                    { name: 'Prioridad Soporte', value: 'Baja', active: false }
-                ]
-            },
-            {
-                id: 'STANDARD',
-                name: 'STANDARD',
-                priceUSD: 13.99,
-                tag: 'Dirección Básica',
-                highlightColor: 'text-white',
-                cardClass: 'glow-white',
-                btnClass: 'bg-white text-black hover:bg-gray-200',
-                features: [
-                    { name: 'Plan de Entrenamiento', value: '100% Personalizado', active: true },
-                    { name: 'Acompañamiento Técnico', value: 'Continuo', active: true },
-                    { name: 'Histórico de Métricas', value: 'No disponible', active: false },
-                    { name: 'Gymenez ON (Streaming)', value: 'Restringido', active: false },
-                    { name: 'Gymenez EATS (Nutrición)', value: 'Restringido', active: false },
-                    { name: 'Prioridad Soporte', value: 'Media', active: true }
-                ]
-            },
-            {
-                id: 'PLUS',
-                name: 'PLUS',
-                priceUSD: 17.99,
-                tag: 'Control Analítico',
-                highlightColor: 'text-[#FFC300]',
-                cardClass: 'glow-yellow',
-                btnClass: 'bg-[#FFC300] text-black hover:bg-[#FFD700] shadow-[0_0_20px_rgba(255,195,0,0.3)]',
-                features: [
-                    { name: 'Plan de Entrenamiento', value: '100% Personalizado', active: true },
-                    { name: 'Acompañamiento Técnico', value: 'Continuo', active: true },
-                    { name: 'Histórico de Métricas', value: 'Simétricas y Avanzadas', active: true },
-                    { name: 'Gymenez ON (Streaming)', value: 'Catálogo Seleccionado', active: true },
-                    { name: 'Gymenez EATS (Nutrición)', value: 'Restringido', active: false },
-                    { name: 'Prioridad Soporte', value: 'Alta', active: true }
-                ]
-            },
-            {
-                id: 'ULTRA',
-                name: 'ULTRA',
-                priceUSD: 27.99,
-                tag: 'Ecosistema 360°',
-                highlightColor: 'text-[#FFC300]',
-                cardClass: 'glow-ultra',
-                btnClass: 'bg-[#FFC300] text-black hover:bg-[#FFD700] shadow-[0_0_30px_rgba(255,195,0,0.4)]',
-                features: [
-                    { name: 'Plan de Entrenamiento', value: 'Personalizado + Ajustes', active: true },
-                    { name: 'Acompañamiento Técnico', value: 'VIP Bidireccional', active: true },
-                    { name: 'Histórico de Métricas', value: 'Control Total', active: true },
-                    { name: 'Gymenez ON (Streaming)', value: 'Acceso VIP Ilimitado', active: true },
-                    { name: 'Gymenez EATS (Nutrición)', value: 'Planificación Bioquímica', active: true },
-                    { name: 'Prioridad Soporte', value: 'Máxima', active: true }
-                ]
-            }
-        ];
+        let plansData = []; // 🔄 El array ahora nace vacío y se llena desde el Servidor Core
 
         window.onload = async () => {
-            // Verificar Sesión, Perfil y TOKEN JWT
             const storedSession = localStorage.getItem('userSession');
-            const token = localStorage.getItem('gymen_auth_token'); // 🔐 Extraemos Pasaporte
+            const token = localStorage.getItem('gymen_auth_token'); 
 
-            if (storedSession && token) {
-                try {
-                    const user = JSON.parse(storedSession);
-                    currentUserId = user.id || user._id; // Mantenemos el ID para otras lógicas
-                    
-                    // 🛡️ Apunta a la ruta /me inyectando el Token
-                    const resProfile = await fetch(`${API_URL}/api/profile/me`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    const dataProfile = await resProfile.json();
-                    
-                    if (dataProfile.success && dataProfile.profile) {
-                        currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
-                    }
-                } catch (e) {
-                    console.error("No se pudo obtener el perfil.", e);
-                }
+            if (!storedSession || !token) {
+                window.location.href = '/apps/start/login.html';
+                return;
             }
 
-            // Tasa BCV (Esta ruta es pública, no requiere token)
             try {
-                const res = await fetch(`${API_URL}/api/bcv-rate`);
-                const data = await res.json();
-                if(data.success) {
-                    tasaBcvActual = data.rate;
+                const user = JSON.parse(storedSession);
+                currentUserId = user.id || user._id; 
+                
+                // 1. 🛡️ Petición síncrona paralela: Traer perfil y Catálogo de Planes Oficial del Servidor
+                const [resProfile, resCatalog, resBcv] = await Promise.all([
+                    fetch(`${API_URL}/api/profile/me`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}/api/plans/catalog`), // Endpoint público del catálogo
+                    fetch(`${API_URL}/api/bcv-rate`)
+                ]);
+
+                const dataProfile = await resProfile.json();
+                const dataCatalog = await resCatalog.json();
+                const dataBcv = await resBcv.json();
+                
+                // Cargar nivel del usuario
+                if (dataProfile.success && dataProfile.profile) {
+                    currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
+                }
+
+                // 🔄 CARGA DEL CATÁLOGO DINÁMICO
+                if (dataCatalog.success && dataCatalog.plans) {
+                    plansData = dataCatalog.plans;
+                } else {
+                    throw new Error("Catálogo de membresías no disponible.");
+                }
+
+                // Cargar Tasa Cambiaria Oficial
+                if (dataBcv.success) {
+                    tasaBcvActual = dataBcv.rate;
                     document.getElementById('tasa-bcv-display').textContent = `${tasaBcvActual.toFixed(2)} BS`;
                 }
+
+                // 2. Ejecutar renderizado dinámico con la data del Core
+                renderCards();
+                setupScrollObserver();
+
+                // Desplazar automáticamente al plan recomendado (PLUS) o al plan actual si es mayor
+                setTimeout(() => {
+                    let targetPlan = 'PLUS';
+                    if (currentUserPlan === 'ULTRA') targetPlan = 'ULTRA';
+                    scrollToPlan(targetPlan);
+                    document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+                }, 500);
+
             } catch (e) {
-                console.warn("Fallo tasa BCV");
+                console.error("Fallo crítico en sincronización de pasarela:", e);
+                alert("Error perimetral: Sincronización cambiaria o de catálogo caída. Contacte a soporte técnico.");
+                window.location.href = '../apps/start/inicio.html';
             }
-
-            renderCards();
-            setupScrollObserver();
-
-            // Desplazar automáticamente al plan recomendado (PLUS) o al plan actual si es mayor
-            setTimeout(() => {
-                let targetPlan = 'PLUS';
-                if (currentUserPlan === 'ULTRA') targetPlan = 'ULTRA';
-                scrollToPlan(targetPlan);
-                document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
-            }, 500);
         };
 
         function renderCards() {
@@ -352,7 +294,6 @@
             const targetCard = document.getElementById(`card-${planId}`);
             
             if (targetCard && container) {
-                // Desplazamiento suave hacia la tarjeta
                 const scrollLeft = targetCard.offsetLeft - container.offsetLeft - (container.clientWidth / 2) + (targetCard.clientWidth / 2);
                 container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
                 updateActiveTab(planId);
@@ -373,11 +314,7 @@
 
         function setupScrollObserver() {
             const container = document.getElementById('plans-carousel');
-            const options = {
-                root: container,
-                rootMargin: '0px',
-                threshold: 0.6 
-            };
+            const options = { root: container, rootMargin: '0px', threshold: 0.6 };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
