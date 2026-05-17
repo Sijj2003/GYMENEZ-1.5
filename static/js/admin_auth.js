@@ -15,7 +15,6 @@ function showMessage(message, type = 'success') {
     if(!box) return;
     box.textContent = message;
     
-    // Colores basados en el tema Índigo/Core
     if(type === 'success') {
         box.classList.add('bg-indigo-600', 'text-white', 'border-indigo-400');
         box.classList.remove('bg-red-600', 'border-red-400');
@@ -31,6 +30,20 @@ function showMessage(message, type = 'success') {
         box.classList.add('opacity-0', 'translate-y-[-20px]');
     }, 4000);
 }
+
+// Interceptor administrativo para inyectar cabeceras cruzadas y credenciales de protección
+const originalAdminFetch = window.fetch;
+window.fetch = async function(...args) {
+    if (typeof args[1] === 'undefined') args[1] = {};
+    if (typeof args[1].credentials === 'undefined') args[1].credentials = 'include';
+    
+    const adminToken = localStorage.getItem('admin_token');
+    if (adminToken) {
+        if (typeof args[1].headers === 'undefined') args[1].headers = {};
+        args[1].headers['Authorization'] = `Bearer ${adminToken}`;
+    }
+    return originalAdminFetch.apply(this, args);
+};
 
 // ---------------------------------------------
 // LÓGICA DE LOGIN (login.html)
@@ -54,13 +67,10 @@ async function handleAdminLogin(event) {
         const data = await response.json();
         
         if (response.ok && data.success) {
-            // Guardar datos de sesión visual
             localStorage.setItem('adminSession', JSON.stringify(data.admin));
-            // 🔴 CRÍTICO: Guardar el token de seguridad para las siguientes peticiones
-            localStorage.setItem('admin_token', data.token);
+            localStorage.setItem('admin_token', data.token); // Guardamos token salvavidas administrativamente
 
             showMessage("ACCESO CONCEDIDO. INICIANDO NÚCLEO...");
-            // Redirigir al archivo separado del Dashboard
             setTimeout(() => {
                 window.location.href = 'inicio.html';
             }, 1200);
@@ -76,13 +86,19 @@ async function handleAdminLogin(event) {
     }
 }
 
-function handleLogout() {
-    // Eliminar tanto la sesión visual como el token criptográfico
-    localStorage.removeItem('adminSession');
-    localStorage.removeItem('admin_token');
-    
-    // Redirigir de vuelta al login
-    window.location.href = 'login.html';
+async function handleLogout() {
+    try {
+        await fetch(`${API_BASE_URL}/api/admin/logout`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (e) {
+        console.error(e);
+    } finally {
+        localStorage.removeItem('adminSession');
+        localStorage.removeItem('admin_token');
+        window.location.href = 'login.html';
+    }
 }
 
 // ---------------------------------------------
@@ -92,30 +108,21 @@ window.addEventListener('DOMContentLoaded', () => {
     const isLoginScreen = document.getElementById('admin-login-form') !== null;
     const isDashboardScreen = document.getElementById('admin-name-display') !== null;
     const storedSession = localStorage.getItem('adminSession');
-    const storedToken = localStorage.getItem('admin_token');
 
-    // 1. Si estamos en la página de Login
     if (isLoginScreen) {
-        // Si ya está logueado y tiene token, mandarlo al dashboard directamente
-        if (storedSession && storedToken) {
+        if (storedSession) {
             window.location.href = 'inicio.html';
             return;
         }
-        // Si faltaba el token pero había sesión fantasma, limpiarla por seguridad
-        if (storedSession && !storedToken) handleLogout();
-
         document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
     }
 
-    // 2. Si estamos en el Dashboard
     if (isDashboardScreen) {
-        // Si NO está logueado o falta el token, patearlo al login
-        if (!storedSession || !storedToken) {
+        if (!storedSession) {
             window.location.href = 'login.html';
             return;
         }
         
-        // Cargar el nombre del administrador
         try {
             const adminData = JSON.parse(storedSession);
             document.getElementById('admin-name-display').textContent = adminData.name || 'Admin';
@@ -123,7 +130,6 @@ window.addEventListener('DOMContentLoaded', () => {
             handleLogout();
         }
 
-        // Configurar botón de cerrar sesión
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
     }
