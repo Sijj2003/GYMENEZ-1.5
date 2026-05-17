@@ -1,5 +1,6 @@
 // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
 const DEVICE_ID_KEY = 'gymen_device_id';
+const AUTH_TOKEN_KEY = 'gymen_auth_token'; // 🔐 Respaldo seguro para producción cross-domain
 
 let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
 
@@ -22,18 +23,28 @@ const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de cr
 function forceGlobalLogout(reason) {
     CURRENT_USER_SESSION = null;
     localStorage.removeItem('userSession');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem('gymen_session_exp'); 
     alert(reason || "Tu sesión ha expirado por seguridad. Vuelve a ingresar.");
     window.location.href = '/apps/start/login.html';
 }
 
 // =======================================================
-// 🛡️ INTERCEPTOR GLOBAL DE PETICIONES (COOKIE EDITION)
+// 🛡️ INTERCEPTOR GLOBAL DE PETICIONES (HYBRID EDITION)
 // =======================================================
 const originalFetch = window.fetch;
 window.fetch = async function(...args) {
     if (typeof args[1] === 'undefined') args[1] = {};
     if (typeof args[1].credentials === 'undefined') args[1].credentials = 'include';
+    
+    // Inyectar automáticamente las cabeceras de respaldo por si las cookies son bloqueadas
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) {
+        if (typeof args[1].headers === 'undefined') args[1].headers = {};
+        if (typeof args[1].headers['Authorization'] === 'undefined') {
+            args[1].headers['Authorization'] = `Bearer ${token}`;
+        }
+    }
     
     const response = await originalFetch.apply(this, args);
     
@@ -46,11 +57,13 @@ window.fetch = async function(...args) {
 };
 
 // =======================================================
-// 🛡️ GENERADOR DE CABECERAS ZERO TRUST (OPTIMIZADO)
+// 🛡️ GENERADOR DE CABECERAS ZERO TRUST (HÍBRIDO)
 // =======================================================
 function getAuthHeaders() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
     return {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
     };
 }
 
@@ -75,6 +88,9 @@ async function apiLogin(email, password, deviceId) {
         
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
+        if (data.token) {
+            localStorage.setItem(AUTH_TOKEN_KEY, data.token); // Guardamos token salvavidas
+        }
         
         const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
         localStorage.setItem('gymen_session_exp', tiempoExpiracion);
@@ -104,6 +120,7 @@ async function apiLogout() {
     } finally {
         CURRENT_USER_SESSION = null;
         localStorage.removeItem('userSession'); 
+        localStorage.removeItem(AUTH_TOKEN_KEY); 
         localStorage.removeItem('gymen_session_exp'); 
         return { success: true }; 
     }
@@ -121,6 +138,9 @@ async function apiForceLogout(email, password, deviceId, name, lastname, dob, ph
         
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
+        if (data.token) {
+            localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+        }
         
         const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
         localStorage.setItem('gymen_session_exp', tiempoExpiracion);
@@ -513,7 +533,6 @@ window.onload = function() {
 
         document.getElementById('modal-cancel-btn')?.addEventListener('click', () => {
             closeModalSafe('active-session-modal');
-            showForceLogoutMessage(''); 
         });
         
         document.getElementById('modal-confirm-btn')?.addEventListener('click', () => {
