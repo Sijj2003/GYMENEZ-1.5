@@ -154,8 +154,6 @@
         </p>
     </main>
 
-   <script src="/static/js/auth.js"></script>
-    
     <script>
         const API_URL = "https://sijj2003.pythonanywhere.com";
         let tasaBcvActual = 0;
@@ -165,8 +163,7 @@
         // 🔄 El array nace vacío. El backend dicta cuáles son los planes y sus precios.
         let plansData = []; 
 
-        // 2. IMPORTANTE: Cambiar window.onload por DOMContentLoaded para evitar choques
-        document.addEventListener('DOMContentLoaded', async () => {
+        window.onload = async () => {
             const storedSession = localStorage.getItem('userSession');
             const token = localStorage.getItem('gymen_auth_token'); 
 
