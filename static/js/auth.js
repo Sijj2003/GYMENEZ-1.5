@@ -398,9 +398,11 @@ async function checkSessionValidity() {
     const verification = await apiVerifySession(userId, localDeviceId);
 
     if (!verification.isValid) {
+        stopSessionChecker();
         await apiLogout(); 
-        clearInterval(sessionCheckerInterval);
-        alert('Tu sesión ha sido cerrada desde otro dispositivo o por un administrador.');
+        
+        // 🔐 SOLUCIÓN: Usamos el mensaje real del backend en lugar de una alerta fija
+        alert(verification.message || 'Tu sesión ha expirado por motivos de seguridad.');
         window.location.href = '/'; 
     }
 }
