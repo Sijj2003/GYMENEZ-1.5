@@ -402,7 +402,7 @@ async function checkSessionValidity() {
         await apiLogout(); 
         
         // 🔐 SOLUCIÓN: Usamos el mensaje real del backend en lugar de una alerta fija
-        alert(verification.message || 'Tu sesión ha expirado por motivos de seguridad.');
+        alert(verification.message || 'Tu sesión ha expirado.');
         window.location.href = '/'; 
     }
 }
