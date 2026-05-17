@@ -11,6 +11,14 @@ let userFullName = null;
 let routineExercises = []; 
 let redirectTimer = null; 
 
+// =======================================================
+// 🛡️ FUNCIÓN DE SEGURIDAD: OBTENER TOKEN
+// =======================================================
+function getBearerToken() {
+    const token = localStorage.getItem('gymen_auth_token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 // === 1. DINAMISMO POR URL ===
 const urlParams = new URLSearchParams(window.location.search);
 const urlDay = urlParams.get('day');
@@ -82,7 +90,9 @@ function getCleanYouTubeEmbed(url) {
 window.openTutorial = async (exerciseName) => {
     try {
         showMessage(`Buscando telemetría...`, 'success');
-        const res = await fetch(`${API_BASE_URL}/api/exercises/link_tutorial/${encodeURIComponent(exerciseName)}`);
+        const res = await fetch(`${API_BASE_URL}/api/exercises/link_tutorial/${encodeURIComponent(exerciseName)}`, {
+            headers: getBearerToken() // 🔐 Envío del Token
+        });
         const data = await res.json();
         
         if (data.success && data.tutorialLink) {
@@ -243,7 +253,10 @@ window.toggleExerciseStatus = (exerciseName, statusType) => {
 
 async function loadRoutine() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/routines/day/${userId}/${CURRENT_DAY}`);
+        // 🔐 Apunta a la nueva ruta segura "today" y envía el Token
+        const response = await fetch(`${API_BASE_URL}/api/routines/today/${CURRENT_DAY}`, {
+            headers: getBearerToken()
+        });
         const data = await response.json();
         
         if (data.success && data.routines.length > 0 && data.routines[0].exercises) {
