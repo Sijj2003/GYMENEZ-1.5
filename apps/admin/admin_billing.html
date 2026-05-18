@@ -9,10 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../static/css/admin_auth.css">
     <style>
-        .payment-card { transition: all 0.3s ease; }
-        .payment-card:hover { transform: translateY(-3px); border-color: rgba(255, 195, 0, 0.4); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.8), 0 0 20px rgba(255, 195, 0, 0.1); }
-        .history-card:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.1); }
-        .badge-banco { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        .admin-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        .admin-table th { padding: 12px 16px; text-align: left; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #6b7280; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .admin-table td { padding: 16px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.2s; }
+        .admin-table tr:hover td { background: rgba(255,255,255,0.05); cursor: pointer; }
+        .admin-table td:first-child { border-left: 1px solid rgba(255,255,255,0.02); border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
+        .admin-table td:last-child { border-right: 1px solid rgba(255,255,255,0.02); border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
+        
+        .modal-glass { background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+        .receipt-panel { background: rgba(0, 0, 0, 0.4); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 16px; }
         
         .tab-btn { position: relative; transition: all 0.3s ease; }
         .tab-btn.active { color: #FFC300; }
@@ -26,7 +31,7 @@
     <div class="fixed inset-0 bg-[url('../../static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-10 -z-10 mix-blend-screen grayscale"></div>
     <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
 
-    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
+    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
             <div class="flex items-center gap-2 md:gap-3">
                 <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#FFC300] rounded-full shadow-[0_0_10px_#FFC300] animate-pulse"></div>
@@ -51,28 +56,128 @@
             </div>
             <button onclick="exportFiscalCSV()" class="px-5 py-3 rounded-xl bg-emerald-600/90 text-white border border-emerald-500/50 text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Exportar Cierre Mes (CSV)
+                Exportar Histórico (CSV)
             </button>
         </div>
 
-        <div class="flex gap-6 border-b border-white/10 mb-8 mt-4">
-            <button onclick="switchTab('pending')" id="tab-pending" class="tab-btn active pb-3 text-[10px] font-black uppercase tracking-widest">
-                En Cola de Revisión
-            </button>
-            <button onclick="switchTab('history')" id="tab-history" class="tab-btn pb-3 text-gray-500 hover:text-white text-[10px] font-black uppercase tracking-widest">
-                Histórico de Pagos
-            </button>
-        </div>
+        <div class="glass-panel p-4 md:p-8 rounded-[24px] md:rounded-[32px]">
+            <div class="flex gap-6 border-b border-white/10 mb-6">
+                <button onclick="switchTab('pending')" id="tab-pending" class="tab-btn active pb-3 text-[10px] font-black uppercase tracking-widest">
+                    Cola de Revisión
+                </button>
+                <button onclick="switchTab('history')" id="tab-history" class="tab-btn pb-3 text-gray-500 hover:text-white text-[10px] font-black uppercase tracking-widest">
+                    Histórico Archivados
+                </button>
+            </div>
 
-        <div id="view-pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div></div>
-        </div>
+            <div id="view-pending" class="overflow-x-auto no-scrollbar">
+                <table class="admin-table min-w-[800px]">
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Monto (Bs.)</th>
+                            <th>Plan Solicitado</th>
+                            <th>Atleta (Email)</th>
+                            <th class="text-right">Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-table-body">
+                        <tr><td colspan="5" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div id="view-history" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div></div>
+            <div id="view-history" class="hidden overflow-x-auto no-scrollbar">
+                <table class="admin-table min-w-[800px]">
+                    <thead>
+                        <tr>
+                            <th>Status / Fecha</th>
+                            <th>Referencia</th>
+                            <th>Monto (Bs.)</th>
+                            <th>Atleta (Email)</th>
+                            <th class="text-right">Auditoría Fiscal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <tr><td colspan="5" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </main>
+
+    <div id="payment-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-[5000] flex items-center justify-center p-4 transition-opacity">
+        <div class="modal-glass w-full max-w-lg p-6 md:p-10 rounded-[24px] md:rounded-[32px] max-h-[95vh] overflow-y-auto no-scrollbar relative">
+            
+            <button onclick="closeModalSafe('payment-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <div class="text-center mb-6">
+                <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-widest">Recibo de Transacción</h3>
+                <p id="modal-status-badge" class="text-[9px] font-black uppercase tracking-[0.2em] mt-2 inline-block px-3 py-1 rounded bg-[#FFC300]/20 text-[#FFC300]">PENDIENTE</p>
+            </div>
+
+            <div class="receipt-panel p-6 space-y-4">
+                <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Referencia</span>
+                    <span id="modal-ref" class="text-lg font-black text-white tracking-[0.2em]">--</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Monto Bolívares</span>
+                    <span id="modal-monto" class="text-base font-bold text-[#FFC300]">--</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Monto Dólares / Tasa</span>
+                    <span id="modal-tasa" class="text-xs font-medium text-gray-300">--</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Plan Solicitado</span>
+                    <span id="modal-plan" class="text-xs font-black bg-white/10 px-2 py-0.5 rounded text-white tracking-widest uppercase">--</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Banco Emisor</span>
+                    <span id="modal-banco" class="text-xs font-bold text-gray-300">--</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Atleta (Nombre)</span>
+                    <span id="modal-name" class="text-xs font-bold text-white uppercase">--</span>
+                </div>
+                <div class="flex justify-between items-center pb-2">
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Correo Electrónico</span>
+                    <span id="modal-email" class="text-xs font-medium text-gray-400">--</span>
+                </div>
+
+                <div id="modal-fiscal-block" class="hidden mt-4 pt-4 border-t border-dashed border-white/20">
+                    <p class="text-[9px] text-gray-500 uppercase tracking-widest font-black text-center mb-3">Desglose Fiscal (IVA 16%)</p>
+                    <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1">
+                        <span>Base Imponible USD:</span> <span id="modal-base-usd">--</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-red-400 font-mono mb-1">
+                        <span>Retención IVA USD:</span> <span id="modal-iva-usd">--</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-gray-400 font-mono mt-3 mb-1">
+                        <span>Base Imponible Bs:</span> <span id="modal-base-bs">--</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-red-400 font-mono">
+                        <span>Retención IVA Bs:</span> <span id="modal-iva-bs">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modal-action-buttons" class="mt-8 flex gap-3">
+                <button id="btn-approve" class="w-1/2 py-3 rounded-xl bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                    Aprobar Pago
+                </button>
+                <button id="btn-reject" class="w-1/2 py-3 rounded-xl border border-red-500/30 text-red-400 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/10 hover:border-red-500 transition">
+                    Rechazar
+                </button>
+            </div>
+            
+            <p id="modal-date" class="text-center text-[8px] text-gray-600 font-bold uppercase mt-6 tracking-widest">--</p>
+        </div>
+    </div>
 
     <script src="../../static/js/admin_auth.js"></script>
     <script>
@@ -102,107 +207,151 @@
 
         // CARGAR PENDIENTES
         async function loadPendingPayments() {
-            const grid = document.getElementById('view-pending');
-            grid.innerHTML = '<div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div></div>';
+            const tbody = document.getElementById('pending-table-body');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>';
 
             try {
                 const res = await fetch(`${API_URL}/api/admin/payments/pending`);
                 const data = await res.json();
-                if (data.success && data.payments.length > 0) renderPending(data.payments);
-                else showEmptyState(grid, "Bandeja Limpia", "No hay transacciones pendientes de revisión.");
-            } catch (e) { showMessage("Fallo de conexión.", "error"); }
+                if (data.success && data.payments.length > 0) renderPendingTable(data.payments);
+                else tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500 text-xs font-bold uppercase tracking-widest">Bandeja Limpia. No hay transacciones en cola.</td></tr>`;
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400 text-xs font-bold uppercase tracking-widest">Error de red</td></tr>'; }
         }
 
         // CARGAR HISTORIAL FISCAL
         async function loadHistoryPayments() {
-            const grid = document.getElementById('view-history');
-            grid.innerHTML = '<div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div></div>';
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-emerald-500 rounded-full animate-spin mx-auto"></div></td></tr>';
 
             try {
                 const res = await fetch(`${API_URL}/api/admin/payments/history`);
                 const data = await res.json();
                 if (data.success && data.history.length > 0) {
                     historyDataToExport = data.history;
-                    renderHistory(data.history);
-                } else showEmptyState(grid, "Sin Registros", "No hay pagos archivados históricamente.");
-            } catch (e) { showMessage("Fallo de conexión.", "error"); }
+                    renderHistoryTable(data.history);
+                } else tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500 text-xs font-bold uppercase tracking-widest">Sin registros históricos.</td></tr>`;
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400 text-xs font-bold uppercase tracking-widest">Error de red</td></tr>'; }
         }
 
-        function showEmptyState(container, title, subtitle) {
-            container.innerHTML = `
-                <div class="col-span-full text-center py-16 glass-panel rounded-[24px] border border-white/5">
-                    <svg class="w-12 h-12 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-xl font-black text-white uppercase tracking-widest">${title}</p>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">${subtitle}</p>
-                </div>`;
-        }
-
-        function renderPending(payments) {
-            const grid = document.getElementById('view-pending');
-            grid.innerHTML = '';
+        function renderPendingTable(payments) {
+            const tbody = document.getElementById('pending-table-body');
+            tbody.innerHTML = '';
+            
             payments.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'glass-panel payment-card p-6 md:p-8 rounded-[24px] flex flex-col justify-between';
-                card.innerHTML = `
-                    <div class="mb-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-2.5 py-1 badge-banco text-[8px] font-black uppercase tracking-widest rounded text-gray-300">${p.banco}</span>
-                            <span class="text-[9px] font-black text-[#FFC300] uppercase tracking-widest border border-[#FFC300]/20 px-2 py-0.5 rounded bg-[#FFC300]/10">Plan ${p.plan}</span>
-                        </div>
-                        <h3 class="text-3xl font-black text-white tracking-[0.2em] mb-1">#${p.referencia}</h3>
-                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Atleta: <span class="text-white">${p.user_email}</span></p>
-                    </div>
-                    <div class="flex gap-3 border-t border-white/5 pt-5">
-                        <button onclick="processPayment('${p.id}', 'approve')" class="w-1/2 py-3 rounded-xl bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-[0_0_15px_rgba(16,185,129,0.2)]">Aprobar</button>
-                        <button onclick="processPayment('${p.id}', 'reject')" class="w-1/2 py-3 rounded-xl border border-red-500/30 text-red-400 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/10 hover:border-red-500 transition">Rechazar</button>
-                    </div>`;
-                grid.appendChild(card);
+                const tr = document.createElement('tr');
+                tr.onclick = () => openPaymentModal(p, 'pending');
+                tr.innerHTML = `
+                    <td><span class="text-xs font-black text-white tracking-[0.2em]">#${p.referencia}</span></td>
+                    <td><span class="text-[11px] font-black text-[#FFC300] tracking-widest">Bs. ${p.monto_bs}</span></td>
+                    <td><span class="text-[9px] font-black text-gray-300 uppercase bg-white/10 px-2 py-0.5 rounded tracking-widest">${p.plan}</span></td>
+                    <td>
+                        <p class="text-[10px] font-bold text-white uppercase">${p.user_full_name}</p>
+                        <p class="text-[9px] text-gray-500">${p.user_email}</p>
+                    </td>
+                    <td class="text-right">
+                        <button class="px-3 py-1.5 rounded-lg bg-white/5 text-gray-300 hover:text-[#FFC300] hover:bg-[#FFC300]/10 text-[9px] font-black uppercase tracking-widest transition">Ver</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        function renderHistory(history) {
-            const grid = document.getElementById('view-history');
-            grid.innerHTML = '';
+        function renderHistoryTable(history) {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+            
             history.forEach(h => {
                 const isApprove = h.status === 'APROBADO';
                 const color = isApprove ? 'emerald' : 'red';
-                const f = h.fiscal || {};
-                
-                let fiscalBlock = '';
-                if (isApprove && f.total_bs) {
-                    fiscalBlock = `
-                        <div class="mt-4 p-4 rounded-xl bg-black/40 border border-white/5 grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">Monto Dólares (Tasa: ${f.tasa_bcv})</p>
-                                <p class="text-[10px] text-white font-mono mt-1">Base: $${f.base_usd}</p>
-                                <p class="text-[10px] text-red-400 font-mono">IVA (16%): $${f.iva_usd}</p>
-                                <p class="text-[11px] font-black text-emerald-400 mt-1 tracking-widest">TOTAL: $${f.total_usd}</p>
-                            </div>
-                            <div class="border-l border-white/5 pl-4">
-                                <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">Monto Bolívares (Retención)</p>
-                                <p class="text-[10px] text-white font-mono mt-1">Base: Bs.${f.base_bs}</p>
-                                <p class="text-[10px] text-red-400 font-mono">IVA (16%): Bs.${f.iva_bs}</p>
-                                <p class="text-[11px] font-black text-[#FFC300] mt-1 tracking-widest">TOTAL: Bs.${f.total_bs}</p>
-                            </div>
-                        </div>`;
-                }
+                const dateRaw = new Date(h.processed_at);
+                const dateStr = !isNaN(dateRaw) ? dateRaw.toLocaleDateString() : 'N/A';
 
-                const card = document.createElement('div');
-                card.className = `glass-panel payment-card history-card p-6 md:p-8 rounded-[24px] border-t border-${color}-500/20`;
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[9px] font-black text-${color}-400 uppercase tracking-widest bg-${color}-500/10 px-2 py-0.5 rounded border border-${color}-500/20">${h.status}</span>
-                        <span class="text-[8px] font-bold text-gray-500 uppercase">${new Date(h.processed_at).toLocaleDateString()}</span>
-                    </div>
-                    <h3 class="text-xl font-black text-white tracking-[0.2em] mb-1">#${h.referencia} <span class="text-[9px] text-gray-500 ml-2">(${h.banco})</span></h3>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Plan ${h.plan} | Atleta: <span class="text-white">${h.user_email}</span></p>
-                    ${fiscalBlock}`;
-                grid.appendChild(card);
+                const tr = document.createElement('tr');
+                tr.onclick = () => openPaymentModal(h, 'history');
+                tr.innerHTML = `
+                    <td>
+                        <span class="text-[9px] font-black text-${color}-400 uppercase tracking-widest bg-${color}-500/10 px-2 py-0.5 rounded border border-${color}-500/20 block w-max mb-1">${h.status}</span>
+                        <span class="text-[8px] font-bold text-gray-500">${dateStr}</span>
+                    </td>
+                    <td><span class="text-xs font-black text-white tracking-[0.2em] break-words">#${h.referencia}</span><br><span class="text-[8px] text-gray-500">${h.banco}</span></td>
+                    <td><span class="text-[11px] font-black text-gray-300 tracking-widest">Bs. ${h.monto_bs}</span></td>
+                    <td>
+                        <p class="text-[10px] font-bold text-white uppercase">${h.user_full_name}</p>
+                        <p class="text-[9px] text-gray-500">${h.user_email}</p>
+                    </td>
+                    <td class="text-right">
+                        <button class="px-3 py-1.5 rounded-lg bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 text-[9px] font-black uppercase tracking-widest transition">Recibo Fiscal</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
+        }
+
+        // ==========================================
+        // CONTROL DEL MODAL (RECIBO FACTURA)
+        // ==========================================
+        function closeModalSafe(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function openPaymentModal(payment, type) {
+            const modal = document.getElementById('payment-modal');
+            const badge = document.getElementById('modal-status-badge');
+            const btnApprove = document.getElementById('btn-approve');
+            const btnReject = document.getElementById('btn-reject');
+            const fiscalBlock = document.getElementById('modal-fiscal-block');
+            const actionsBlock = document.getElementById('modal-action-buttons');
+
+            // Setear datos base
+            document.getElementById('modal-ref').textContent = payment.referencia;
+            document.getElementById('modal-monto').textContent = `Bs. ${payment.monto_bs}`;
+            document.getElementById('modal-tasa').textContent = `$${payment.precio_usd} (Tasa: ${payment.tasa_bcv})`;
+            document.getElementById('modal-plan').textContent = payment.plan;
+            document.getElementById('modal-banco').textContent = payment.banco;
+            document.getElementById('modal-name').textContent = payment.user_full_name;
+            document.getElementById('modal-email').textContent = payment.user_email;
+            
+            const dateStr = payment.created_at ? new Date(payment.created_at).toLocaleString() : 'Fecha Desconocida';
+            document.getElementById('modal-date').textContent = `Emitido: ${dateStr}`;
+
+            if (type === 'pending') {
+                badge.textContent = 'EN REVISIÓN';
+                badge.className = 'text-[9px] font-black uppercase tracking-[0.2em] mt-2 inline-block px-3 py-1 rounded bg-[#FFC300]/20 text-[#FFC300] border border-[#FFC300]/30';
+                
+                fiscalBlock.classList.add('hidden');
+                actionsBlock.classList.remove('hidden');
+
+                // Asignar funciones a los botones
+                btnApprove.onclick = () => processPayment(payment.id, 'approve');
+                btnReject.onclick = () => processPayment(payment.id, 'reject');
+
+            } else {
+                const isApprove = payment.status === 'APROBADO';
+                const color = isApprove ? 'emerald' : 'red';
+                
+                badge.textContent = payment.status;
+                badge.className = `text-[9px] font-black uppercase tracking-[0.2em] mt-2 inline-block px-3 py-1 rounded bg-${color}-500/20 text-${color}-400 border border-${color}-500/30`;
+                
+                actionsBlock.classList.add('hidden');
+
+                if (isApprove && payment.fiscal) {
+                    fiscalBlock.classList.remove('hidden');
+                    const f = payment.fiscal;
+                    document.getElementById('modal-base-usd').textContent = `$${f.base_usd}`;
+                    document.getElementById('modal-iva-usd').textContent = `$${f.iva_usd}`;
+                    document.getElementById('modal-base-bs').textContent = `Bs. ${f.base_bs}`;
+                    document.getElementById('modal-iva-bs').textContent = `Bs. ${f.iva_bs}`;
+                } else {
+                    fiscalBlock.classList.add('hidden');
+                }
+            }
+
+            modal.classList.remove('hidden');
         }
 
         async function processPayment(paymentId, action) {
             if (!confirm(`¿Confirmar acción de ${action.toUpperCase()} en esta transacción?`)) return;
+            
+            closeModalSafe('payment-modal');
+
             try {
                 const res = await fetch(`${API_URL}/api/admin/payments/${action}/${paymentId}`, { method: 'POST' });
                 const data = await res.json();
@@ -219,16 +368,16 @@
                 return showMessage("No hay datos históricos para exportar.", "error");
             }
 
-            let csvContent = "FECHA,EMAIL_ATLETA,PLAN,BANCO,REFERENCIA,STATUS,TASA_BCV_APLICADA,BASE_IMPONIBLE_USD,IVA_16_USD,TOTAL_USD,BASE_IMPONIBLE_BS,RETENCION_IVA_16_BS,TOTAL_PAGADO_BS\n";
+            let csvContent = "FECHA,NOMBRES,EMAIL_ATLETA,PLAN,BANCO,REFERENCIA,STATUS,TASA_BCV_APLICADA,BASE_IMPONIBLE_USD,IVA_16_USD,TOTAL_USD,BASE_IMPONIBLE_BS,RETENCION_IVA_16_BS,TOTAL_PAGADO_BS\n";
             
             const escapeCSV = (str) => `"${String(str).replace(/"/g, '""')}"`;
 
             historyDataToExport.forEach(row => {
-                const date = new Date(row.processed_at).toLocaleDateString();
+                const date = row.processed_at ? new Date(row.processed_at).toLocaleDateString() : '';
                 const f = row.fiscal || {};
                 
                 const csvRow = [
-                    date, row.user_email, row.plan, row.banco, row.referencia, row.status,
+                    date, row.user_full_name, row.user_email, row.plan, row.banco, row.referencia, row.status,
                     f.tasa_bcv || 0, f.base_usd || 0, f.iva_usd || 0, f.total_usd || 0,
                     f.base_bs || 0, f.iva_bs || 0, f.total_bs || 0
                 ].map(escapeCSV).join(",");
