@@ -1,386 +1,298 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ - Gestión de Ejercicios</title>
-    <link class="icon" type="image/png" href="mini_logo.png">
-    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <title>GYMENEZ CORE | Bóveda de Ejercicios</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/admin_auth.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        .admin-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        .admin-table th { padding: 12px 16px; text-align: left; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #6b7280; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .admin-table td { padding: 16px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.2s; }
+        .admin-table tr:hover td { background: rgba(255,255,255,0.05); }
+        .admin-table td:first-child { border-left: 1px solid rgba(255,255,255,0.02); border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
+        .admin-table td:last-child { border-right: 1px solid rgba(255,255,255,0.02); border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
         
-        .GYM-YELLOW { color: #FFC300; }
-        .bg-GYM-YELLOW { background-color: #FFC300; }
-        .hover\:bg-GYM-YELLOW-dark:hover { background-color: #FFB300; }
-        .border-GYM-YELLOW { border-color: #FFC300; }
-        .focus\:ring-GYM-YELLOW:focus { --tw-ring-color: #FFC300; }
-        .focus\:border-GYM-YELLOW:focus { border-color: #FFC300; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d0d1a;
-            background-image: url('FONDO.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            color: #e5e7eb;
-            min-height: 100vh;
-        }
-
-        .dashboard-header {
-            background-color: rgba(13, 13, 26, 0.9);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .content-container {
-            background-color: rgba(18, 18, 30, 0.95);
-            backdrop-filter: blur(3px);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            padding: 24px;
-            margin-top: 24px;
-        }
-
-        .admin-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .admin-table th, .admin-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .admin-table th {
-            background-color: #1a1a2e;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-        
-        .modal-backdrop { background-color: rgba(0, 0, 0, 0.85); }
-        .modal-content {
-            background-color: #1a1a2e;
-            border: 1px solid #334155;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-        .modal-content input, .modal-content textarea {
-             background-color: #1a1a2e;
-             border: 1px solid #334155;
-             color: #e5e7eb;
-        }
+        .modal-glass { background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
     </style>
 </head>
-<body>
-    
-    <header class="dashboard-header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-white">
-                <span class="GYM-YELLOW">GYM</span>ENEZ
-            </h1>
-            <nav class="space-x-4">
-                <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
-                    ← Regresar
-                </button>
-            </nav>
+<body class="bg-[#030305] text-white selection:bg-[#FFC300] selection:text-black overflow-x-hidden min-h-screen flex flex-col">
+
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center border border-white/10"></div>
+
+    <div class="fixed inset-0 bg-[url('../../static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-10 -z-10 mix-blend-screen grayscale"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
+
+    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#FFC300] rounded-full shadow-[0_0_10px_#FFC300] animate-pulse"></div>
+                <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter block">
+                    GYMENEZ <span class="text-white">CORE</span>
+                </h1>
+            </div>
+            <a href="inicio.html" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                Volver a Consola
+            </a>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="content-container mt-8">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-3">
-                <h2 class="text-xl font-semibold text-white">Lista de Ejercicios</h2>
-                <button id="add-exercise-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg text-sm transition duration-150 ease-in-out">
-                    + Añadir Ejercicio
+    <main class="relative z-10 max-w-7xl mx-auto w-full px-4 md:px-6 py-8 md:py-10 flex-grow animate-premium-in">
+        
+        <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <p class="text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-1">Biblioteca Audiovisual</p>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">
+                    Bóveda de <span class="text-[#FFC300]">Ejercicios.</span>
+                </h2>
+            </div>
+            <div class="flex gap-3">
+                <a href="admin_routines_creator.html" class="px-5 py-3 rounded-xl border border-white/10 text-white text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition flex items-center gap-2">
+                    Constructor de Rutinas
+                </a>
+                <button onclick="openModalForCreate()" class="px-5 py-3 rounded-xl bg-[#FFC300] text-black text-[9px] font-black uppercase tracking-widest hover:bg-yellow-400 transition shadow-[0_0_20px_rgba(255,195,0,0.2)] flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Añadir Ejercicio
                 </button>
             </div>
-            
+        </div>
+
+        <div class="glass-panel p-4 md:p-8 rounded-[24px] md:rounded-[32px]">
             <div class="mb-6">
                 <input type="text" id="exercise-search-input" placeholder="Buscar por Nombre o Descripción..." 
-                       class="w-full p-3 rounded-lg bg-[#1a1a2e] border border-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-GYM-YELLOW focus:border-GYM-YELLOW transition duration-150">
+                       class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs md:text-sm font-medium">
             </div>
 
-            <div class="overflow-x-auto rounded-lg border border-gray-700">
-                <table class="admin-table">
+            <div class="overflow-x-auto no-scrollbar">
+                <table class="admin-table min-w-[800px]">
                     <thead>
                         <tr>
-                            <th class="rounded-tl-lg">Nombre del Ejercicio</th>
-                            <th>Link Tutorial</th>
-                            <th>Descripción</th>
-                            <th class="rounded-tr-lg">Acciones</th>
+                            <th>Ejercicio</th>
+                            <th>Descripción Biomecánica</th>
+                            <th>Media</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="exercises-table-body" class="text-sm text-gray-300 divide-y divide-gray-800">
-                    </tbody>
+                    <tbody id="exercises-table-body">
+                        </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <div id="exercise-modal" class="fixed inset-0 bg-black bg-opacity-80 modal-backdrop hidden z-[1010] flex justify-center p-4 overflow-y-auto">
-        <div class="modal-content w-full max-w-xl p-6 rounded-xl transform transition-all duration-300 scale-100">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
-                <h3 id="modal-title" class="text-2xl font-semibold text-white">Añadir Nuevo Ejercicio</h3>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-GYM-YELLOW text-3xl leading-none transition-colors duration-200">&times;</button>
+    <div id="exercise-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-[5000] flex items-center justify-center p-4 transition-opacity">
+        <div class="modal-glass w-full max-w-2xl p-6 md:p-10 rounded-[24px] md:rounded-[32px] max-h-[90vh] overflow-y-auto no-scrollbar">
+            
+            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
+                <div>
+                    <h3 id="modal-title" class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Añadir Ejercicio</h3>
+                    <p class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-1">Diccionario Técnico</p>
+                </div>
+                <button onclick="closeModalSafe('exercise-modal')" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
 
-            <form id="exercise-form" class="space-y-6">
+            <form id="exercise-form" class="space-y-5">
                 <input type="hidden" id="exercise-id-field" name="id">
                 <input type="hidden" id="is-edit-mode" value="false">
 
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-300">Nombre del Ejercicio <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" name="name" required 
-                           class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
-                           placeholder="Ej: Press de Banca Inclinado">
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Nombre Oficial del Ejercicio <span class="text-[#FFC300]">*</span></label>
+                    <input type="text" id="name" name="name" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="Ej: Press de Banca Inclinado">
+                </div>
+                
+                <div>
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Enlace del Tutorial (YouTube) <span class="text-gray-600">(Opcional)</span></label>
+                    <input type="url" id="link_tutorial" name="link_tutorial" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="https://youtube.com/watch?v=...">
                 </div>
 
                 <div>
-                    <label for="link_tutorial" class="block text-sm font-medium text-gray-300">Link Tutorial del Ejercicio <span class="text-gray-500">(Opcional)</span></label>
-                    <input type="url" id="link_tutorial" name="link_tutorial" 
-                           class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
-                           placeholder="Ej: https://youtube.com/watch?v=tutorial">
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Descripción y Ejecución <span class="text-[#FFC300]">*</span></label>
+                    <textarea id="description" name="description" rows="4" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Músculos implicados, postura y cadencia..."></textarea>
                 </div>
 
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-300">Descripción del Ejercicio <span class="text-red-500">*</span></label>
-                    <textarea id="description" name="description" rows="4" required
-                              class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
-                              placeholder="Describe la ejecución, músculos trabajados y puntos clave."></textarea>
-                </div>
-
-                <div class="pt-6 flex justify-end space-x-3 border-t border-gray-700">
-                    <button type="button" id="cancel-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-5 rounded-lg transition duration-200 ease-in-out" onclick="document.getElementById('exercise-modal').classList.add('hidden')">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="submit-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-bold py-2 px-5 rounded-lg transition duration-200 ease-in-out">
-                        Crear Ejercicio
+                <div class="pt-6 mt-4">
+                    <button type="submit" id="submit-btn" class="w-full btn-gold py-4 rounded-xl font-black text-[10px] uppercase tracking-widest">
+                        Guardar en la Bóveda
                     </button>
                 </div>
             </form>
         </div>
     </div>
+
+    <script src="../../static/js/admin_auth.js"></script>
     
     <script>
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/exercise'; 
+        const API_EXERCISES = "https://sijj2003.pythonanywhere.com/api/admin/exercises";
+        const API_EXERCISE = "https://sijj2003.pythonanywhere.com/api/admin/exercise";
         let allExercisesData = [];
 
-        // 🔴 AUTENTICACIÓN PERIMETRAL
-        function getAuthHeaders() {
-            const token = localStorage.getItem('admin_token');
-            if (!token) {
-                window.location.href = 'login.html';
-                throw new Error('No hay sesión de administrador activa.');
-            }
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-        }
-
         async function fetchAllExercises() {
-            const tableBody = document.getElementById('exercises-table-body');
-            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 GYM-YELLOW">Cargando ejercicios...</td></tr>';
+            const tbody = document.getElementById('exercises-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>';
             
             try {
-                const response = await fetch(API_BASE_URL.replace('/exercise', '/exercises'), { 
-                    method: 'GET',
-                    headers: getAuthHeaders() // 🔴 Protegido con token
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
+                // NOTA: No enviamos headers manualmente. `admin_auth.js` intercepta y lo hace por nosotros.
+                const res = await fetch(API_EXERCISES);
+                const data = await res.json();
                 
-                if (data.success && data.exercises) {
+                if (data.success) {
                     allExercisesData = data.exercises; 
                     renderExercisesTable(allExercisesData);
                 } else {
-                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
-                    allExercisesData = [];
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400 text-xs font-bold uppercase tracking-widest">${data.error}</td></tr>`;
                 }
             } catch (error) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error de conexión o permisos.</td></tr>';
-                allExercisesData = [];
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400 text-xs font-bold uppercase tracking-widest">Error de conexión con el núcleo.</td></tr>';
             }
         }
 
-        function renderExercisesTable(exercisesToRender) {
-            const tableBody = document.getElementById('exercises-table-body');
-            tableBody.innerHTML = ''; 
+        function renderExercisesTable(exercises) {
+            const tbody = document.getElementById('exercises-table-body');
+            tbody.innerHTML = ''; 
 
-            if (exercisesToRender.length === 0) {
-                const searchTerm = document.getElementById('exercise-search-input').value;
-                const message = searchTerm.trim() !== '' ? `No se encontraron ejercicios para "${searchTerm}".` : 'No hay ejercicios registrados.';
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">${message}</td></tr>`;
+            if (exercises.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-500 text-xs font-bold uppercase tracking-widest">No hay ejercicios registrados</td></tr>`;
                 return;
             }
 
-            exercisesToRender.forEach(exercise => {
-                const row = tableBody.insertRow();
-                row.classList.add('hover:bg-gray-800/50'); 
-                row.insertCell().textContent = exercise.name || 'N/A';
+            exercises.forEach(exercise => {
+                const tr = document.createElement('tr');
+                const desc = exercise.description || 'Sin descripción';
+                const shortDesc = desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
                 
-                const linkCell = row.insertCell();
+                let linkHTML = `<span class="text-[9px] text-gray-600 font-bold uppercase tracking-widest">NO DISPONIBLE</span>`;
                 if (exercise.link_tutorial) {
-                    const link = document.createElement('a');
-                    link.href = exercise.link_tutorial;
-                    link.target = "_blank";
-                    link.textContent = 'Ver Video';
-                    link.classList.add('text-blue-400', 'hover:text-blue-300', 'underline');
-                    linkCell.appendChild(link);
-                } else {
-                    linkCell.textContent = 'N/A';
+                    linkHTML = `<a href="${exercise.link_tutorial}" target="_blank" class="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[#FFC300] hover:text-white transition bg-[#FFC300]/10 px-2.5 py-1 rounded border border-[#FFC300]/20"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg> Reproducir</a>`;
                 }
 
-                const descriptionText = exercise.description || 'N/A';
-                row.insertCell().textContent = descriptionText.length > 50 ? descriptionText.substring(0, 50) + '...' : descriptionText;
-
-                const actionsCell = row.insertCell();
-                actionsCell.classList.add('space-x-2');
-                
-                const editBtn = document.createElement('button');
-                editBtn.textContent = 'Editar';
-                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold');
-                editBtn.onclick = () => openModalForEdit(exercise);
-                actionsCell.appendChild(editBtn);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Eliminar';
-                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'ml-2');
-                deleteBtn.onclick = () => deleteExercise(exercise.id, exercise.name);
-                actionsCell.appendChild(deleteBtn);
+                tr.innerHTML = `
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#FFC300]">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                            </div>
+                            <p class="text-xs font-black text-white uppercase tracking-tighter">${exercise.name}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <p class="text-[10px] text-gray-400 font-medium">${shortDesc}</p>
+                    </td>
+                    <td>
+                        ${linkHTML}
+                    </td>
+                    <td class="text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick='openModalForEdit(${JSON.stringify(exercise).replace(/'/g, "&#39;")})' class="w-7 h-7 rounded-lg bg-white/5 hover:bg-[#FFC300]/20 hover:text-[#FFC300] flex items-center justify-center transition text-gray-400">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                            <button onclick='deleteExercise("${exercise.id}", "${exercise.name}")' class="w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition text-gray-400">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        function filterExercisesTable(searchTerm) {
-            const normalizedSearch = searchTerm.toLowerCase().trim();
-            if (normalizedSearch === '') {
-                renderExercisesTable(allExercisesData);
-                return;
-            }
-            const filteredExercises = allExercisesData.filter(exercise => {
-                return (exercise.name || '').toLowerCase().includes(normalizedSearch) || 
-                       (exercise.description || '').toLowerCase().includes(normalizedSearch);
-            });
-            renderExercisesTable(filteredExercises);
-        }
+        // Búsqueda en tiempo real
+        document.getElementById('exercise-search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            if (!term) return renderExercisesTable(allExercisesData);
+            const filtered = allExercisesData.filter(ex => 
+                (ex.name||'').toLowerCase().includes(term) || 
+                (ex.description||'').toLowerCase().includes(term)
+            );
+            renderExercisesTable(filtered);
+        });
 
+        // Control de Modales
+        function closeModalSafe(id) { document.getElementById(id).classList.add('hidden'); }
+        
         function openModalForCreate() {
-            const form = document.getElementById('exercise-form');
-            form.reset(); 
-            document.getElementById('modal-title').textContent = 'Añadir Nuevo Ejercicio';
-            document.getElementById('exercise-id-field').value = '';
+            document.getElementById('exercise-form').reset();
+            document.getElementById('modal-title').textContent = 'Añadir Ejercicio';
             document.getElementById('is-edit-mode').value = 'false';
-            document.getElementById('submit-btn').textContent = 'Crear Ejercicio';
             document.getElementById('exercise-modal').classList.remove('hidden');
         }
 
         function openModalForEdit(exercise) {
-            const form = document.getElementById('exercise-form');
-            form.reset(); 
-            document.getElementById('modal-title').textContent = `Editar Ejercicio: ${exercise.name}`;
+            document.getElementById('exercise-form').reset();
+            document.getElementById('modal-title').textContent = 'Editar Ejercicio';
             document.getElementById('exercise-id-field').value = exercise.id;
             document.getElementById('is-edit-mode').value = 'true';
-            document.getElementById('submit-btn').textContent = 'Guardar Cambios';
-
+            
             document.getElementById('name').value = exercise.name || '';
             document.getElementById('link_tutorial').value = exercise.link_tutorial || '';
             document.getElementById('description').value = exercise.description || '';
+            
             document.getElementById('exercise-modal').classList.remove('hidden');
         }
 
-        async function handleExerciseFormSubmit(event) {
-            event.preventDefault();
-            const form = event.target;
-            const isEditMode = document.getElementById('is-edit-mode').value === 'true';
-            const exerciseId = document.getElementById('exercise-id-field').value;
+        // Crear / Editar (POST / PUT)
+        document.getElementById('exercise-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const isEdit = document.getElementById('is-edit-mode').value === 'true';
+            const id = document.getElementById('exercise-id-field').value;
 
-            const formData = {
-                id: exerciseId,
+            const payload = {
                 name: form.name.value.trim(),
                 link_tutorial: form.link_tutorial.value.trim(),
                 description: form.description.value.trim()
             };
-            
-            if (!formData.name || !formData.description) {
-                alert("Campos obligatorios faltantes.");
-                return;
-            }
 
-            const method = isEditMode ? 'PUT' : 'POST';
-            const url = isEditMode ? `${API_BASE_URL}/${exerciseId}` : API_BASE_URL;
+            const url = isEdit ? `${API_EXERCISE}/${id}` : API_EXERCISE;
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true; btn.textContent = "PROCESANDO...";
 
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: getAuthHeaders(), // 🔴 Protegido con token
-                    body: JSON.stringify(formData)
+                const res = await fetch(url, { 
+                    method: method, 
+                    body: JSON.stringify(payload) 
                 });
-                
-                if (!response.ok) throw new Error("Error en servidor.");
-                const data = await response.json();
+                const data = await res.json();
                 
                 if (data.success) {
-                    alert("Operación exitosa");
-                    document.getElementById('exercise-modal').classList.add('hidden');
+                    showMessage("Bóveda actualizada con éxito.", "success");
+                    closeModalSafe('exercise-modal');
                     fetchAllExercises();
                 } else {
-                    alert(`Error: ${data.error}`);
+                    showMessage(data.error, "error");
                 }
-            } catch (error) {
-                alert("Error procesando solicitud.");
+            } catch(err) { 
+                showMessage("Fallo de red.", "error"); 
+            } finally {
+                btn.disabled = false; btn.textContent = "GUARDAR EN LA BÓVEDA";
             }
-        }
-        
-        async function deleteExercise(exerciseId, exerciseName) {
-            if (!confirm(`¿Eliminar permanently el ejercicio: "${exerciseName}"?`)) return;
+        });
 
+        // Eliminar (DELETE)
+        async function deleteExercise(id, name) {
+            if (!confirm(`¿Estás seguro de eliminar el ejercicio: "${name}"? Esta acción no se puede deshacer.`)) return;
             try {
-                const response = await fetch(`${API_BASE_URL}/${exerciseId}`, { 
-                    method: 'DELETE',
-                    headers: getAuthHeaders() // 🔴 Protegido con token
-                });
-                if (!response.ok) throw new Error();
-                const data = await response.json();
+                const res = await fetch(`${API_EXERCISE}/${id}`, { method: 'DELETE' });
+                const data = await res.json();
                 if (data.success) {
-                    alert("Eliminado con éxito");
+                    showMessage("Ejercicio purgado.", "success");
                     fetchAllExercises();
+                } else {
+                    showMessage(data.error, "error");
                 }
-            } catch (error) {
-                alert("Error al eliminar.");
+            } catch(e) { 
+                showMessage("Fallo al eliminar.", "error"); 
             }
         }
 
-        window.onload = function() {
-            const storedSession = localStorage.getItem('adminSession');
-            const storedToken = localStorage.getItem('admin_token');
-            if (!storedSession || !storedToken) {
-                window.location.href = 'administration.html'; 
-                return;
-            }
-
-            fetchAllExercises();
-            document.getElementById('back-btn').addEventListener('click', () => window.location.href = 'admin_routines.html');
-            document.getElementById('add-exercise-btn').addEventListener('click', openModalForCreate);
-            document.getElementById('close-modal-btn').addEventListener('click', () => document.getElementById('exercise-modal').classList.add('hidden'));
-            document.getElementById('exercise-form').addEventListener('submit', handleExerciseFormSubmit);
-            document.getElementById('exercise-search-input').addEventListener('input', (e) => filterExercisesTable(e.target.value));
-        };
+        // Iniciar
+        window.addEventListener('DOMContentLoaded', fetchAllExercises);
     </script>
 </body>
 </html>
