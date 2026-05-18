@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ CORE | Facturación y Auditoría</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/admin_auth.css">
+    <style>
+        /* Ajustes específicos para las tarjetas de pago */
+        .payment-card { transition: all 0.3s ease; }
+        .payment-card:hover { transform: translateY(-3px); border-color: rgba(255, 195, 0, 0.4); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.8), 0 0 20px rgba(255, 195, 0, 0.1); }
+        .badge-banco { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="bg-[#030305] text-white selection:bg-[#FFC300] selection:text-black overflow-x-hidden min-h-screen flex flex-col">
+
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center border border-white/10"></div>
+
+    <div class="fixed inset-0 bg-[url('../../static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-10 -z-10 mix-blend-screen grayscale"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
+
+    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#FFC300] rounded-full shadow-[0_0_10px_#FFC300] animate-pulse"></div>
+                <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter block">
+                    GYMENEZ <span class="text-white">CORE</span>
+                </h1>
+            </div>
+            <a href="inicio.html" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                Volver a Consola
+            </a>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-7xl mx-auto w-full px-4 md:px-6 py-8 md:py-10 flex-grow animate-premium-in">
+        
+        <div class="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <p class="text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-1 md:mb-2">Auditoría Financiera</p>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none break-words">
+                    Pagos <span class="text-[#FFC300]">Pendientes.</span>
+                </h2>
+            </div>
+            <button onclick="loadPendingPayments()" class="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-[#FFC300] transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Sincronizar
+            </button>
+        </div>
+
+        <div id="payments-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="col-span-full text-center py-20">
+                <div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Buscando transacciones...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../../static/js/admin_auth.js"></script>
+    <script>
+        const API_URL = "https://sijj2003.pythonanywhere.com";
+
+        async function loadPendingPayments() {
+            const grid = document.getElementById('payments-grid');
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-20">
+                    <div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div>
+                    <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Sincronizando con el Núcleo...</p>
+                </div>
+            `;
+
+            try {
+                // Petición protegida por admin_auth.js (Interceptor)
+                const res = await fetch(`${API_URL}/api/admin/payments/pending`);
+                const data = await res.json();
+
+                if (data.success && data.payments.length > 0) {
+                    renderPayments(data.payments);
+                } else {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-16 glass-panel rounded-[24px] border border-white/5">
+                            <svg class="w-12 h-12 mx-auto text-[#FFC300] mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p class="text-xl font-black text-white uppercase tracking-widest">Bandeja Limpia</p>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">No hay transacciones pendientes de revisión.</p>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                showMessage("Fallo de conexión al buscar pagos.", "error");
+            }
+        }
+
+        function renderPayments(payments) {
+            const grid = document.getElementById('payments-grid');
+            grid.innerHTML = '';
+
+            payments.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel payment-card p-6 md:p-8 rounded-[24px] flex flex-col justify-between';
+                
+                card.innerHTML = `
+                    <div class="mb-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-2.5 py-1 badge-banco text-[8px] font-black uppercase tracking-widest rounded text-gray-300">Banco: ${p.banco}</span>
+                            <span class="text-[9px] font-black text-[#FFC300] uppercase tracking-widest border border-[#FFC300]/20 px-2 py-0.5 rounded bg-[#FFC300]/10">Plan ${p.plan}</span>
+                        </div>
+                        <h3 class="text-3xl font-black text-white tracking-[0.2em] mb-1">#${p.referencia}</h3>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Atleta: <span class="text-white">${p.user_email}</span></p>
+                        <p class="text-[9px] font-bold text-gray-600 mt-2">Reportado: ${new Date(p.created_at).toLocaleDateString()}</p>
+                    </div>
+                    
+                    <div class="flex gap-3 border-t border-white/5 pt-5">
+                        <button onclick="processPayment('${p.id}', 'approve')" class="w-1/2 py-3 rounded-xl bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                            Aprobar
+                        </button>
+                        <button onclick="processPayment('${p.id}', 'reject')" class="w-1/2 py-3 rounded-xl border border-red-500/30 text-red-400 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/10 hover:border-red-500 transition">
+                            Rechazar
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function processPayment(paymentId, action) {
+            if (!confirm(`¿Estás seguro de ${action === 'approve' ? 'APROBAR' : 'RECHAZAR'} este pago?`)) return;
+
+            try {
+                const res = await fetch(`${API_URL}/api/admin/payments/${action}/${paymentId}`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage(`Transacción ${action === 'approve' ? 'aprobada' : 'rechazada'} exitosamente.`, 'success');
+                    loadPendingPayments();
+                } else {
+                    showMessage(data.error || "Error al procesar el pago.", "error");
+                }
+            } catch (e) {
+                showMessage("Fallo de conexión.", "error");
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadPendingPayments);
+    </script>
+</body>
+</html>
