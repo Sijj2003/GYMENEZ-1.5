@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ CORE | Facturación y Auditoría</title>
+    <title>GYMENEZ CORE | Auditoría y Cierre Fiscal</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../static/css/admin_auth.css">
     <style>
-        /* Ajustes específicos para las tarjetas de pago */
         .payment-card { transition: all 0.3s ease; }
         .payment-card:hover { transform: translateY(-3px); border-color: rgba(255, 195, 0, 0.4); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.8), 0 0 20px rgba(255, 195, 0, 0.1); }
+        .history-card:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.1); }
         .badge-banco { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        
+        .tab-btn { position: relative; transition: all 0.3s ease; }
+        .tab-btn.active { color: #FFC300; }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background-color: #FFC300; box-shadow: 0 0 8px #FFC300; }
     </style>
 </head>
 <body class="bg-[#030305] text-white selection:bg-[#FFC300] selection:text-black overflow-x-hidden min-h-screen flex flex-col">
@@ -38,24 +42,34 @@
 
     <main class="relative z-10 max-w-7xl mx-auto w-full px-4 md:px-6 py-8 md:py-10 flex-grow animate-premium-in">
         
-        <div class="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-                <p class="text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-1 md:mb-2">Auditoría Financiera</p>
-                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none break-words">
-                    Pagos <span class="text-[#FFC300]">Pendientes.</span>
+                <p class="text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-1">Auditoría Financiera</p>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none break-words">
+                    Centro <span class="text-[#FFC300]">Fiscal.</span>
                 </h2>
             </div>
-            <button onclick="loadPendingPayments()" class="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-[#FFC300] transition flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                Sincronizar
+            <button onclick="exportFiscalCSV()" class="px-5 py-3 rounded-xl bg-emerald-600/90 text-white border border-emerald-500/50 text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Exportar Cierre Mes (CSV)
             </button>
         </div>
 
-        <div id="payments-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <div class="col-span-full text-center py-20">
-                <div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div>
-                <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Buscando transacciones...</p>
-            </div>
+        <div class="flex gap-6 border-b border-white/10 mb-8 mt-4">
+            <button onclick="switchTab('pending')" id="tab-pending" class="tab-btn active pb-3 text-[10px] font-black uppercase tracking-widest">
+                En Cola de Revisión
+            </button>
+            <button onclick="switchTab('history')" id="tab-history" class="tab-btn pb-3 text-gray-500 hover:text-white text-[10px] font-black uppercase tracking-widest">
+                Histórico de Pagos
+            </button>
+        </div>
+
+        <div id="view-pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div></div>
+        </div>
+
+        <div id="view-history" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div></div>
         </div>
 
     </main>
@@ -63,85 +77,175 @@
     <script src="../../static/js/admin_auth.js"></script>
     <script>
         const API_URL = "https://sijj2003.pythonanywhere.com";
+        let historyDataToExport = []; // Almacena en memoria para el CSV
 
-        async function loadPendingPayments() {
-            const grid = document.getElementById('payments-grid');
-            grid.innerHTML = `
-                <div class="col-span-full text-center py-20">
-                    <div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div>
-                    <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Sincronizando con el Núcleo...</p>
-                </div>
-            `;
-
-            try {
-                // Petición protegida por admin_auth.js (Interceptor)
-                const res = await fetch(`${API_URL}/api/admin/payments/pending`);
-                const data = await res.json();
-
-                if (data.success && data.payments.length > 0) {
-                    renderPayments(data.payments);
-                } else {
-                    grid.innerHTML = `
-                        <div class="col-span-full text-center py-16 glass-panel rounded-[24px] border border-white/5">
-                            <svg class="w-12 h-12 mx-auto text-[#FFC300] mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <p class="text-xl font-black text-white uppercase tracking-widest">Bandeja Limpia</p>
-                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">No hay transacciones pendientes de revisión.</p>
-                        </div>
-                    `;
-                }
-            } catch (e) {
-                showMessage("Fallo de conexión al buscar pagos.", "error");
+        // CONTROL DE PESTAÑAS
+        function switchTab(tab) {
+            document.getElementById('tab-pending').classList.remove('active');
+            document.getElementById('tab-history').classList.remove('active');
+            document.getElementById('tab-pending').classList.add('text-gray-500');
+            document.getElementById('tab-history').classList.add('text-gray-500');
+            
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.remove('text-gray-500');
+            
+            if (tab === 'pending') {
+                document.getElementById('view-pending').classList.remove('hidden');
+                document.getElementById('view-history').classList.add('hidden');
+                loadPendingPayments();
+            } else {
+                document.getElementById('view-pending').classList.add('hidden');
+                document.getElementById('view-history').classList.remove('hidden');
+                loadHistoryPayments();
             }
         }
 
-        function renderPayments(payments) {
-            const grid = document.getElementById('payments-grid');
-            grid.innerHTML = '';
+        // CARGAR PENDIENTES
+        async function loadPendingPayments() {
+            const grid = document.getElementById('view-pending');
+            grid.innerHTML = '<div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-[#FFC300] rounded-full animate-spin mx-auto mb-4"></div></div>';
 
+            try {
+                const res = await fetch(`${API_URL}/api/admin/payments/pending`);
+                const data = await res.json();
+                if (data.success && data.payments.length > 0) renderPending(data.payments);
+                else showEmptyState(grid, "Bandeja Limpia", "No hay transacciones pendientes de revisión.");
+            } catch (e) { showMessage("Fallo de conexión.", "error"); }
+        }
+
+        // CARGAR HISTORIAL FISCAL
+        async function loadHistoryPayments() {
+            const grid = document.getElementById('view-history');
+            grid.innerHTML = '<div class="col-span-full text-center py-20"><div class="w-10 h-10 border-4 border-white/10 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div></div>';
+
+            try {
+                const res = await fetch(`${API_URL}/api/admin/payments/history`);
+                const data = await res.json();
+                if (data.success && data.history.length > 0) {
+                    historyDataToExport = data.history;
+                    renderHistory(data.history);
+                } else showEmptyState(grid, "Sin Registros", "No hay pagos archivados históricamente.");
+            } catch (e) { showMessage("Fallo de conexión.", "error"); }
+        }
+
+        function showEmptyState(container, title, subtitle) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-16 glass-panel rounded-[24px] border border-white/5">
+                    <svg class="w-12 h-12 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <p class="text-xl font-black text-white uppercase tracking-widest">${title}</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">${subtitle}</p>
+                </div>`;
+        }
+
+        function renderPending(payments) {
+            const grid = document.getElementById('view-pending');
+            grid.innerHTML = '';
             payments.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'glass-panel payment-card p-6 md:p-8 rounded-[24px] flex flex-col justify-between';
-                
                 card.innerHTML = `
                     <div class="mb-6">
                         <div class="flex justify-between items-start mb-4">
-                            <span class="px-2.5 py-1 badge-banco text-[8px] font-black uppercase tracking-widest rounded text-gray-300">Banco: ${p.banco}</span>
+                            <span class="px-2.5 py-1 badge-banco text-[8px] font-black uppercase tracking-widest rounded text-gray-300">${p.banco}</span>
                             <span class="text-[9px] font-black text-[#FFC300] uppercase tracking-widest border border-[#FFC300]/20 px-2 py-0.5 rounded bg-[#FFC300]/10">Plan ${p.plan}</span>
                         </div>
                         <h3 class="text-3xl font-black text-white tracking-[0.2em] mb-1">#${p.referencia}</h3>
                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Atleta: <span class="text-white">${p.user_email}</span></p>
-                        <p class="text-[9px] font-bold text-gray-600 mt-2">Reportado: ${new Date(p.created_at).toLocaleDateString()}</p>
                     </div>
-                    
                     <div class="flex gap-3 border-t border-white/5 pt-5">
-                        <button onclick="processPayment('${p.id}', 'approve')" class="w-1/2 py-3 rounded-xl bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                            Aprobar
-                        </button>
-                        <button onclick="processPayment('${p.id}', 'reject')" class="w-1/2 py-3 rounded-xl border border-red-500/30 text-red-400 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/10 hover:border-red-500 transition">
-                            Rechazar
-                        </button>
+                        <button onclick="processPayment('${p.id}', 'approve')" class="w-1/2 py-3 rounded-xl bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-[0_0_15px_rgba(16,185,129,0.2)]">Aprobar</button>
+                        <button onclick="processPayment('${p.id}', 'reject')" class="w-1/2 py-3 rounded-xl border border-red-500/30 text-red-400 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/10 hover:border-red-500 transition">Rechazar</button>
+                    </div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderHistory(history) {
+            const grid = document.getElementById('view-history');
+            grid.innerHTML = '';
+            history.forEach(h => {
+                const isApprove = h.status === 'APROBADO';
+                const color = isApprove ? 'emerald' : 'red';
+                const f = h.fiscal || {};
+                
+                let fiscalBlock = '';
+                if (isApprove && f.total_bs) {
+                    fiscalBlock = `
+                        <div class="mt-4 p-4 rounded-xl bg-black/40 border border-white/5 grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">Monto Dólares (Tasa: ${f.tasa_bcv})</p>
+                                <p class="text-[10px] text-white font-mono mt-1">Base: $${f.base_usd}</p>
+                                <p class="text-[10px] text-red-400 font-mono">IVA (16%): $${f.iva_usd}</p>
+                                <p class="text-[11px] font-black text-emerald-400 mt-1 tracking-widest">TOTAL: $${f.total_usd}</p>
+                            </div>
+                            <div class="border-l border-white/5 pl-4">
+                                <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">Monto Bolívares (Retención)</p>
+                                <p class="text-[10px] text-white font-mono mt-1">Base: Bs.${f.base_bs}</p>
+                                <p class="text-[10px] text-red-400 font-mono">IVA (16%): Bs.${f.iva_bs}</p>
+                                <p class="text-[11px] font-black text-[#FFC300] mt-1 tracking-widest">TOTAL: Bs.${f.total_bs}</p>
+                            </div>
+                        </div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `glass-panel payment-card history-card p-6 md:p-8 rounded-[24px] border-t border-${color}-500/20`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-[9px] font-black text-${color}-400 uppercase tracking-widest bg-${color}-500/10 px-2 py-0.5 rounded border border-${color}-500/20">${h.status}</span>
+                        <span class="text-[8px] font-bold text-gray-500 uppercase">${new Date(h.processed_at).toLocaleDateString()}</span>
                     </div>
-                `;
+                    <h3 class="text-xl font-black text-white tracking-[0.2em] mb-1">#${h.referencia} <span class="text-[9px] text-gray-500 ml-2">(${h.banco})</span></h3>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Plan ${h.plan} | Atleta: <span class="text-white">${h.user_email}</span></p>
+                    ${fiscalBlock}`;
                 grid.appendChild(card);
             });
         }
 
         async function processPayment(paymentId, action) {
-            if (!confirm(`¿Estás seguro de ${action === 'approve' ? 'APROBAR' : 'RECHAZAR'} este pago?`)) return;
-
+            if (!confirm(`¿Confirmar acción de ${action.toUpperCase()} en esta transacción?`)) return;
             try {
                 const res = await fetch(`${API_URL}/api/admin/payments/${action}/${paymentId}`, { method: 'POST' });
                 const data = await res.json();
-                
                 if (data.success) {
-                    showMessage(`Transacción ${action === 'approve' ? 'aprobada' : 'rechazada'} exitosamente.`, 'success');
+                    showMessage(data.message, 'success');
                     loadPendingPayments();
-                } else {
-                    showMessage(data.error || "Error al procesar el pago.", "error");
-                }
-            } catch (e) {
-                showMessage("Fallo de conexión.", "error");
+                } else showMessage(data.error, "error");
+            } catch (e) { showMessage("Fallo de conexión.", "error"); }
+        }
+
+        // GENERADOR Y DESCARGA DE EXCEL/CSV FISCAL
+        function exportFiscalCSV() {
+            if (!historyDataToExport || historyDataToExport.length === 0) {
+                return showMessage("No hay datos históricos para exportar.", "error");
             }
+
+            let csvContent = "FECHA,EMAIL_ATLETA,PLAN,BANCO,REFERENCIA,STATUS,TASA_BCV_APLICADA,BASE_IMPONIBLE_USD,IVA_16_USD,TOTAL_USD,BASE_IMPONIBLE_BS,RETENCION_IVA_16_BS,TOTAL_PAGADO_BS\n";
+            
+            const escapeCSV = (str) => `"${String(str).replace(/"/g, '""')}"`;
+
+            historyDataToExport.forEach(row => {
+                const date = new Date(row.processed_at).toLocaleDateString();
+                const f = row.fiscal || {};
+                
+                const csvRow = [
+                    date, row.user_email, row.plan, row.banco, row.referencia, row.status,
+                    f.tasa_bcv || 0, f.base_usd || 0, f.iva_usd || 0, f.total_usd || 0,
+                    f.base_bs || 0, f.iva_bs || 0, f.total_bs || 0
+                ].map(escapeCSV).join(",");
+                
+                csvContent += csvRow + "\n";
+            });
+
+            // Forzar descarga del archivo
+            const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Cierre_Fiscal_GYMENEZ_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showMessage("Reporte fiscal descargado con éxito.", "success");
         }
 
         window.addEventListener('DOMContentLoaded', loadPendingPayments);
