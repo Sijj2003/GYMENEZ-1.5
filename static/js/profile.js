@@ -1,6 +1,11 @@
 // static/js/profile.js
 
-const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+// 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
+const isLocalhost = window.location.hostname === '127.0.0.1' || 
+                    window.location.hostname === 'localhost' || 
+                    window.location.protocol === 'file:';
+
+const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
 /**
  * Función Helper para obtener el Pasaporte Criptográfico (Token) del LocalStorage
@@ -15,7 +20,6 @@ function getBearerToken() {
  */
 async function apiFetchProfileData() {
     try {
-        // Apunta a la ruta segura /me y envía el Token
         const response = await fetch(`${API_BASE_URL}/api/profile/me`, { 
             headers: getBearerToken() 
         }); 
@@ -33,13 +37,11 @@ async function apiFetchProfileData() {
  */
 async function apiFetchMetrics() {
     try {
-        // Apunta a la ruta segura /me y envía el Token
         const response = await fetch(`${API_BASE_URL}/api/metrics/me`, { 
             headers: getBearerToken() 
         });
 
         // 🛡️ MANEJO ELEGANTE DEL ESCUDO (403 FORBIDDEN)
-        // Si el backend nos rebota por no tener plan PLUS, devolvemos un estado controlado
         if (response.status === 403) {
             return { success: false, isForbidden: true, message: 'Módulo restringido por plan.' };
         }
@@ -102,13 +104,11 @@ function renderMetrics(m) {
 async function loadProfileData() {
     const storedSession = localStorage.getItem('userSession');
     if (!storedSession) {
-        // Redirige al login si no hay sesión
         window.location.href = '/apps/start/login.html';
         return;
     }
     
     try {
-        // Ejecutamos ambas peticiones al mismo tiempo para mayor fluidez.
         const [profileRes, metricsRes] = await Promise.all([
             apiFetchProfileData(),
             apiFetchMetrics()
@@ -118,12 +118,11 @@ async function loadProfileData() {
             renderProfile(profileRes.profile);
         }
 
-        // Si la petición a métricas fue exitosa Y NO está restringida, las renderizamos
+        // 🟢 Si la petición de métricas fue exitosa Y NO está restringida
         if (metricsRes.success && metricsRes.metrics && !metricsRes.isForbidden) {
             renderMetrics(metricsRes.metrics);
         }
 
-        // Transición visual: Oculta el spinner y muestra el contenido progresivamente
         document.getElementById('loading-spinner').classList.add('hidden');
         document.getElementById('profile-content').classList.remove('hidden');
 
@@ -136,5 +135,4 @@ async function loadProfileData() {
     }
 }
 
-// Inicia el proceso al cargar la ventana
 window.addEventListener('DOMContentLoaded', loadProfileData);
