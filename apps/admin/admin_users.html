@@ -129,7 +129,7 @@
                     <div>
                         <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Teléfono</label>
                         <div class="flex gap-2">
-                            <select id="phone_prefix" name="phone_prefix" class="w-20 glass-input px-2 py-3 rounded-xl text-white text-xs font-bold text-center appearance-none"><option value="0414">0414</option><option value="0424">0424</option><option value="0412">0412</option></select>
+                            <select id="phone_prefix" name="phone_prefix" class="w-20 glass-input px-2 py-3 rounded-xl text-white text-xs font-bold text-center appearance-none"><option value="0414">0414</option><option value="0424">0424</option><option value="0412">0412</option><option value="0422">0422</option><option value="0416">0416</option><option value="0426">0426</option></select>
                             <input type="text" id="phone_number_body" name="phone_number_body" required class="flex-1 glass-input px-4 py-3 rounded-xl text-white text-xs">
                         </div>
                     </div>
@@ -166,7 +166,12 @@
 
     <script src="../../static/js/admin_auth.js"></script>
     <script>
-        const API_URL = "https://sijj2003.pythonanywhere.com";
+        // 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
+        const isLocalhost = window.location.hostname === '127.0.0.1' || 
+                            window.location.hostname === 'localhost' || 
+                            window.location.protocol === 'file:';
+
+        const API_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
         let allUsersData = [];
 
         function formatToUpperCase(inputString) { return inputString ? inputString.toUpperCase().trim() : ''; }
@@ -195,9 +200,11 @@
                 if (data.success) {
                     allUsersData = data.users; 
                     renderUsersTable(allUsersData);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-400 text-xs font-bold">${data.error}</td></tr>`;
                 }
             } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400 text-xs font-bold">Error de conexión.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400 text-xs font-bold uppercase tracking-widest">Error de conexión con el núcleo.</td></tr>';
             }
         }
 
@@ -257,7 +264,7 @@
             });
         }
 
-        // Search
+        // Buscador reactivo
         document.getElementById('user-search-input').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase().trim();
             if (!term) return renderUsersTable(allUsersData);
@@ -316,7 +323,7 @@
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        // Acciones CRUD
+        // 🔥 CORRECCIÓN: Envío del formulario con Content-Type correcto y Fetch dinámico
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
@@ -338,32 +345,70 @@
 
             const url = isEdit ? `${API_URL}/api/admin/user/${id}` : `${API_URL}/api/admin/user`;
             
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'PROCESANDO...';
+
             try {
-                const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(url, { 
+                    method: isEdit ? 'PUT' : 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, // Inyección de cabecera mandatoria
+                    body: JSON.stringify(payload) 
+                });
                 const data = await res.json();
                 if (data.success) {
+                    showMessage(data.message || 'Operación exitosa', 'success');
                     closeModalSafe('user-modal');
                     fetchAllUsers();
-                } else alert(data.error);
-            } catch(e) { alert("Error de red"); }
+                } else {
+                    showMessage(data.error || 'Error al procesar la solicitud', 'error');
+                }
+            } catch(e) { 
+                showMessage("Error de red", 'error'); 
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Guardar Ficha';
+            }
         });
 
+        // 🔥 CORRECCIÓN: Bloqueo de usuarios con cabeceras correctas
         async function handleBlockUser(id, isBlocked) {
             if (!confirm(`¿${isBlocked ? 'Desbloquear' : 'Bloquear'} acceso a este usuario?`)) return;
             try {
                 const res = await fetch(`${API_URL}/api/admin/user/block/${id}`, { 
-                    method: 'PUT', body: JSON.stringify({ is_blocked: !isBlocked }) 
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' }, // Inyección de cabecera mandatoria
+                    body: JSON.stringify({ is_blocked: !isBlocked }) 
                 });
-                if (res.ok) fetchAllUsers();
-            } catch(e) { alert("Error al bloquear"); }
+                const data = await res.json();
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    fetchAllUsers();
+                } else {
+                    showMessage(data.error || 'Error al modificar estado', 'error');
+                }
+            } catch(e) { 
+                showMessage("Error de red al intentar bloquear", 'error'); 
+            }
         }
 
         async function deleteUser(id, name) {
             if (!confirm(`¿Borrar permanentemente a ${name}? Esta acción purga su biometría.`)) return;
             try {
-                const res = await fetch(`${API_URL}/api/admin/user/${id}`, { method: 'DELETE' });
-                if (res.ok) fetchAllUsers();
-            } catch(e) { alert("Error al borrar"); }
+                const res = await fetch(`${API_URL}/api/admin/user/${id}`, { 
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    fetchAllUsers();
+                } else {
+                    showMessage(data.error || 'Error al intentar eliminar', 'error');
+                }
+            } catch(e) { 
+                showMessage("Error al borrar", 'error'); 
+            }
         }
 
         window.addEventListener('DOMContentLoaded', fetchAllUsers);
