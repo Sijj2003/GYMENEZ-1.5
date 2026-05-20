@@ -12,10 +12,7 @@
     <link rel="stylesheet" href="/static/css/profile.css">
     
     <style>
-        /* Animación suave para la aparición de los candados */
-        .lock-overlay {
-            animation: fadeInLock 0.5s ease-out forwards;
-        }
+        .lock-overlay { animation: fadeInLock 0.5s ease-out forwards; }
         @keyframes fadeInLock {
             from { opacity: 0; backdrop-filter: blur(0px); }
             to { opacity: 1; backdrop-filter: blur(8px); }
@@ -162,9 +159,6 @@
     <script src="/static/js/profile.js"></script>
 
     <script>
-        // No declaramos API_BASE_URL porque profile.js probablemente la trae, o la extraemos del entorno si es necesario.
-        const URL_API = "https://sijj2003.pythonanywhere.com";
-
         function showMessage(message, type = 'error') {
             const messagebox = document.getElementById('message-box');
             if(!messagebox) return;
@@ -180,16 +174,13 @@
             }, 3500);
         }
 
-        // Función que oscurece y bloquea los paneles de datos
         function lockDataCard(cardId, requiredLevel) {
             const card = document.getElementById(cardId);
             if (!card) return;
             
-            // 1. Ofuscar los valores levemente en el DOM visual por seguridad de frontend
             const values = card.querySelectorAll('.value, p.text-gray-300');
             values.forEach(v => v.textContent = '***'); 
 
-            // 2. Crear el velo de cristal esmerilado encima de la tarjeta
             const overlay = document.createElement('div');
             overlay.className = 'lock-overlay absolute inset-0 z-20 bg-[#030305]/60 flex flex-col items-center justify-center cursor-not-allowed rounded-[24px] md:rounded-[32px]';
             
@@ -199,7 +190,6 @@
                 </div>
             `;
             
-            // 3. Lanzar notificación roja si intentan hacer click en la zona bloqueada
             overlay.onclick = (e) => {
                 e.stopPropagation();
                 showMessage(`ACCESO RESTRINGIDO: El registro avanzado requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
@@ -214,9 +204,7 @@
             const isUltra = normalizedLevel === 'ULTRA';
             const isPlus = normalizedLevel === 'PLUS' || isUltra;
 
-            // Bloqueamos las métricas detalladas si no es Plus o Ultra
             if (!isPlus) {
-                // Pequeño timeout para asegurar que profile.js haya llenado la data antes de ofuscarla y taparla
                 setTimeout(() => {
                     lockDataCard('card-upper-body', 'PLUS');
                     lockDataCard('card-lower-body', 'PLUS');
@@ -225,29 +213,28 @@
             }
         }
 
-        // Verificar Nivel de Suscripción (Seguridad Zero Trust)
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('userSession');
-            const token = localStorage.getItem('gymen_auth_token'); // 🔐 Extraemos el Token
+            const token = localStorage.getItem('gymen_auth_token'); 
 
             if (storedSession && token) {
-                // 🛡️ Petición a la ruta segura '/me' inyectando el Pasaporte
-                fetch(`${URL_API}/api/profile/me`, {
+                // 🔥 CORRECCIÓN: Usa la API_BASE_URL detectada en profile.js
+                fetch(`${API_BASE_URL}/api/profile/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success && data.profile) {
-                            const subLevel = data.profile.subscription_level || 'No Suscrito';
-                            applyProfileLocks(subLevel);
-                        } else {
-                            applyProfileLocks('No Suscrito');
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error obteniendo perfil para candados:", err);
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.profile) {
+                        const subLevel = data.profile.subscription_level || 'No Suscrito';
+                        applyProfileLocks(subLevel);
+                    } else {
                         applyProfileLocks('No Suscrito');
-                    });
+                    }
+                })
+                .catch(err => {
+                    console.error("Error obteniendo perfil para candados:", err);
+                    applyProfileLocks('No Suscrito');
+                });
             } else {
                 applyProfileLocks('No Suscrito');
             }
