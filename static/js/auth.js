@@ -100,6 +100,11 @@ async function apiLogin(email, password, deviceId) {
 
         if (response.status === 403) return { success: false, error: data.error || 'Acceso denegado (403).' };
         
+        // Capturar redirección inteligente controlada si hay otra sesión activa sin lanzar 403
+        if (data.is_session_active) {
+            return { success: false, is_session_active: true, email: data.email, error: data.error };
+        }
+
         if (!response.ok || !data.success) {
             if (data.requires_activation) return { success: false, requires_activation: true, email: data.email, message: data.message };
             return { success: false, error: data.error || 'Credenciales inválidas.' };
@@ -341,16 +346,20 @@ async function handleLogin(e) {
             return;
         }
         
+        // 🔥 CAPTURA EL FLAG DE SESIÓN SIMULTÁNEA CONTROLADA DESDE EL SERVER
+        if (response.is_session_active || (response.error && response.error.includes('Sesión activa'))) {
+            openModalSafe('active-session-modal');
+            document.getElementById('modal-options').classList.remove('hidden');
+            document.getElementById('force-logout-form').classList.add('hidden');
+            document.getElementById('force-email').value = email;
+            showForceLogoutMessage(''); 
+            return;
+        }
+        
         if (response.error && response.error.includes('bloqueada')) {
             openModalSafe('block-modal');
             showMessage('Acceso Restringido.', 'error');
             setTimeout(() => closeModalSafe('block-modal'), 10000); 
-        } else if (response.error && (response.error.includes('Sesion activa detectada') || response.error.includes('sesión activa'))) {
-            openModalSafe('active-session-modal');
-            showMessage('Sesión en uso detectada.', 'error');
-            document.getElementById('force-logout-form').classList.add('hidden');
-            document.getElementById('modal-options').classList.remove('hidden');
-            showForceLogoutMessage(''); 
         } else {
             showMessage(response.error, 'error');
         }
