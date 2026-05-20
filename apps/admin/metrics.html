@@ -69,7 +69,10 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div><label class="label-style">Estatura (cm)</label><input type="number" name="estatura" class="custom-input"></div>
                         <div><label class="label-style">Peso (kg)</label><input type="number" step="0.1" name="peso" class="custom-input"></div>
-                        <div><label class="label-style">Edad (años)</label><input type="number" name="edad" class="custom-input"></div>
+                        <div>
+                            <label class="label-style">Edad (Calculada Dinámicamente)</label>
+                            <input type="text" id="metric-edad" readonly class="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-gray-500 font-bold text-sm cursor-not-allowed select-none focus:outline-none transition font-mono" placeholder="Automática por nacimiento">
+                        </div>
                     </div>
                 </div>
 
@@ -122,7 +125,6 @@
 
         async function init() {
             try {
-                // Ahora no mandamos headers manuales porque admin_auth.js inyecta el token y usa API_BASE_URL
                 const res = await fetch(`${API_BASE_URL}/api/admin/users`);
                 const data = await res.json();
                 if (data.success) { 
@@ -156,7 +158,6 @@
             form.reset();
             
             try {
-                // 🔥 CORRECCIÓN: Apuntando a la ruta de Administración (/api/admin/metrics)
                 const res = await fetch(`${API_BASE_URL}/api/admin/metrics/${id}`);
                 const data = await res.json();
                 if (data.success && data.metrics) {
@@ -164,6 +165,9 @@
                         const input = form.querySelector(`[name="${key}"]`);
                         if (input) input.value = data.metrics[key];
                     });
+                    
+                    // Asignamos la edad calculada por el Backend de forma segura
+                    document.getElementById('metric-edad').value = data.metrics.edad ? `${data.metrics.edad} AÑOS` : 'N/A';
                 }
             } catch (e) { 
                 showMessage("Error obteniendo métricas del usuario.", "error"); 
@@ -173,13 +177,18 @@
         document.getElementById('metrics-form').onsubmit = async (e) => {
             e.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target));
-            const btn = document.getElementById('btn-submit');
             
+            // 🔥 SOLUCIÓN SENIOR: Eliminamos la clave 'edad' para que no se envíe a Firebase.
+            // Esto asegura que la base de datos se mantenga limpia y dependa del cálculo dinámico del backend.
+            if ('edad' in formData) {
+                delete formData.edad;
+            }
+
+            const btn = document.getElementById('btn-submit');
             btn.disabled = true;
             btn.textContent = "Sincronizando Ficha...";
 
             try {
-                // 🔥 CORRECCIÓN: Ruta de Administración y agregando cabecera Content-Type
                 const res = await fetch(`${API_BASE_URL}/api/admin/metrics/${currentUserId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -189,6 +198,8 @@
                 
                 if(result.success) {
                     showMessage("Datos biométricos sincronizados con éxito.", "success");
+                    // Volvemos a consultar para refrescar la edad en caso de que hubiese cambios en las colecciones
+                    if (currentUserId) selectUser(currentUserId, document.getElementById('display-name').textContent);
                 } else {
                     showMessage(result.error || "Error al actualizar la ficha.", "error");
                 }
