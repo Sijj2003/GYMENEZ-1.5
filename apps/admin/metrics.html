@@ -161,13 +161,17 @@
                 const res = await fetch(`${API_BASE_URL}/api/admin/metrics/${id}`);
                 const data = await res.json();
                 if (data.success && data.metrics) {
+                    // 1. Mapeo genérico por atributo [name] (aquí se saltará la edad por no tener name)
                     Object.keys(data.metrics).forEach(key => {
                         const input = form.querySelector(`[name="${key}"]`);
                         if (input) input.value = data.metrics[key];
                     });
                     
-                    // Asignamos la edad calculada por el Backend de forma segura
-                    document.getElementById('metric-edad').value = data.metrics.edad ? `${data.metrics.edad} AÑOS` : 'N/A';
+                    // 2. 🔥 INYECCIÓN DIRECTA POR ID PARA EL CAMPO READONLY
+                    const edadInput = document.getElementById('metric-edad');
+                    if (edadInput) {
+                        edadInput.value = data.metrics.edad ? `${data.metrics.edad} AÑOS` : 'N/A';
+                    }
                 }
             } catch (e) { 
                 showMessage("Error obteniendo métricas del usuario.", "error"); 
@@ -178,8 +182,7 @@
             e.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target));
             
-            // 🔥 SOLUCIÓN SENIOR: Eliminamos la clave 'edad' para que no se envíe a Firebase.
-            // Esto asegura que la base de datos se mantenga limpia y dependa del cálculo dinámico del backend.
+            // Garantía doble de limpieza para el payload (Clean Architecture)
             if ('edad' in formData) {
                 delete formData.edad;
             }
@@ -198,7 +201,7 @@
                 
                 if(result.success) {
                     showMessage("Datos biométricos sincronizados con éxito.", "success");
-                    // Volvemos a consultar para refrescar la edad en caso de que hubiese cambios en las colecciones
+                    // Refrescar inmediatamente el panel para re-calcular y renderizar la edad actualizada
                     if (currentUserId) selectUser(currentUserId, document.getElementById('display-name').textContent);
                 } else {
                     showMessage(result.error || "Error al actualizar la ficha.", "error");
