@@ -127,8 +127,6 @@
     <script src="../../static/js/admin_auth.js"></script>
     
     <script>
-        const API_EXERCISES = "https://sijj2003.pythonanywhere.com/api/admin/exercises";
-        const API_EXERCISE = "https://sijj2003.pythonanywhere.com/api/admin/exercise";
         let allExercisesData = [];
 
         async function fetchAllExercises() {
@@ -136,8 +134,8 @@
             tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>';
             
             try {
-                // NOTA: No enviamos headers manualmente. `admin_auth.js` intercepta y lo hace por nosotros.
-                const res = await fetch(API_EXERCISES);
+                // Usamos API_BASE_URL heredado de admin_auth.js
+                const res = await fetch(`${API_BASE_URL}/api/admin/exercises`);
                 const data = await res.json();
                 
                 if (data.success) {
@@ -247,7 +245,7 @@
                 description: form.description.value.trim()
             };
 
-            const url = isEdit ? `${API_EXERCISE}/${id}` : API_EXERCISE;
+            const url = isEdit ? `${API_BASE_URL}/api/admin/exercise/${id}` : `${API_BASE_URL}/api/admin/exercise`;
             const method = isEdit ? 'PUT' : 'POST';
             
             const btn = document.getElementById('submit-btn');
@@ -256,12 +254,13 @@
             try {
                 const res = await fetch(url, { 
                     method: method, 
+                    headers: { 'Content-Type': 'application/json' }, // 🔥 VITAL
                     body: JSON.stringify(payload) 
                 });
                 const data = await res.json();
                 
                 if (data.success) {
-                    showMessage("Bóveda actualizada con éxito.", "success");
+                    showMessage(data.message || "Bóveda actualizada con éxito.", "success");
                     closeModalSafe('exercise-modal');
                     fetchAllExercises();
                 } else {
@@ -278,10 +277,13 @@
         async function deleteExercise(id, name) {
             if (!confirm(`¿Estás seguro de eliminar el ejercicio: "${name}"? Esta acción no se puede deshacer.`)) return;
             try {
-                const res = await fetch(`${API_EXERCISE}/${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API_BASE_URL}/api/admin/exercise/${id}`, { 
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
                 const data = await res.json();
                 if (data.success) {
-                    showMessage("Ejercicio purgado.", "success");
+                    showMessage(data.message || "Ejercicio purgado.", "success");
                     fetchAllExercises();
                 } else {
                     showMessage(data.error, "error");
