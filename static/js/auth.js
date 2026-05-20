@@ -86,9 +86,19 @@ async function apiLogin(email, password, deviceId) {
             headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email, password, deviceId })
         });
+
+        // 🔥 CORRECCIÓN SENIOR: Capturar el código 429 (Rate Limit) explícitamente
+        if (response.status === 429) {
+            return { 
+                success: false, 
+                error: 'Múltiples intentos detectados. Por favor, intenta de nuevo en 60 segundos.' 
+            };
+        }
+
         const data = await response.json();
 
         if (response.status === 403) return { success: false, error: data.error || 'Acceso denegado (403).' };
+        
         if (!response.ok || !data.success) {
             if (data.requires_activation) return { success: false, requires_activation: true, email: data.email, message: data.message };
             return { success: false, error: data.error || 'Credenciales inválidas.' };
