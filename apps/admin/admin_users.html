@@ -165,13 +165,8 @@
     </div>
 
     <script src="../../static/js/admin_auth.js"></script>
+    
     <script>
-        // 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
-        const isLocalhost = window.location.hostname === '127.0.0.1' || 
-                            window.location.hostname === 'localhost' || 
-                            window.location.protocol === 'file:';
-
-        const API_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
         let allUsersData = [];
 
         function formatToUpperCase(inputString) { return inputString ? inputString.toUpperCase().trim() : ''; }
@@ -194,7 +189,8 @@
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>';
             
             try {
-                const res = await fetch(`${API_URL}/api/admin/users`);
+                // Aquí usamos API_BASE_URL, inyectado heredado globalmente desde admin_auth.js
+                const res = await fetch(`${API_BASE_URL}/api/admin/users`);
                 const data = await res.json();
                 
                 if (data.success) {
@@ -283,7 +279,6 @@
             this.value = formatIdNumber(raw);
         });
 
-        // Modales
         function closeModalSafe(id) { document.getElementById(id).classList.add('hidden'); }
         
         function openModalForCreate() {
@@ -323,7 +318,7 @@
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        // 🔥 CORRECCIÓN: Envío del formulario con Content-Type correcto y Fetch dinámico
+        // Envío del formulario (Crear/Editar)
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
@@ -343,7 +338,7 @@
             if (form.password.value) payload.password = form.password.value;
             if (form.activo_desde.value) payload.activo_desde = form.activo_desde.value;
 
-            const url = isEdit ? `${API_URL}/api/admin/user/${id}` : `${API_URL}/api/admin/user`;
+            const url = isEdit ? `${API_BASE_URL}/api/admin/user/${id}` : `${API_BASE_URL}/api/admin/user`;
             
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
@@ -352,7 +347,7 @@
             try {
                 const res = await fetch(url, { 
                     method: isEdit ? 'PUT' : 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, // Inyección de cabecera mandatoria
+                    headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify(payload) 
                 });
                 const data = await res.json();
@@ -371,13 +366,13 @@
             }
         });
 
-        // 🔥 CORRECCIÓN: Bloqueo de usuarios con cabeceras correctas
+        // Bloqueo de usuarios
         async function handleBlockUser(id, isBlocked) {
             if (!confirm(`¿${isBlocked ? 'Desbloquear' : 'Bloquear'} acceso a este usuario?`)) return;
             try {
-                const res = await fetch(`${API_URL}/api/admin/user/block/${id}`, { 
+                const res = await fetch(`${API_BASE_URL}/api/admin/user/block/${id}`, { 
                     method: 'PUT', 
-                    headers: { 'Content-Type': 'application/json' }, // Inyección de cabecera mandatoria
+                    headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify({ is_blocked: !isBlocked }) 
                 });
                 const data = await res.json();
@@ -392,10 +387,11 @@
             }
         }
 
+        // Eliminar usuario
         async function deleteUser(id, name) {
             if (!confirm(`¿Borrar permanentemente a ${name}? Esta acción purga su biometría.`)) return;
             try {
-                const res = await fetch(`${API_URL}/api/admin/user/${id}`, { 
+                const res = await fetch(`${API_BASE_URL}/api/admin/user/${id}`, { 
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' }
                 });
