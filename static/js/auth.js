@@ -1,3 +1,5 @@
+// static/js/auth.js - System Core Intelligence & Security
+
 // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
 const DEVICE_ID_KEY = 'gymen_device_id';
 const AUTH_TOKEN_KEY = 'gymen_auth_token'; // 🔐 Respaldo seguro para producción cross-domain
@@ -49,11 +51,11 @@ window.fetch = async function(...args) {
     const response = await originalFetch.apply(this, args);
     
     // 🔥 CORRECCIÓN SENIOR: Identificar si la ruta es de Autenticación
-    // Si estamos intentando loguearnos o registrarnos, un 401 significa "Clave mala", NO "Sesión Expirada".
     const requestUrl = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
     const isAuthRoute = requestUrl.includes('/api/login') || 
                         requestUrl.includes('/api/register') || 
-                        requestUrl.includes('/api/force_logout') ||
+                        requestUrl.includes('/api/auth/request_force_code') ||
+                        requestUrl.includes('/api/auth/verify_force_logout') ||
                         requestUrl.includes('/api/admin_login');
     
     if (response.status === 401 && !isAuthRoute) {
@@ -87,7 +89,6 @@ async function apiLogin(email, password, deviceId) {
             body: JSON.stringify({ email, password, deviceId })
         });
 
-        // 🔥 CORRECCIÓN SENIOR: Capturar el código 429 (Rate Limit) explícitamente
         if (response.status === 429) {
             return { 
                 success: false, 
@@ -107,7 +108,7 @@ async function apiLogin(email, password, deviceId) {
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
         if (data.token) {
-            localStorage.setItem(AUTH_TOKEN_KEY, data.token); // Guardamos token salvavidas
+            localStorage.setItem(AUTH_TOKEN_KEY, data.token);
         }
         
         const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
@@ -141,31 +142,6 @@ async function apiLogout() {
         localStorage.removeItem(AUTH_TOKEN_KEY); 
         localStorage.removeItem('gymen_session_exp'); 
         return { success: true }; 
-    }
-}
-
-async function apiForceLogout(email, password, deviceId, name, lastname, dob, phone, ci) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, deviceId, name, lastname, dob, phone, ci })
-        });
-        const data = await response.json();
-        if (!response.ok || !data.success) return { success: false, error: data.error || 'Error al forzar cierre.' };
-        
-        CURRENT_USER_SESSION = data.user;
-        localStorage.setItem('userSession', JSON.stringify(data.user)); 
-        if (data.token) {
-            localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-        }
-        
-        const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
-        localStorage.setItem('gymen_session_exp', tiempoExpiracion);
-        
-        return { success: true, user: data.user };
-    } catch (e) {
-        return { success: false, error: 'No se pudo conectar con el servidor.' };
     }
 }
 
@@ -434,39 +410,6 @@ async function handleRegister(e) {
     }
 }
 
-async function handleForceLogout(e) {
-    e.preventDefault();
-    const email = document.getElementById('force-email').value;
-    const password = document.getElementById('login-password').value; 
-    const name = document.getElementById('force-name').value;
-    const lastname = document.getElementById('force-lastname').value;
-    const dob = document.getElementById('force-dob').value.trim();
-    const ci = document.getElementById('force-ci').value.trim(); 
-    
-    const phonePrefix = document.getElementById('force-phone-prefix').value;
-    const phoneNum = document.getElementById('force-phone-num').value.trim();
-    const phone = `${phonePrefix}-${phoneNum}`;
-
-    const btn = document.getElementById('force-logout-btn');
-    btn.disabled = true;
-    btn.textContent = 'VERIFICANDO DATOS...';
-    showForceLogoutMessage(''); 
-
-    const response = await apiForceLogout(email, password, localDeviceId, name, lastname, dob, phone, ci);
-
-    if (response.success) {
-        showMessage('Sesión remota cerrada. Ingresando...', 'success');
-        closeModalSafe('active-session-modal');
-        setTimeout(() => {
-            window.location.href = '/apps/start/inicio.html';
-        }, 1500); 
-    } else {
-        showForceLogoutMessage('Error: Los datos no coinciden con tu perfil.', 'error');
-        btn.disabled = false;
-        btn.textContent = 'CONFIRMAR IDENTIDAD';
-    }
-}
-
 async function handleVerifyActivation(e) {
     e.preventDefault();
     const email = document.getElementById('activation-email').value;
@@ -535,16 +478,12 @@ window.onload = function() {
         }, SPLASH_DURATION_MS);
 
         document.getElementById('login-form')?.addEventListener('submit', handleLogin);
-        document.getElementById('force-logout-form')?.addEventListener('submit', handleForceLogout);
         document.getElementById('register-form')?.addEventListener('submit', handleRegister);
         document.getElementById('activation-form')?.addEventListener('submit', handleVerifyActivation);
 
         document.getElementById('reg-dob')?.addEventListener('input', applyDateMask);
         document.getElementById('reg-ci')?.addEventListener('input', applyCIMask);
         document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
-        document.getElementById('force-dob')?.addEventListener('input', applyDateMask);
-        document.getElementById('force-ci')?.addEventListener('input', applyCIMask);
-        document.getElementById('force-phone-num')?.addEventListener('input', applyPhoneMask);
 
         document.getElementById('register-request-link')?.addEventListener('click', () => openModalSafe('register-modal'));
         document.getElementById('close-register-modal')?.addEventListener('click', () => closeModalSafe('register-modal'));
@@ -553,10 +492,83 @@ window.onload = function() {
             closeModalSafe('active-session-modal');
         });
         
-        document.getElementById('modal-confirm-btn')?.addEventListener('click', () => {
-            document.getElementById('modal-options').classList.add('hidden');
-            document.getElementById('force-logout-form').classList.remove('hidden');
-            document.getElementById('force-email').value = document.getElementById('login-email').value;
+        // 🔥 PROTOCOLO 1: SOLICITAR CÓDIGO SHIELD OTP DE DESCONEXIÓN REMOTA
+        document.getElementById('modal-confirm-btn')?.addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('modal-confirm-btn');
+
+            btn.disabled = true;
+            btn.textContent = "GENERANDO PROTOCOLO SHIELD...";
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/request_force_code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    document.getElementById('modal-options').classList.add('hidden');
+                    document.getElementById('force-logout-form').classList.remove('hidden');
+                    document.getElementById('force-email').value = email;
+                    showForceLogoutMessage('Código enviado con éxito. Revisa tu buzón.', 'success');
+                } else {
+                    alert(data.error || 'No se pudo generar el token de seguridad.');
+                    btn.disabled = false;
+                    btn.textContent = "Solicitar Código SHIELD";
+                }
+            } catch(err) {
+                alert('Error de conexión en el perímetro de seguridad.');
+                btn.disabled = false;
+                btn.textContent = "Solicitar Código SHIELD";
+            }
+        });
+        
+        // 🔥 PROTOCOLO 2: EJECUTAR LA EXPULSIÓN CON EL CÓDIGO DE 6 DÍGITOS
+        document.getElementById('force-logout-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('force-email').value;
+            const code = document.getElementById('force-shield-code').value;
+            const btn = document.getElementById('force-logout-btn');
+
+            btn.disabled = true;
+            btn.textContent = 'AUTENTICANDO CÓDIGO...';
+            showForceLogoutMessage('');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/verify_force_logout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code, deviceId: localDeviceId })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('userSession', JSON.stringify(data.user)); 
+                    if (data.token) {
+                        localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+                    }
+                    
+                    const tiempoExpiracion = Date.now() + (480 * 60 * 1000);
+                    localStorage.setItem('gymen_session_exp', tiempoExpiracion);
+
+                    showMessage('Sesión remota purgada. Ingresando...', 'success');
+                    closeModalSafe('active-session-modal');
+                    setTimeout(() => {
+                        window.location.href = '/apps/start/inicio.html';
+                    }, 1200);
+                } else {
+                    showForceLogoutMessage(data.error || 'Código incorrecto o vencido.', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Expulsar Dispositivo Remoto';
+                }
+            } catch(err) {
+                showForceLogoutMessage('Error de red al procesar la desconexión.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Expulsar Dispositivo Remoto';
+            }
         });
         
         document.getElementById('force-logout-cancel')?.addEventListener('click', () => {
@@ -564,7 +576,17 @@ window.onload = function() {
             setTimeout(() => {
                 document.getElementById('modal-options').classList.remove('hidden');
                 document.getElementById('force-logout-form').classList.add('hidden');
+                document.getElementById('force-shield-code').value = '';
+                const btnConfirm = document.getElementById('modal-confirm-btn');
+                if (btnConfirm) { btnConfirm.disabled = false; btnConfirm.textContent = "Solicitar Código SHIELD"; }
             }, 300);
+        });
+
+        // 🔥 PROTOCOLO 3: BOTÓN DE CONTINGENCIA SOS WHATSAPP DIRECTO
+        document.getElementById('force-whatsapp-sos')?.addEventListener('click', () => {
+            const email = document.getElementById('force-email').value;
+            const msg = `Hola Coach, estoy intentando cambiar de dispositivo en mi cuenta de GYMENEZ (${email || 'No especificado'}) pero no me llega el código SHIELD de desconexión. Solicito soporte táctico.`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
         });
 
         document.getElementById('staff-access-link')?.addEventListener('click', () => openModalSafe('area-selection-modal'));
