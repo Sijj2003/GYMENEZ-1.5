@@ -198,32 +198,18 @@
     
     <script src="../../static/js/admin_auth.js"></script>
     <script>
-        const API_ROUTINE_BASE = 'https://sijj2003.pythonanywhere.com/api/admin/routine'; 
-        const API_ROUTINES_ALL = 'https://sijj2003.pythonanywhere.com/api/admin/routines'; 
-        const API_EXERCISES = 'https://sijj2003.pythonanywhere.com/api/admin/exercises';
-        const API_USERS = 'https://sijj2003.pythonanywhere.com/api/admin/users';
-
+        // 🚀 HEREDAMOS API_BASE_URL DE admin_auth.js
         let allRoutinesData = [];
         let allAvailableExercises = [];
         let allAvailableUsers = [];
         let currentRoutineState = { id: null, name: '', description: '', assigned_days: [], exercises: [], assigned_users: [] };
 
-        function showMessage(message, type = 'success') {
-            const box = document.getElementById('message-box');
-            if(!box) return;
-            box.textContent = message;
-            box.className = `fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-[10px] font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-500 text-center border border-white/10 ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`;
-            box.style.opacity = '1'; box.style.transform = 'translate(-50%, 0)';
-            setTimeout(() => { box.style.opacity = '0'; box.style.transform = 'translate(-50%, -20px)'; }, 3500);
-        }
-
         async function fetchAllDataInitial() {
             try {
-                // NOTA: admin_auth.js inyecta el token en cada fetch automáticamente
                 const [routinesRes, exercisesRes, usersRes] = await Promise.all([
-                    fetch(API_ROUTINES_ALL).then(r => r.json()),
-                    fetch(API_EXERCISES).then(r => r.json()),
-                    fetch(API_USERS).then(r => r.json())
+                    fetch(`${API_BASE_URL}/api/admin/routines`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/api/admin/exercises`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/api/admin/users`).then(r => r.json())
                 ]);
 
                 allRoutinesData = routinesRes.success ? routinesRes.routines : [];
@@ -232,7 +218,7 @@
                 
                 renderRoutinesTable(allRoutinesData);
             } catch (error) {
-                document.getElementById('routines-table-body').innerHTML = '<tr><td colspan="5" class="text-center py-10 text-red-400 font-bold text-xs uppercase">Fallo crítico al conectar con el núcleo.</td></tr>';
+                document.getElementById('routines-table-body').innerHTML = '<tr><td colspan="5" class="text-center py-10 text-red-400 font-bold text-xs uppercase tracking-widest">Fallo crítico al conectar con el núcleo.</td></tr>';
             }
         }
 
@@ -305,7 +291,7 @@
             currentRoutineState = {
                 id: fullRoutine.id,
                 name: fullRoutine.name || '',
-                description: fullRoutine.description || fullRoutine.notes || '',
+                description: fullRoutine.notes || fullRoutine.description || '', // 🔥 Mapeo dual notes/description
                 assigned_days: fullRoutine.assigned_days || [],
                 exercises: [...(fullRoutine.exercises || [])], 
                 assigned_users: [...(fullRoutine.assigned_users || [])]
@@ -340,7 +326,7 @@
             const term = searchTerm.toLowerCase().trim();
 
             const filtered = allAvailableUsers.filter(u => 
-                (u.name || '').toLowerCase().includes(term) || (u.email || '').toLowerCase().includes(term)
+                (u.name || u.full_name || '').toLowerCase().includes(term) || (u.email || '').toLowerCase().includes(term)
             );
 
             filtered.forEach(user => {
@@ -353,7 +339,7 @@
                         ${isAssigned ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
                     </div>
                     <div class="truncate">
-                        <p class="text-[10px] font-bold text-white uppercase">${user.name || 'Sin Nombre'}</p>
+                        <p class="text-[10px] font-bold text-white uppercase">${user.full_name || user.name || 'Sin Nombre'}</p>
                         <p class="text-[8px] text-gray-500 tracking-widest">${user.email}</p>
                     </div>
                 `;
@@ -450,7 +436,7 @@
             if (index > -1) currentRoutineState.exercises[index][field] = parseInt(value) > 0 ? parseInt(value) : 1;
         }
 
-        // --- ENVÍO A LA API ---
+        // 🔥 CORRECCIÓN: Inyección de Cabeceras Content-Type en POST/PUT de Rutina
         document.getElementById('routine-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
@@ -470,16 +456,20 @@
                 assigned_users: currentRoutineState.assigned_users
             };
 
-            const url = isEdit ? `${API_ROUTINE_BASE}/${id}` : API_ROUTINE_BASE;
+            const url = isEdit ? `${API_BASE_URL}/api/admin/routine/${id}` : `${API_BASE_URL}/api/admin/routine`;
             const btn = document.getElementById('submit-btn');
             btn.disabled = true; btn.textContent = "PROCESANDO...";
 
             try {
-                const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(url, { 
+                    method: isEdit ? 'PUT' : 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, // <-- VITAL
+                    body: JSON.stringify(payload) 
+                });
                 const data = await res.json();
                 
                 if (data.success) {
-                    showMessage("Estructura de rutina guardada.", "success");
+                    showMessage(data.message || "Estructura de rutina guardada.", "success");
                     closeModalSafe('routine-modal');
                     fetchAllDataInitial();
                 } else {
@@ -492,19 +482,23 @@
             }
         });
 
+        // 🔥 CORRECCIÓN: Delete con cabeceras limpias
         async function deleteRoutine(id, name) {
             if (!confirm(`¿Destruir el plan "${name}"? Esto afectará a los atletas asignados.`)) return;
             try {
-                const res = await fetch(`${API_ROUTINE_BASE}/${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API_BASE_URL}/api/admin/routine/${id}`, { 
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
                 const data = await res.json();
                 if (data.success) {
                     showMessage("Plan purgado.", "success");
                     fetchAllDataInitial();
                 }
-            } catch (e) { showMessage("Error", "error"); }
+            } catch (e) { showMessage("Error de conexión", "error"); }
         }
 
-        // Buscador Front
+        // Buscadores de Front
         document.getElementById('routine-search-input').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase().trim();
             if(!term) return renderRoutinesTable(allRoutinesData);
