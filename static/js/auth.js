@@ -48,7 +48,15 @@ window.fetch = async function(...args) {
     
     const response = await originalFetch.apply(this, args);
     
-    if (response.status === 401) {
+    // 🔥 CORRECCIÓN SENIOR: Identificar si la ruta es de Autenticación
+    // Si estamos intentando loguearnos o registrarnos, un 401 significa "Clave mala", NO "Sesión Expirada".
+    const requestUrl = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+    const isAuthRoute = requestUrl.includes('/api/login') || 
+                        requestUrl.includes('/api/register') || 
+                        requestUrl.includes('/api/force_logout') ||
+                        requestUrl.includes('/api/admin_login');
+    
+    if (response.status === 401 && !isAuthRoute) {
         console.warn("🚨 Interceptor detectó un 401 del servidor. Expulsando...");
         forceGlobalLogout("Tu sesión ha expirado en el servidor. Por favor, inicia sesión nuevamente.");
     }
