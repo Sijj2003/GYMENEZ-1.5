@@ -1,5 +1,11 @@
 // static/js/admin_auth.js - System Core Intelligence
-const API_BASE_URL = "https://sijj2003.pythonanywhere.com"; 
+
+// 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
+const isLocalhost = window.location.hostname === '127.0.0.1' || 
+                    window.location.hostname === 'localhost' || 
+                    window.location.protocol === 'file:';
+
+const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
 function getDeviceId() {
     let deviceId = localStorage.getItem('deviceId');
@@ -16,11 +22,11 @@ function showMessage(message, type = 'success') {
     box.textContent = message;
     
     if(type === 'success') {
-        box.classList.add('bg-indigo-600', 'text-white', 'border-indigo-400');
-        box.classList.remove('bg-red-600', 'border-red-400');
+        box.classList.add('bg-emerald-600', 'text-white', 'border-emerald-500');
+        box.classList.remove('bg-red-600', 'border-red-500');
     } else {
-        box.classList.add('bg-red-600', 'text-white', 'border-red-400');
-        box.classList.remove('bg-indigo-600', 'border-indigo-400');
+        box.classList.add('bg-red-600', 'text-white', 'border-red-500');
+        box.classList.remove('bg-emerald-600', 'border-emerald-500');
     }
     
     box.classList.remove('opacity-0', 'translate-y-[-20px]');
@@ -31,7 +37,9 @@ function showMessage(message, type = 'success') {
     }, 4000);
 }
 
-// Interceptor administrativo para inyectar cabeceras cruzadas y credenciales de protección
+// =================================================================
+// 🛡️ INTERCEPTOR GLOBAL DE PETICIONES ADMINISTRATIVAS
+// =================================================================
 const originalAdminFetch = window.fetch;
 window.fetch = async function(...args) {
     if (typeof args[1] === 'undefined') args[1] = {};
@@ -42,7 +50,21 @@ window.fetch = async function(...args) {
         if (typeof args[1].headers === 'undefined') args[1].headers = {};
         args[1].headers['Authorization'] = `Bearer ${adminToken}`;
     }
-    return originalAdminFetch.apply(this, args);
+    
+    const response = await originalAdminFetch.apply(this, args);
+
+    // 🔥 CORRECCIÓN SENIOR: Expulsión automática si caduca la sesión
+    const requestUrl = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+    const isAuthRoute = requestUrl.includes('/api/admin_login') || requestUrl.includes('/api/admin/logout');
+    
+    if (response.status === 401 && !isAuthRoute) {
+        console.warn("🚨 Credencial Administrativa Expirada. Ejecutando expulsión de seguridad...");
+        localStorage.removeItem('adminSession');
+        localStorage.removeItem('admin_token');
+        window.location.href = 'login.html';
+    }
+
+    return response;
 };
 
 // ---------------------------------------------
@@ -64,13 +86,21 @@ async function handleAdminLogin(event) {
             body: JSON.stringify({ email, password, deviceId: getDeviceId() })
         });
 
+        // 🔥 CORRECCIÓN SENIOR: Capturar Rate Limit (429) en Panel Admin
+        if (response.status === 429) {
+            showMessage("Múltiples intentos. Sistema bloqueado temporalmente por 60 seg.", "error");
+            btn.disabled = false;
+            btn.textContent = "VERIFICAR CREDENCIALES";
+            return;
+        }
+
         const data = await response.json();
         
         if (response.ok && data.success) {
             localStorage.setItem('adminSession', JSON.stringify(data.admin));
             localStorage.setItem('admin_token', data.token); // Guardamos token salvavidas administrativamente
 
-            showMessage("ACCESO CONCEDIDO. INICIANDO NÚCLEO...");
+            showMessage("ACCESO CONCEDIDO. INICIANDO NÚCLEO...", "success");
             setTimeout(() => {
                 window.location.href = 'inicio.html';
             }, 1200);
@@ -93,7 +123,7 @@ async function handleLogout() {
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (e) {
-        console.error(e);
+        console.error("Fallo al cerrar sesión en el servidor:", e);
     } finally {
         localStorage.removeItem('adminSession');
         localStorage.removeItem('admin_token');
