@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="/static/css/profile.css">
     
     <style>
-        .lock-overlay { animation: fadeInLock 0.5s ease-out forwards; }
+        .lock-overlay {
+            animation: fadeInLock 0.5s ease-out forwards;
+        }
         @keyframes fadeInLock {
             from { opacity: 0; backdrop-filter: blur(0px); }
             to { opacity: 1; backdrop-filter: blur(8px); }
@@ -157,88 +159,5 @@
     </div>
 
     <script src="/static/js/profile.js"></script>
-
-    <script>
-        function showMessage(message, type = 'error') {
-            const messagebox = document.getElementById('message-box');
-            if(!messagebox) return;
-            messagebox.textContent = message;
-            messagebox.className = `fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-500 text-center w-11/12 max-w-[350px] border border-white/10 ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`;
-            
-            messagebox.style.opacity = '1';
-            messagebox.style.transform = 'translate(-50%, 0)';
-            
-            setTimeout(() => {
-                messagebox.style.opacity = '0';
-                messagebox.style.transform = 'translate(-50%, -20px)';
-            }, 3500);
-        }
-
-        function lockDataCard(cardId, requiredLevel) {
-            const card = document.getElementById(cardId);
-            if (!card) return;
-            
-            const values = card.querySelectorAll('.value, p.text-gray-300');
-            values.forEach(v => v.textContent = '***'); 
-
-            const overlay = document.createElement('div');
-            overlay.className = 'lock-overlay absolute inset-0 z-20 bg-[#030305]/60 flex flex-col items-center justify-center cursor-not-allowed rounded-[24px] md:rounded-[32px]';
-            
-            overlay.innerHTML = `
-                <div class="bg-[#111] border border-white/10 px-4 md:px-5 py-2 md:py-2.5 rounded-xl uppercase tracking-widest text-[9px] md:text-[10px] font-black text-gray-300 shadow-2xl flex items-center gap-2 hover:border-[#FFC300]/50 transition-colors">
-                    <span>🔒</span> REQUIERE PLAN ${requiredLevel}
-                </div>
-            `;
-            
-            overlay.onclick = (e) => {
-                e.stopPropagation();
-                showMessage(`ACCESO RESTRINGIDO: El registro avanzado requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
-            };
-            
-            card.appendChild(overlay);
-        }
-
-        function applyProfileLocks(level) {
-            const normalizedLevel = (level || 'No Suscrito').toUpperCase();
-            
-            const isUltra = normalizedLevel === 'ULTRA';
-            const isPlus = normalizedLevel === 'PLUS' || isUltra;
-
-            if (!isPlus) {
-                setTimeout(() => {
-                    lockDataCard('card-upper-body', 'PLUS');
-                    lockDataCard('card-lower-body', 'PLUS');
-                    lockDataCard('card-medical', 'PLUS');
-                }, 500); 
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const storedSession = localStorage.getItem('userSession');
-            const token = localStorage.getItem('gymen_auth_token'); 
-
-            if (storedSession && token) {
-                // 🔥 CORRECCIÓN: Usa la API_BASE_URL detectada en profile.js
-                fetch(`${API_BASE_URL}/api/profile/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.profile) {
-                        const subLevel = data.profile.subscription_level || 'No Suscrito';
-                        applyProfileLocks(subLevel);
-                    } else {
-                        applyProfileLocks('No Suscrito');
-                    }
-                })
-                .catch(err => {
-                    console.error("Error obteniendo perfil para candados:", err);
-                    applyProfileLocks('No Suscrito');
-                });
-            } else {
-                applyProfileLocks('No Suscrito');
-            }
-        });
-    </script>
 </body>
 </html>
