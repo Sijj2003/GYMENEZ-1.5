@@ -135,7 +135,11 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-5 mt-2">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-white/5 pt-5 mt-2">
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Nacimiento</label>
+                        <input type="date" id="dob" name="dob" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs">
+                    </div>
                     <div>
                         <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Suscripción</label>
                         <select id="subscription_level" name="subscription_level" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none">
@@ -151,7 +155,11 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Sexo</label>
-                        <select id="sex" name="sex" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none"><option value="Hombre">Hombre</option><option value="Mujer">Mujer</option></select>
+                        <select id="sex" name="sex" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none">
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
                 </div>
 
@@ -184,12 +192,25 @@
             return formatted;
         }
 
+        // 🔥 Conversor Inteligente de Fechas
+        function parseDateForInput(dateStr) {
+            if (!dateStr) return '';
+            // Si viene en formato DD/MM/YYYY lo volteamos a YYYY-MM-DD
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                }
+            }
+            return dateStr; // Si ya viene en YYYY-MM-DD o formato válido, lo dejamos pasar
+        }
+
         async function fetchAllUsers() {
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>';
             
             try {
-                // Aquí usamos API_BASE_URL, inyectado heredado globalmente desde admin_auth.js
+                // Aquí usamos API_BASE_URL heredado de admin_auth.js
                 const res = await fetch(`${API_BASE_URL}/api/admin/users`);
                 const data = await res.json();
                 
@@ -260,7 +281,6 @@
             });
         }
 
-        // Buscador reactivo
         document.getElementById('user-search-input').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase().trim();
             if (!term) return renderUsersTable(allUsersData);
@@ -272,7 +292,6 @@
             renderUsersTable(filtered);
         });
 
-        // Formato ID en tiempo real
         document.getElementById('id_number').addEventListener('input', function() {
             const oldVal = this.value;
             const raw = oldVal.replace(/\D/g, '');
@@ -303,6 +322,11 @@
             document.getElementById('password').required = false;
             
             document.getElementById('subscription_level').value = user.subscription_level || 'STANDARD';
+            document.getElementById('sex').value = user.sex || 'Hombre';
+            
+            // Fechas procesadas por parseDateForInput
+            document.getElementById('dob').value = parseDateForInput(user.dob);
+            document.getElementById('activo_desde').value = parseDateForInput(user.activo_desde);
             
             if (user.id_number && user.id_number.includes('-')) {
                 const [pref, num] = user.id_number.split('-');
@@ -318,7 +342,7 @@
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        // Envío del formulario (Crear/Editar)
+        // Envío del formulario
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
@@ -331,12 +355,13 @@
                 id_number: `${form.id_number_prefix.value}-${formatIdNumber(form.id_number.value)}`,
                 phone_number: `${form.phone_prefix.value}-${form.phone_number_body.value.replace(/\D/g, '')}`,
                 subscription_level: form.subscription_level.value,
-                sex: form.sex.value
+                sex: form.sex.value,
+                dob: form.dob.value,
+                activo_desde: form.activo_desde.value
             };
 
             if (!isEdit) payload.email = form.email.value;
             if (form.password.value) payload.password = form.password.value;
-            if (form.activo_desde.value) payload.activo_desde = form.activo_desde.value;
 
             const url = isEdit ? `${API_BASE_URL}/api/admin/user/${id}` : `${API_BASE_URL}/api/admin/user`;
             
@@ -366,7 +391,6 @@
             }
         });
 
-        // Bloqueo de usuarios
         async function handleBlockUser(id, isBlocked) {
             if (!confirm(`¿${isBlocked ? 'Desbloquear' : 'Bloquear'} acceso a este usuario?`)) return;
             try {
@@ -387,7 +411,6 @@
             }
         }
 
-        // Eliminar usuario
         async function deleteUser(id, name) {
             if (!confirm(`¿Borrar permanentemente a ${name}? Esta acción purga su biometría.`)) return;
             try {
