@@ -36,13 +36,15 @@
         .label-style { font-size: 0.7rem; text-transform: uppercase; color: #9ca3af; margin-bottom: 4px; display: block; }
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body class="min-h-screen pb-10 relative">
+
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center border border-white/10"></div>
 
     <header class="glass-effect fixed top-0 w-full z-50 px-6 py-3 flex justify-between items-center">
         <h1 class="text-2xl font-extrabold tracking-tighter">
             <span class="text-yellow-400">GYM</span>ENEZ <span class="text-sm font-light text-gray-400 ml-2">ADMIN</span>
         </h1>
-        <button onclick="window.location.href='administration.html'" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-xs transition">Volver</button>
+        <button onclick="window.location.href='inicio.html'" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-xs transition">Volver a Consola</button>
     </header>
 
     <main class="pt-24 px-4 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -105,35 +107,33 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase">
+                <button type="submit" id="btn-submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest mt-4">
                     Actualizar Ficha del Usuario
                 </button>
             </form>
         </div>
     </main>
 
+    <script src="../../static/js/admin_auth.js"></script>
+
     <script>
-        const API_BASE_URL = "https://sijj2003.pythonanywhere.com";
         let allUsers = [];
         let currentUserId = null;
 
-        // 🔴 AUTENTICACIÓN PERIMETRAL
-        function getAuthHeaders() {
-            const token = localStorage.getItem('admin_token');
-            if (!token) {
-                window.location.href = 'login.html';
-                throw new Error('Sesión inválida.');
-            }
-            return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-        }
-
         async function init() {
             try {
-                // 🔴 Protegido con cabeceras de seguridad
-                const res = await fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders() });
+                // Ahora no mandamos headers manuales porque admin_auth.js inyecta el token y usa API_BASE_URL
+                const res = await fetch(`${API_BASE_URL}/api/admin/users`);
                 const data = await res.json();
-                if (data.success) { allUsers = data.users; renderUsers(allUsers); }
-            } catch (err) { console.error(err); }
+                if (data.success) { 
+                    allUsers = data.users; 
+                    renderUsers(allUsers); 
+                } else {
+                    showMessage("Error al cargar el directorio de usuarios.", "error");
+                }
+            } catch (err) { 
+                showMessage("Fallo de red al conectar con el servidor.", "error"); 
+            }
         }
 
         function renderUsers(list) {
@@ -156,8 +156,8 @@
             form.reset();
             
             try {
-                // 🔴 Peticiones protegidas en cascada
-                const res = await fetch(`${API_BASE_URL}/api/metrics/${id}`, { headers: getAuthHeaders() });
+                // 🔥 CORRECCIÓN: Apuntando a la ruta de Administración (/api/admin/metrics)
+                const res = await fetch(`${API_BASE_URL}/api/admin/metrics/${id}`);
                 const data = await res.json();
                 if (data.success && data.metrics) {
                     Object.keys(data.metrics).forEach(key => {
@@ -165,29 +165,44 @@
                         if (input) input.value = data.metrics[key];
                     });
                 }
-            } catch (e) { alert("Error obteniendo métricas."); }
+            } catch (e) { 
+                showMessage("Error obteniendo métricas del usuario.", "error"); 
+            }
         }
 
         document.getElementById('metrics-form').onsubmit = async (e) => {
             e.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target));
+            const btn = document.getElementById('btn-submit');
             
+            btn.disabled = true;
+            btn.textContent = "Sincronizando Ficha...";
+
             try {
-                const res = await fetch(`${API_BASE_URL}/api/metrics/${currentUserId}`, {
+                // 🔥 CORRECCIÓN: Ruta de Administración y agregando cabecera Content-Type
+                const res = await fetch(`${API_BASE_URL}/api/admin/metrics/${currentUserId}`, {
                     method: 'POST',
-                    headers: getAuthHeaders(), // 🔴 Protegido con token
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
                 const result = await res.json();
-                if(result.success) alert("Datos sincronizados con éxito.");
-            } catch (err) { alert("Error al guardar."); }
+                
+                if(result.success) {
+                    showMessage("Datos biométricos sincronizados con éxito.", "success");
+                } else {
+                    showMessage(result.error || "Error al actualizar la ficha.", "error");
+                }
+            } catch (err) { 
+                showMessage("Error de red. Intenta nuevamente.", "error"); 
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "ACTUALIZAR FICHA DEL USUARIO";
+            }
         };
 
         window.onload = function() {
-            if (!localStorage.getItem('adminSession') || !localStorage.getItem('admin_token')) {
-                window.location.href = 'login.html'; return;
-            }
             init();
+            
             document.getElementById('user-search').oninput = (e) => {
                 const term = e.target.value.toLowerCase();
                 renderUsers(allUsers.filter(u => (u.full_name || u.name).toLowerCase().includes(term)));
