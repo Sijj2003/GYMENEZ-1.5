@@ -1,0 +1,17 @@
+# Archivo robots.txt para GYMENEZ
+User-agent: *
+
+# Permitir indexación de páginas públicas
+Allow: /
+Allow: /fitness
+Allow: /eats
+Allow: /on
+Allow: /billing/planes
+
+# Bloquear el rastreo de áreas privadas y administrativas
+Disallow: /apps/admin/
+Disallow: /apps/user/
+Disallow: /billing/payments
+
+# Ruta del mapa del sitio para acelerar la lectura
+Sitemap: https://gymenez.vercel.app/sitemap.xml
