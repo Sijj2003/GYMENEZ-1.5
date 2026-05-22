@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte Élite | GYMENEZ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #030305; color: white; }
+        
+        /* Custom Scrollbar Premium */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 195, 0, 0.5); }
+        
+        /* Glass Panel Reusable */
+        .glass-panel {
+            background: rgba(15, 15, 20, 0.6);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Animación de entrada de mensajes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg-animate { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden selection:bg-[#FFC300] selection:text-black">
+
+    <header class="glass-panel h-16 w-full flex items-center justify-between px-6 z-50 flex-shrink-0">
+        <div class="flex items-center gap-4">
+            <button id="btn-back" class="text-gray-400 hover:text-[#FFC300] transition-colors p-2 rounded-full hover:bg-white/5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 bg-[#FFC300] rounded-full animate-pulse shadow-[0_0_10px_#FFC300]"></div>
+                <div>
+                    <h1 class="font-black text-lg uppercase tracking-wider italic">GYMENEZ <span class="text-[#FFC300]">SOPORTE</span></h1>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-2 text-xs text-gray-400 uppercase tracking-widest font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            Agente Élite Conectado
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-5xl mx-auto overflow-y-auto p-4 md:p-8 flex flex-col relative" id="chat-container">
+        
+        <div id="welcome-screen" class="flex-1 flex flex-col items-center justify-center text-center mt-10 md:mt-20 msg-animate">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#FFC300] to-yellow-600 rounded-2xl rotate-12 flex items-center justify-center shadow-[0_0_40px_rgba(255,195,0,0.3)] mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-black -rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black uppercase italic mb-4">¿CÓMO PODEMOS <span class="text-[#FFC300]">AYUDARTE?</span></h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm md:text-base mb-10">Nuestro Agente Élite impulsado por IA está listo para resolver tus dudas operativas, financieras o técnicas sobre la plataforma.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+                <button class="faq-btn glass-panel text-left p-4 rounded-2xl hover:border-[#FFC300] transition-all group">
+                    <div class="text-[#FFC300] font-bold text-sm uppercase tracking-widest mb-1">Finanzas</div>
+                    <div class="text-gray-300 text-sm group-hover:text-white transition-colors">¿Cuáles son los métodos de pago aceptados para fundadores?</div>
+                </button>
+                <button class="faq-btn glass-panel text-left p-4 rounded-2xl hover:border-[#FFC300] transition-all group">
+                    <div class="text-[#FFC300] font-bold text-sm uppercase tracking-widest mb-1">Técnico</div>
+                    <div class="text-gray-300 text-sm group-hover:text-white transition-colors">Tengo un error de inicio de sesión múltiple (Protocolo SHIELD).</div>
+                </button>
+                <button class="faq-btn glass-panel text-left p-4 rounded-2xl hover:border-[#FFC300] transition-all group">
+                    <div class="text-[#FFC300] font-bold text-sm uppercase tracking-widest mb-1">Plataforma</div>
+                    <div class="text-gray-300 text-sm group-hover:text-white transition-colors">¿Cómo configuro mis macros en GYMENEZ EATS?</div>
+                </button>
+                <button class="faq-btn glass-panel text-left p-4 rounded-2xl hover:border-[#FFC300] transition-all group">
+                    <div class="text-[#FFC300] font-bold text-sm uppercase tracking-widest mb-1">Soporte</div>
+                    <div class="text-gray-300 text-sm group-hover:text-white transition-colors">Mi reporte de pago con el BCV sale como "vencido".</div>
+                </button>
+            </div>
+        </div>
+
+        <div id="chat-messages" class="flex flex-col space-y-6 pb-4 w-full max-w-3xl mx-auto hidden">
+            </div>
+    </main>
+
+    <footer class="p-4 md:p-6 w-full max-w-4xl mx-auto flex-shrink-0">
+        <div class="relative flex items-center bg-[#0a0a0f] border border-white/10 rounded-2xl p-2 shadow-2xl focus-within:border-[#FFC300] transition-colors">
+            
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje al Agente Élite..." class="w-full bg-transparent text-white placeholder-gray-500 px-4 py-3 outline-none text-sm md:text-base">
+            
+            <button id="btn-send-chat" class="bg-[#FFC300] hover:bg-yellow-400 text-black p-3 md:px-6 md:py-3 rounded-xl font-black uppercase tracking-widest text-xs md:text-sm transition-all flex items-center gap-2 group">
+                <span class="hidden md:inline">Enviar</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+
+        </div>
+        <div class="text-center mt-3 text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+            GYMENEZ AI no sustituye el consejo médico profesional.
+        </div>
+    </footer>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const btnSend = document.getElementById('btn-send-chat');
+        const faqBtns = document.querySelectorAll('.faq-btn');
+
+        // 🔴 MUY IMPORTANTE: Cambia esta URL por la tuya de PythonAnywhere 🔴
+        const BACKEND_URL = 'https://TU_USUARIO.pythonanywhere.com/api/soporte-chat';
+
+        // Configurar botones FAQ
+        faqBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Extrae solo el texto de la pregunta (segundo div)
+                const pregunta = btn.querySelector('div:nth-child(2)').innerText.trim();
+                enviarMensaje(pregunta);
+            });
+        });
+
+        async function enviarMensaje(textoFaq = null) {
+            const texto = typeof textoFaq === 'string' ? textoFaq : chatInput.value.trim();
+            if(!texto) return;
+
+            // 1. Limpiar Input y ocultar Pantalla de Bienvenida
+            chatInput.value = '';
+            if (!welcomeScreen.classList.contains('hidden')) {
+                welcomeScreen.classList.add('hidden');
+                chatMessages.classList.remove('hidden');
+            }
+
+            // 2. Mostrar mensaje del usuario
+            appendMessage(texto, 'usuario');
+
+            // 3. Efecto de carga
+            const loadingId = appendMessage('Analizando parámetros...', 'sistema-loading');
+
+            try {
+                // 4. Llamada al Backend
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mensaje: texto })
+                });
+
+                const data = await response.json();
+                
+                // 5. Quitar mensaje de carga
+                document.getElementById(loadingId).remove();
+
+                if(data.respuesta) {
+                    let respuestaFormateada = data.respuesta.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    appendMessage(respuestaFormateada, 'bot', true);
+                } else {
+                    appendMessage('Fallo en la telemetría. Reintenta la solicitud.', 'bot');
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById(loadingId).remove();
+                appendMessage('Error de conexión con el servidor principal. Verifica tu red.', 'bot');
+            }
+        }
+
+        function appendMessage(texto, emisor, esHtml = false) {
+            const div = document.createElement('div');
+            const id = 'msg-' + Math.random().toString(36).substr(2, 9);
+            div.id = id;
+            div.className = 'w-full flex msg-animate';
+
+            let innerContent = '';
+
+            if(emisor === 'usuario') {
+                div.classList.add('justify-end');
+                innerContent = `
+                    <div class="max-w-[85%] md:max-w-[70%] bg-gradient-to-r from-[#FFC300] to-yellow-500 text-black font-medium rounded-2xl rounded-tr-none p-4 shadow-lg">
+                        ${texto}
+                    </div>
+                `;
+            } else if(emisor === 'bot') {
+                div.classList.add('justify-start');
+                innerContent = `
+                    <div class="flex gap-4 max-w-[90%] md:max-w-[80%]">
+                        <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#FFC300]" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="glass-panel text-gray-200 rounded-2xl rounded-tl-none p-5 shadow-lg leading-relaxed text-sm md:text-base">
+                            ${esHtml ? texto : texto.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Loading Style
+                div.classList.add('justify-start');
+                innerContent = `
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center animate-pulse mt-1">
+                            <div class="w-2 h-2 bg-[#FFC300] rounded-full"></div>
+                        </div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-3 animate-pulse">
+                            ${texto}
+                        </div>
+                    </div>
+                `;
+            }
+
+            div.innerHTML = innerContent;
+            chatMessages.appendChild(div);
+            
+            // Auto-scroll suave
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+            
+            return id;
+        }
+
+        // Triggers para enviar
+        btnSend.addEventListener('click', () => enviarMensaje());
+        chatInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') enviarMensaje();
+        });
+    </script>
+</body>
+</html>
