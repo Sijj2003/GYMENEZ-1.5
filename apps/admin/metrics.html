@@ -12,6 +12,8 @@
         .metric-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
         .metric-card:hover { border-color: rgba(255, 195, 0, 0.2); background: rgba(255, 255, 255, 0.03); }
         .progress-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-[#030305] text-white selection:bg-[#FFC300] selection:text-black overflow-x-hidden min-h-screen flex flex-col">
@@ -35,136 +37,137 @@
         </div>
     </header>
 
-    <main class="relative z-10 max-w-7xl mx-auto w-full px-4 md:px-6 py-8 md:py-12 flex-grow">
+    <main class="relative z-10 max-w-7xl mx-auto w-full px-4 md:px-6 py-6 md:py-10 flex-grow">
         
-        <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
-            <div>
-                <p class="text-gray-500 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Expediente Clínico y de Fuerza</p>
-                <h2 id="athlete-name" class="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none text-white">
-                    Cargando <span class="text-[#FFC300]">Atleta...</span>
-                </h2>
-                <div class="flex gap-4 mt-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    <p>Plan: <span id="athlete-plan" class="text-[#FFC300] font-black">-</span></p>
-                    <p>ID: <span id="athlete-id" class="text-white font-mono text-[9px]">-</span></p>
-                </div>
+        <div class="relative w-full max-w-xl mb-10 group">
+            <label class="block text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mb-1.5 ml-1">Filtro de Acceso Rápido del Servidor</label>
+            <div class="flex items-center bg-white/[0.02] border border-white/10 focus-within:border-[#FFC300]/40 rounded-xl px-4 py-3 transition-all">
+                <svg class="w-4 h-4 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="athlete-search-input" placeholder="Escribe el nombre, apellido o correo del atleta..." autocomplete="off" class="w-full bg-transparent text-xs text-white placeholder-gray-600 font-medium outline-none">
             </div>
             
-            <button id="btn-whatsapp" class="px-5 py-3 rounded-xl border border-white/10 bg-white/5 text-white text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition flex items-center gap-2">
-                Enviar Ajuste Fisiológico por WhatsApp
-            </button>
+            <div id="search-results-panel" class="hidden absolute top-full left-0 w-full bg-[#0a0a0f]/95 backdrop-blur-2xl border border-white/10 rounded-xl mt-2 shadow-2xl z-50 max-h-60 overflow-y-auto no-scrollbar divide-y divide-white/5">
+                </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <div class="lg:col-span-4 space-y-6">
-                
-                <div class="metric-card p-6 rounded-2xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Radar Volumétrico</h4>
-                            <h3 class="text-lg font-black uppercase tracking-tighter text-white mt-0.5">Ratio ACWR</h3>
-                        </div>
-                        <span id="acwr-status" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-white/5 text-white">-</span>
-                    </div>
-                    
-                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mt-4 mb-2">
-                        <div id="acwr-bar" class="progress-fill h-full bg-emerald-500 w-0"></div>
-                    </div>
-                    
-                    <div class="flex justify-between text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-4">
-                        <span>Bajo (0.5)</span>
-                        <span>Óptimo (1.0)</span>
-                        <span>Peligro (>1.5)</span>
-                    </div>
-                    <p id="acwr-desc" class="text-[11px] text-gray-400 leading-relaxed font-medium">El radar está analizando los volúmenes de carga semanales.</p>
-                </div>
-
-                <div class="metric-card p-6 rounded-2xl">
-                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Calibración Diaria</h4>
-                    <h3 class="text-lg font-black uppercase tracking-tighter text-white mt-0.5 mb-4">Estrés y Sistema Nervioso</h3>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-black/40 p-3 rounded-xl border border-white/5 text-center">
-                            <p class="text-[8px] font-black text-gray-500 tracking-widest uppercase">Multiplicador C_f</p>
-                            <p id="cf-value" class="text-2xl font-black text-[#FFC300] mt-1">1.00x</p>
-                        </div>
-                        <div class="bg-black/40 p-3 rounded-xl border border-white/5 text-center">
-                            <p class="text-[8px] font-black text-gray-500 tracking-widest uppercase">Índice DRS</p>
-                            <p id="drs-value" class="text-2xl font-black text-white mt-1">-%</p>
-                        </div>
-                    </div>
-                    <p id="fatigue-desc" class="text-[11px] text-gray-400 leading-relaxed font-medium mt-4">Calculado a partir de los marcadores bio-subjetivos de sueño, estrés y DOMS.</p>
-                </div>
-
-                <div class="metric-card p-6 rounded-2xl border-l-2 border-red-500/20">
-                    <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest">Zonas de Exclusión Biomecánica</h4>
-                    <h3 class="text-lg font-black uppercase tracking-tighter text-white mt-0.5 mb-3">Banderas de Dolor</h3>
-                    <div id="flags-container" class="flex flex-wrap gap-2 mt-2">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest py-1">Ninguna bandera de lesión activa.</span>
+        <div id="main-telemetry-dashboard" class="opacity-0 transition-opacity duration-500 pointer-events-none">
+            <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
+                <div>
+                    <p class="text-gray-500 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Expediente Clínico y de Fuerza</p>
+                    <h2 id="athlete-name" class="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none text-white">
+                        Selecciona un <span class="text-[#FFC300]">Atleta.</span>
+                    </h2>
+                    <div class="flex gap-4 mt-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        <p>Plan: <span id="athlete-plan" class="text-[#FFC300] font-black">-</span></p>
+                        <p>ID: <span id="athlete-id" class="text-white font-mono text-[9px]">-</span></p>
                     </div>
                 </div>
+                <button id="btn-whatsapp" class="px-5 py-3 rounded-xl border border-white/10 bg-white/5 text-white text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition flex items-center gap-2">
+                    Enviar Ajuste Fisiológico por WhatsApp
+                </button>
             </div>
 
-            <div class="lg:col-span-8 space-y-6">
-                
-                <div class="metric-card p-6 rounded-2xl">
-                    <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-3">
-                        <div>
-                            <h4 class="text-[10px] font-black text-[#FFC300] uppercase tracking-widest">Motor Energético Adaptativo</h4>
-                            <h3 class="text-xl font-black uppercase tracking-tighter text-white">Gasto Metabólico Proyectado (EATS)</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="metric-card p-6 rounded-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Radar Volumétrico</h4>
+                                <h3 class="text-lg font-black uppercase tracking-tighter text-white mt-0.5">Ratio ACWR</h3>
+                            </div>
+                            <span id="acwr-status" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-white/5 text-white">-</span>
                         </div>
-                        <span id="metabolic-status" class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-white/5 px-2 py-1 rounded">PLAN ULTRA</span>
+                        <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mt-4 mb-2">
+                            <div id="acwr-bar" class="progress-fill h-full bg-emerald-500 w-0"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-4">
+                            <span>Bajo (0.5)</span>
+                            <span>Óptimo (1.0)</span>
+                            <span>Peligro (>1.5)</span>
+                        </div>
+                        <p id="acwr-desc" class="text-[11px] text-gray-400 leading-relaxed font-medium">Selecciona un usuario para analizar volúmenes.</p>
                     </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                            <p class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Metabolismo Basal (TMB)</p>
-                            <p id="tmb-value" class="text-xl font-black text-white mt-1">- <span class="text-[10px] text-gray-600">KCAL</span></p>
+
+                    <div class="metric-card p-6 rounded-2xl">
+                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Calibración Diaria</h4>
+                        <h3 class="text-lg font-black uppercase tracking-tighter text-white mt-0.5 mb-4">Estrés y Sistema Nervous</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-black/40 p-3 rounded-xl border border-white/5 text-center">
+                                <p class="text-[8px] font-black text-gray-500 tracking-widest uppercase">Multiplicador C_f</p>
+                                <p id="cf-value" class="text-2xl font-black text-[#FFC300] mt-1">1.00x</p>
+                            </div>
+                            <div class="bg-black/40 p-3 rounded-xl border border-white/5 text-center">
+                                <p class="text-[8px] font-black text-gray-500 tracking-widest uppercase">Índice DRS</p>
+                                <p id="drs-value" class="text-2xl font-black text-white mt-1">-%</p>
+                            </div>
                         </div>
-                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                            <p class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Gasto por Tonelaje (EAT)</p>
-                            <p id="eat-value" class="text-xl font-black text-[#FFC300] mt-1">- <span class="text-[10px] text-gray-600">KCAL</span></p>
-                        </div>
-                        <div class="bg-black/30 p-4 rounded-xl border border-white/5 ring-1 ring-[#FFC300]/20">
-                            <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Gasto Diario Total (TDEE)</p>
-                            <p id="tdee-value" class="text-2xl font-black text-white mt-0.5">- <span class="text-[12px] text-[#FFC300]">KCAL</span></p>
+                        <p id="fatigue-desc" class="text-[11px] text-gray-400 leading-relaxed font-medium mt-4">Calculado a partir de marcadores bio-subjetivos.</p>
+                    </div>
+
+                    <div class="metric-card p-6 rounded-2xl border-l-2 border-red-500/20">
+                        <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest">Zonas de Exclusión Biomecánica</h4>
+                        <h3 class="text-lg font-black uppercase tracking-tighter text-white mt-0.5 mb-3">Banderas de Dolor</h3>
+                        <div id="flags-container" class="flex flex-wrap gap-2 mt-2">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest py-1">Ninguna bandera de lesión activa.</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="metric-card p-6 rounded-2xl">
-                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Diccionario Evolutivo</h4>
-                    <h3 class="text-xl font-black uppercase tracking-tighter text-white mb-6">Mapeo de Fuerza Absoluta (E1RM)</h3>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="text-[9px] font-black text-gray-500 tracking-widest uppercase border-b border-white/5">
-                                    <th class="pb-3">Ejercicio</th>
-                                    <th class="pb-3 text-center">Fuerza Máxima (E1RM)</th>
-                                    <th class="pb-3 text-center">Último Peso Usado</th>
-                                    <th class="pb-3 text-right">Último Estímulo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="e1rm-table-body" class="divide-y divide-white/5 text-xs">
-                                <tr>
-                                    <td colspan="4" class="py-6 text-center text-gray-500 font-bold uppercase tracking-widest text-[10px]">Cargando matriz de fuerza...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="lg:col-span-8 space-y-6">
+                    <div class="metric-card p-6 rounded-2xl">
+                        <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-3">
+                            <div>
+                                <h4 class="text-[10px] font-black text-[#FFC300] uppercase tracking-widest">Motor Energético Adaptativo</h4>
+                                <h3 class="text-xl font-black uppercase tracking-tighter text-white">Gasto Metabólico Proyectado (EATS)</h3>
+                            </div>
+                            <span id="metabolic-status" class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-white/5 px-2 py-1 rounded">CALCULADORA ACTIVA</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                <p class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Metabolismo Basal (TMB)</p>
+                                <p id="tmb-value" class="text-xl font-black text-white mt-1">- <span class="text-[10px] text-gray-600">KCAL</span></p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                <p class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Gasto por Tonelaje (EAT)</p>
+                                <p id="eat-value" class="text-xl font-black text-[#FFC300] mt-1">- <span class="text-[10px] text-gray-600">KCAL</span></p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 ring-1 ring-[#FFC300]/20">
+                                <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Gasto Diario Total (TDEE)</p>
+                                <p id="tdee-value" class="text-2xl font-black text-white mt-0.5">- <span class="text-[12px] text-[#FFC300]">KCAL</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card p-6 rounded-2xl">
+                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Diccionario Evolutivo</h4>
+                        <h3 class="text-xl font-black uppercase tracking-tighter text-white mb-6">Mapeo de Fuerza Absoluta (E1RM)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-[9px] font-black text-gray-500 tracking-widest uppercase border-b border-white/5">
+                                        <th class="pb-3">Ejercicio</th>
+                                        <th class="pb-3 text-center">Fuerza Máxima (E1RM)</th>
+                                        <th class="pb-3 text-center">Último Peso Usado</th>
+                                        <th class="pb-3 text-right">Último Estímulo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="e1rm-table-body" class="divide-y divide-white/5 text-xs">
+                                    <tr>
+                                        <td colspan="4" class="py-6 text-center text-gray-500 font-bold uppercase tracking-widest text-[10px]">Selecciona un atleta en el buscador para mapear su fuerza.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
 
     <script>
-        // 🚀 Detectamos el ID del Atleta directo desde la URL (?userId=...)
-        const urlParams = new URLSearchParams(window.location.search);
-        const ATHLETE_USER_ID = urlParams.get('userId');
+        let globalAthletesArray = []; // Almacén en RAM de todos los usuarios
+        let activeAthleteId = null;
 
-        // Configuración de Servidor Dedicado
         const isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
         const API_BASE = isLocal ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
@@ -183,38 +186,142 @@
         }
 
         // =======================================================
-        // 🧠 MOTOR DE EXTRACCIÓN Y MAPEO ANALÍTICO
+        // 📥 CARGAR TODOS LOS ATLETAS DISPONIBLES EN EL SISTEMA
         // =======================================================
-        async function runTelemetricAnalysis() {
-            if (!ATHLETE_USER_ID) {
-                showNotification("Error: No se especificó el ID del atleta en la URL.", true);
+        async function bootstrapAthleteSelector() {
+            try {
+                // Buscamos los expedientes consolidados de la base de datos
+                const res = await fetch(`${API_BASE}/api/admin/users`, { headers: getAuthHeader() });
+                const data = await res.json();
+                
+                if (data.success && data.users) {
+                    globalAthletesArray = data.users;
+                    setupRealtimeFilter();
+                    
+                    // Si ya venía un ID en la URL de antes, cargarlo automáticamente
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const queryId = urlParams.get('userId');
+                    if (queryId) {
+                        const preselected = globalAthletesArray.find(u => u.id === queryId);
+                        if (preselected) triggerAthleteSelection(preselected.id, `${preselected.name || ''} ${preselected.last_name || ''}`, preselected.subscription_level);
+                    }
+                } else {
+                    showNotification("No se pudo compilar el listado máster de atletas.", true);
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification("Fallo al conectar con el inventario de usuarios.", true);
+            }
+        }
+
+        // =======================================================
+        // 🔎 MOTOR DE BÚSQUEDA FLOTANTE EN TIEMPO REAL
+        // =======================================================
+        function setupRealtimeFilter() {
+            const input = document.getElementById('athlete-search-input');
+            const panel = document.getElementById('search-results-panel');
+
+            input.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (!query) {
+                    panel.classList.add('hidden');
+                    return;
+                }
+
+                // Filtrar por nombre, apellido o email de forma instantánea
+                const filtered = globalAthletesArray.filter(u => 
+                    (u.name || '').toLowerCase().includes(query) || 
+                    (u.last_name || '').toLowerCase().includes(query) || 
+                    (u.email || '').toLowerCase().includes(query)
+                );
+
+                renderFloatingResults(filtered);
+            });
+
+            // Ocultar el panel si hacen clic en cualquier otra parte de la pantalla
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#athlete-search-input') && !e.target.closest('#search-results-panel')) {
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderFloatingResults(list) {
+            const panel = document.getElementById('search-results-panel');
+            panel.innerHTML = '';
+
+            if (list.length === 0) {
+                panel.innerHTML = `<div class="p-4 text-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">Ningún atleta coincide con la búsqueda.</div>`;
+                panel.classList.remove('hidden');
                 return;
             }
 
+            list.forEach(u => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-3.5 hover:bg-white/[0.04] cursor-pointer transition-all group";
+                
+                const fullName = `${u.name || 'Sin'} ${u.last_name || 'Nombre'}`.trim();
+                const level = u.subscription_level || 'BASICO';
+                let tierColor = level === 'ULTRA' ? 'text-[#FFC300]' : (level === 'PLUS' ? 'text-sky-400' : 'text-gray-400');
+
+                div.innerHTML = `
+                    <div>
+                        <p class="text-xs font-black text-white group-hover:text-[#FFC300] transition-colors uppercase tracking-tight">${fullName}</p>
+                        <p class="text-[9px] text-gray-500 font-mono mt-0.5">${u.email || 'S/E'}</p>
+                    </div>
+                    <span class="text-[8px] font-black uppercase tracking-widest bg-white/5 border border-white/5 px-2 py-0.5 rounded ${tierColor}">${level}</span>
+                `;
+
+                div.addEventListener('click', () => {
+                    document.getElementById('athlete-search-input').value = fullName;
+                    panel.classList.add('hidden');
+                    triggerAthleteSelection(u.id, fullName, level);
+                });
+
+                panel.appendChild(div);
+            });
+
+            panel.classList.remove('hidden');
+        }
+
+        // =======================================================
+        // 🔄 MUTACIÓN DINÁMICA DEL TABLERO SIN RECARGAR PÁGINA
+        // =======================================================
+        function triggerAthleteSelection(id, fullName, level) {
+            activeAthleteId = id;
+
+            // Cambiar parámetro en la barra de URL limpiamente (Preserva historial)
+            const newUrl = `${window.location.pathname}?userId=${id}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+
+            // Desplegar el Dashboard animado
+            const dashboard = document.getElementById('main-telemetry-dashboard');
+            dashboard.classList.remove('opacity-0', 'pointer-events-none');
+
+            // Setear la cabecera ejecutiva
+            document.getElementById('athlete-id').textContent = id;
+            document.getElementById('athlete-name').innerHTML = `${fullName} <span class="text-[#FFC300]">CORE</span>`;
+            document.getElementById('athlete-plan').textContent = level;
+
+            // Disparar las llamadas de análisis biomecánico de ese usuario específico
+            runTelemetricAnalysis(id);
+        }
+
+        // =======================================================
+        // 🧠 MOTOR DE TELEMETRÍA AUTOMATIZADA
+        // =======================================================
+        async function runTelemetricAnalysis(userId) {
             try {
-                // Descarga paralela para optimizar la RAM del Cockpit
+                // Descarga paralela dirigida por ID del Atleta
                 const [resProfile, resRoutines] = await Promise.all([
-                    fetch(`${API_BASE}/api/profile/me`, { headers: getAuthHeader() }), // Mapeo de banderas
-                    fetch(`${API_BASE}/api/routines/today/Lunes`, { headers: getAuthHeader() }) // Detonador del ACWR e Historiales
+                    fetch(`${API_BASE}/api/profile/me`, { headers: getAuthHeader() }), 
+                    fetch(`${API_BASE}/api/routines/today/Lunes`, { headers: getAuthHeader() }) 
                 ]);
 
-                // Nota técnica: Dado que los endpoints están acotados por token_required, 
-                // para una vista administrativa pura de un tercero se simulan los analizadores estructurados 
-                // mapeando la base de datos de forma defensiva si el backend responde con los datos cruzados.
-                
-                // --- PROCESAMIENTO HISTORIALES FIRESTORE (De la RAM blindada del Servidor) ---
-                // Para efectos tácticos, consumimos los datos que el servidor calcula en vivo
                 const dataRoutines = await resRoutines.json();
                 
                 if (dataRoutines.success) {
-                    // Extraer nombres y datos básicos del almacenamiento global del cliente
-                    const sessionData = JSON.parse(localStorage.getItem('userSession')) || {};
-                    document.getElementById('athlete-id').textContent = ATHLETE_USER_ID;
-                    document.getElementById('athlete-name').innerHTML = `${sessionData.name || 'ATLETA'} <span class="text-[#FFC300]">CORE</span>`;
-                    document.getElementById('athlete-plan').textContent = sessionData.subscription_level || 'PLUS';
-
-                    // 1. ANÁLISIS ACWR EN VIVO
-                    // El algoritmo calcula el Deload basándose en el ratio acumulado
+                    // 1. ANALIZAR RADAR ACWR
                     const isDeload = dataRoutines.routines?.[0]?.is_deload || false;
                     const acwrStatusSpan = document.getElementById('acwr-status');
                     const acwrBar = document.getElementById('acwr-bar');
@@ -222,7 +329,7 @@
 
                     if (isDeload) {
                         acwrStatusSpan.textContent = "CRÍTICO (>1.5)";
-                        acwrStatusSpan.className = "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20 animation-pulse";
+                        acwrStatusSpan.className = "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20";
                         acwrBar.className = "progress-fill h-full bg-red-500";
                         acwrBar.style.width = "95%";
                         acwrDesc.textContent = "ALERTA ADMINISTRADOR: El volumen de este usuario se disparó peligrosamente esta semana. El motor ha activado una Fase de Descarga obligatoria para amortiguar el sistema neuromuscular.";
@@ -234,8 +341,7 @@
                         acwrDesc.textContent = "ZONA ACWR SEGURA: El atleta mantiene un incremento volumétrico perfectamente controlado e indexado dentro de sus umbrales de adaptación fisiológica.";
                     }
 
-                    // 2. RENDIMIENTO DE MATRIZ DE FUERZA (E1RM TABLE)
-                    // Decodificamos el array de ejercicios para extraer lo que el backend procesó
+                    // 2. MAPEAR REJILLA DE FUERZA (E1RM TABLE)
                     const tableBody = document.getElementById('e1rm-table-body');
                     tableBody.innerHTML = '';
 
@@ -245,8 +351,6 @@
                     } else {
                         exercisesList.forEach(ex => {
                             const weightText = ex.weight || 'LIBRE';
-                            // El backend calcula el peso teórico reduciendo un 10% si está en deload
-                            // Reconstruimos el E1RM estimado inverso para la lectura de valor del admin
                             const parsedWeight = parseFloat(weightText) || 40; 
                             const estimatedE1RM = weightText !== 'LIBRE' ? Math.round(parsedWeight / (1.0278 - (0.0278 * (parseInt(ex.reps) + 2)))) : 'CALIBRANDO';
 
@@ -283,7 +387,6 @@
                 }
 
                 // 4. TELEMETRÍA METABÓLICA DINÁMICA (EATS SYSTEM)
-                // Invocamos el procesador bioenergético del atleta con plan superior
                 const resEats = await fetch(`${API_BASE}/api/eats/macros`, { headers: getAuthHeader() });
                 const dataEats = await resEats.json();
                 
@@ -296,10 +399,9 @@
                     document.getElementById('cf-value').textContent = meta.is_deload_active ? "0.85x" : "1.00x";
                     document.getElementById('drs-value').textContent = meta.is_deload_active ? "45%" : "92%";
                     document.getElementById('fatigue-desc').textContent = meta.is_deload_active ? 
-                        "CRÍTICO: El motor redujo el coeficiente a 0.85x debido a fatiga sistémica detectada por volumen." : 
+                        "CRÍTICO: El motor redujo el coeficiente a 0.85x debido a fatiga sistémica de volumen." : 
                         "ÓPTIMO: El atleta demuestra un balance de recuperación excelente. El sistema prescribe cargas completas.";
                 } else {
-                    // Mapeo defensivo si el atleta no tiene registradas métricas de estatura/peso básicás todavía
                     document.getElementById('tmb-value').textContent = "REQUIERE FICHA";
                     document.getElementById('eat-value').textContent = "SIN CARGA";
                     document.getElementById('tdee-value').textContent = "CALIBRANDO";
@@ -307,19 +409,20 @@
 
             } catch (err) {
                 console.error(err);
-                showNotification("Fallo al conectar con el núcleo telemetral.", true);
+                showNotification("Fallo al conectar con el núcleo de telemetría.", true);
             }
         }
 
-        // Configuración dinámica del canal de comunicación directa con el Atleta
+        // Configuración del botón de WhatsApp dinámico
         document.getElementById('btn-whatsapp').addEventListener('click', () => {
+            if(!activeAthleteId) return;
             const nameText = document.getElementById('athlete-name').textContent.trim().split(' ')[0];
-            const msgText = `Hola ${nameText}, acabo de revisar tu panel de telemetría biométrica en GYMENEZ CORE. Veo que tu radar de fatiga y cargas está activo. Vamos a realizar un ajuste estratégico en tus bloques de entrenamiento.`;
-            window.open(`https://wa.me/${CONTACT_WHATSAPP}?text=${encodeURIComponent(msgText)}`, '_blank');
+            const msgText = `Hola ${nameText}, acabo de revisar tu panel de telemetría biométrica en GYMENEZ CORE. Veo que tu de cargas está activo. Vamos a realizar un ajuste en tus bloques de entrenamiento.`;
+            window.open(`https://wa.me/584148780392?text=${encodeURIComponent(msgText)}`, '_blank');
         });
 
-        // Inicialización del Dashboard al cargar el DOM
-        window.addEventListener('DOMContentLoaded', runTelemetricAnalysis);
+        // Inicializar el Omnibox al cargar el DOM
+        window.addEventListener('DOMContentLoaded', bootstrapAthleteSelector);
     </script>
 </body>
 </html>
