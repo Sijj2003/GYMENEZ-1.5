@@ -159,6 +159,29 @@
 
     </main>
 
+    <div id="neural-timer-overlay" class="fixed bottom-0 left-0 w-full bg-black/95 backdrop-blur-xl border-t border-[#FFC300]/50 z-[4000] transform translate-y-full transition-transform duration-500 flex flex-col items-center justify-center py-8 px-4 shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
+        
+        <button id="timer-minimize-btn" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+
+        <h4 class="text-[#FFC300] text-[10px] font-black uppercase tracking-[0.3em] mb-1">Recarga Metabólica ATP</h4>
+        <p class="text-gray-400 text-[9px] uppercase tracking-widest font-bold mb-6">Tiempo calculado según Demanda Neuronal (SND)</p>
+
+        <div class="relative flex items-center justify-center w-36 h-36 mb-6">
+            <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                <circle cx="72" cy="72" r="68" stroke="currentColor" stroke-width="4" fill="transparent" class="text-white/10" />
+                <circle id="timer-progress" cx="72" cy="72" r="68" stroke="currentColor" stroke-width="6" fill="transparent" class="text-[#FFC300] transition-all duration-1000 ease-linear drop-shadow-[0_0_10px_rgba(255,195,0,0.5)]" stroke-dasharray="427" stroke-dashoffset="0" stroke-linecap="round" />
+            </svg>
+            <span id="timer-display" class="text-5xl font-black text-white font-mono tracking-tighter">00:00</span>
+        </div>
+
+        <div class="flex gap-4 w-full max-w-xs">
+            <button id="timer-add-btn" class="w-1/2 py-3 rounded-xl bg-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white/20 transition">+30 Seg</button>
+            <button id="timer-skip-btn" class="w-1/2 py-3 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 font-bold text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition shadow-[0_0_15px_rgba(239,68,68,0.2)]">Omitir</button>
+        </div>
+    </div>
+
     <footer class="text-center py-6 border-t border-white/5 mt-auto">
         <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
     </footer>
