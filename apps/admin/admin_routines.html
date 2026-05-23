@@ -62,7 +62,7 @@
 
         <div class="glass-panel p-4 md:p-8 rounded-[24px] md:rounded-[32px]">
             <div class="mb-6">
-                <input type="text" id="exercise-search-input" placeholder="Buscar por Nombre o Descripción..." 
+                <input type="text" id="exercise-search-input" placeholder="Buscar por Nombre, Descripción o Patrón Biomecánico..." 
                        class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs md:text-sm font-medium">
             </div>
 
@@ -71,7 +71,7 @@
                     <thead>
                         <tr>
                             <th>Ejercicio</th>
-                            <th>Descripción Biomecánica</th>
+                            <th>Ficha Biomecánica & Descripción</th>
                             <th>Media</th>
                             <th class="text-right">Acciones</th>
                         </tr>
@@ -84,38 +84,74 @@
     </main>
 
     <div id="exercise-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-[5000] flex items-center justify-center p-4 transition-opacity">
-        <div class="modal-glass w-full max-w-2xl p-6 md:p-10 rounded-[24px] md:rounded-[32px] max-h-[90vh] overflow-y-auto no-scrollbar">
+        <div class="modal-glass w-full max-w-3xl p-6 md:p-10 rounded-[24px] md:rounded-[32px] max-h-[95vh] overflow-y-auto no-scrollbar">
             
             <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
                 <div>
                     <h3 id="modal-title" class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Añadir Ejercicio</h3>
-                    <p class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-1">Diccionario Técnico</p>
+                    <p class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-1">Diccionario Técnico Biomecánico</p>
                 </div>
                 <button onclick="closeModalSafe('exercise-modal')" class="text-gray-500 hover:text-white transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <form id="exercise-form" class="space-y-5">
+            <form id="exercise-form" class="space-y-6">
                 <input type="hidden" id="exercise-id-field" name="id">
                 <input type="hidden" id="is-edit-mode" value="false">
 
-                <div>
-                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Nombre Oficial del Ejercicio <span class="text-[#FFC300]">*</span></label>
-                    <input type="text" id="name" name="name" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase" placeholder="Ej: Press de Banca Inclinado">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-b border-white/5 pb-6">
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Nombre Oficial del Ejercicio <span class="text-[#FFC300]">*</span></label>
+                        <input type="text" id="name" name="name" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej: Press de Banca Inclinado">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Enlace del Tutorial (YouTube) <span class="text-gray-600">(Opcional)</span></label>
+                        <input type="url" id="link_tutorial" name="link_tutorial" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="https://youtube.com/watch?v=...">
+                    </div>
                 </div>
-                
+
                 <div>
-                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Enlace del Tutorial (YouTube) <span class="text-gray-600">(Opcional)</span></label>
-                    <input type="url" id="link_tutorial" name="link_tutorial" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="https://youtube.com/watch?v=...">
+                    <h4 class="text-[10px] font-black text-[#FFC300] uppercase tracking-widest mb-4">Clasificación Algorítmica</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Tier (Estabilidad) <span class="text-[#FFC300]">*</span></label>
+                            <select id="tier" name="tier" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer">
+                                <option value="1">Tier 1 - Peso Libre / Inestable</option>
+                                <option value="2">Tier 2 - Máquinas Compuestas</option>
+                                <option value="3">Tier 3 - Aislamiento Específico</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Patrón de Movimiento <span class="text-[#FFC300]">*</span></label>
+                            <select id="movement_pattern" name="movement_pattern" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer">
+                                <option value="EMPUJE_HORIZONTAL">Empuje Horizontal</option>
+                                <option value="EMPUJE_VERTICAL">Empuje Vertical</option>
+                                <option value="TRACCION_HORIZONTAL">Tracción Horizontal</option>
+                                <option value="TRACCION_VERTICAL">Tracción Vertical</option>
+                                <option value="DOMINANTE_DE_RODILLA">Dominante de Rodilla</option>
+                                <option value="DOMINANTE_DE_CADERA">Dominante de Cadera</option>
+                                <option value="AISLAMIENTO">Aislamiento / Monarticular</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Equipamiento Base <span class="text-[#FFC300]">*</span></label>
+                            <select id="equipment" name="equipment" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer">
+                                <option value="BARRA">Barra</option>
+                                <option value="MANCUERNAS">Mancuernas</option>
+                                <option value="POLEA_MAQUINA">Polea / Máquina</option>
+                                <option value="PESO_CORPORAL">Peso Corporal</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Descripción y Ejecución <span class="text-[#FFC300]">*</span></label>
-                    <textarea id="description" name="description" rows="4" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Músculos implicados, postura y cadencia..."></textarea>
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Instrucciones de Ejecución <span class="text-[#FFC300]">*</span></label>
+                    <textarea id="description" name="description" rows="3" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Cadencia, enfoque y tips de postura..."></textarea>
                 </div>
 
-                <div class="pt-6 mt-4">
+                <div class="pt-6 mt-4 border-t border-white/5">
                     <button type="submit" id="submit-btn" class="w-full btn-gold py-4 rounded-xl font-black text-[10px] uppercase tracking-widest">
                         Guardar en la Bóveda
                     </button>
@@ -134,7 +170,6 @@
             tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><div class="w-6 h-6 border-2 border-white/20 border-t-[#FFC300] rounded-full animate-spin mx-auto"></div></td></tr>';
             
             try {
-                // Usamos API_BASE_URL heredado de admin_auth.js
                 const res = await fetch(`${API_BASE_URL}/api/admin/exercises`);
                 const data = await res.json();
                 
@@ -168,17 +203,30 @@
                     linkHTML = `<a href="${exercise.link_tutorial}" target="_blank" class="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[#FFC300] hover:text-white transition bg-[#FFC300]/10 px-2.5 py-1 rounded border border-[#FFC300]/20"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg> Reproducir</a>`;
                 }
 
+                // 🔥 Renderizado visual de las variables Biomecánicas
+                const tierVal = parseInt(exercise.tier) || 1;
+                let tierColor = tierVal === 1 ? 'text-red-400' : (tierVal === 2 ? 'text-yellow-400' : 'text-emerald-400');
+                let patternDisplay = (exercise.movement_pattern || 'No Definido').replace(/_/g, ' ');
+                let equipDisplay = exercise.equipment || 'No Definido';
+
                 tr.innerHTML = `
                     <td>
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#FFC300]">
+                            <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#FFC300] flex-shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
                             </div>
-                            <p class="text-xs font-black text-white uppercase tracking-tighter">${exercise.name}</p>
+                            <p class="text-[11px] font-black text-white uppercase tracking-tighter">${exercise.name}</p>
                         </div>
                     </td>
                     <td>
-                        <p class="text-[10px] text-gray-400 font-medium">${shortDesc}</p>
+                        <div class="mb-2 flex flex-wrap gap-2 text-[8px] font-black uppercase tracking-widest bg-black/40 p-1.5 rounded-lg border border-white/5 w-max">
+                            <span class="${tierColor}">Tier ${tierVal}</span> 
+                            <span class="text-gray-600">|</span> 
+                            <span class="text-sky-400">${patternDisplay}</span> 
+                            <span class="text-gray-600">|</span> 
+                            <span class="text-white">${equipDisplay}</span>
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-medium leading-relaxed">${shortDesc}</p>
                     </td>
                     <td>
                         ${linkHTML}
@@ -204,7 +252,8 @@
             if (!term) return renderExercisesTable(allExercisesData);
             const filtered = allExercisesData.filter(ex => 
                 (ex.name||'').toLowerCase().includes(term) || 
-                (ex.description||'').toLowerCase().includes(term)
+                (ex.description||'').toLowerCase().includes(term) ||
+                (ex.movement_pattern||'').toLowerCase().includes(term)
             );
             renderExercisesTable(filtered);
         });
@@ -216,6 +265,12 @@
             document.getElementById('exercise-form').reset();
             document.getElementById('modal-title').textContent = 'Añadir Ejercicio';
             document.getElementById('is-edit-mode').value = 'false';
+            
+            // Valores por defecto
+            document.getElementById('tier').value = '1';
+            document.getElementById('movement_pattern').value = 'EMPUJE_HORIZONTAL';
+            document.getElementById('equipment').value = 'BARRA';
+
             document.getElementById('exercise-modal').classList.remove('hidden');
         }
 
@@ -228,6 +283,11 @@
             document.getElementById('name').value = exercise.name || '';
             document.getElementById('link_tutorial').value = exercise.link_tutorial || '';
             document.getElementById('description').value = exercise.description || '';
+
+            // Llenar variables Biomecánicas
+            document.getElementById('tier').value = exercise.tier || '1';
+            document.getElementById('movement_pattern').value = exercise.movement_pattern || 'EMPUJE_HORIZONTAL';
+            document.getElementById('equipment').value = exercise.equipment || 'BARRA';
             
             document.getElementById('exercise-modal').classList.remove('hidden');
         }
@@ -239,10 +299,14 @@
             const isEdit = document.getElementById('is-edit-mode').value === 'true';
             const id = document.getElementById('exercise-id-field').value;
 
+            // 🔥 PAYLOAD CON NUEVAS VARIABLES BIOMECÁNICAS
             const payload = {
                 name: form.name.value.trim(),
                 link_tutorial: form.link_tutorial.value.trim(),
-                description: form.description.value.trim()
+                description: form.description.value.trim(),
+                tier: parseInt(form.tier.value),
+                movement_pattern: form.movement_pattern.value,
+                equipment: form.equipment.value
             };
 
             const url = isEdit ? `${API_BASE_URL}/api/admin/exercise/${id}` : `${API_BASE_URL}/api/admin/exercise`;
@@ -254,7 +318,7 @@
             try {
                 const res = await fetch(url, { 
                     method: method, 
-                    headers: { 'Content-Type': 'application/json' }, // 🔥 VITAL
+                    headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify(payload) 
                 });
                 const data = await res.json();
