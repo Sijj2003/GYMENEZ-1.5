@@ -1,6 +1,11 @@
 // static/js/workout.js - GYMENEZ TACTICAL UI
 
-const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+// 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL ( workout.js )
+const isLocalhost = window.location.hostname === '127.0.0.1' || 
+                    window.location.hostname === 'localhost' || 
+                    window.location.protocol === 'file:';
+
+const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 const CONTACT_WHATSAPP = '584148780392'; 
 const REDIRECT_URL = 'routines.html'; 
 const REDIRECT_TIMEOUT_SECONDS = 25; 
@@ -451,7 +456,7 @@ if (surveyForm) {
         const ejerciciosCompletados = routineExercises
             .filter(ex => ex.status === 'completed' && ex.performance_data)
             .map(ex => ({
-                name: ex.original_exercise || ex.exerciseName, // Guardamos el nombre original si fue sustituido para el historial
+                name: ex.original_exercise || ex.exerciseName, 
                 ...ex.performance_data
             }));
 
@@ -466,7 +471,10 @@ if (surveyForm) {
         try {
             await fetch(`${API_BASE_URL}/api/journal/save_session`, {
                 method: 'POST',
-                headers: getBearerToken(),
+                headers: {
+                    ...getBearerToken(),
+                    'Content-Type': 'application/json' // 🔥 Se inyecta Content-Type para solucionar el error 415
+                },
                 body: JSON.stringify(payload)
             });
             showModalContacto();
