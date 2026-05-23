@@ -276,14 +276,14 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
-        // 🚀 TUNELIZACIÓN INTELIGENTE DE ENTORNO PERIMETRAL
-        const isLocalhost = window.location.hostname === '127.0.0.1' || 
-                            window.location.hostname === 'localhost' || 
-                            window.location.protocol === 'file:';
+        // 🚀 TUNELIZACIÓN ENTORNO LOCAL/PRODUCCIÓN AISLADO PARA EVITAR COLISIÓN CON AUTH.JS
+        const isLocalHostEnvironment = window.location.hostname === '127.0.0.1' || 
+                                       window.location.hostname === 'localhost' || 
+                                       window.location.protocol === 'file:';
 
-        const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
+        // 🔥 Se renombra a LOCAL_API_URL para erradicar el SyntaxError global
+        const LOCAL_API_URL = isLocalHostEnvironment ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
-        // Variables de Estado de Calibración Matutina
         let readinessTelemetry = { sleep: 3, stress: 3, doms: 3 };
 
         function getBearerToken() {
@@ -293,7 +293,7 @@
 
         function showMessage(message, type = 'error') {
             const messagebox = document.getElementById('message-box');
-            if(!box) return; // Corregido: antes apuntaba a 'box' sin definir
+            if(!messagebox) return; 
             messagebox.textContent = message;
             messagebox.className = `fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-500 text-center w-11/12 max-w-[350px] border border-white/10 ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`;
             
@@ -327,11 +327,11 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/journal/readiness`, {
+                const res = await fetch(`${LOCAL_API_URL}/api/journal/readiness`, {
                     method: 'POST',
                     headers: {
                         ...getBearerToken(),
-                        'Content-Type': 'application/json' // Blindaje anti-415
+                        'Content-Type': 'application/json' 
                     },
                     body: JSON.stringify({
                         sleep_score: readinessTelemetry.sleep,
@@ -468,9 +468,9 @@
                     modal.classList.remove('hidden');
                 }
 
-                // Fetch Nivel Suscripción protegido con Token JWT
+                // Fetch Nivel Suscripción protegido con Token JWT utilizando LOCAL_API_URL
                 const token = localStorage.getItem('gymen_auth_token');
-                fetch(`${API_BASE_URL}/api/profile/me`, {
+                fetch(`${LOCAL_API_URL}/api/profile/me`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
                 })
                     .then(res => res.json())
