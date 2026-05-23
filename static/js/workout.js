@@ -184,14 +184,31 @@ function renderExercises(exercises) {
                 <div class="flex flex-wrap gap-3 md:gap-6 text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest">
                     <p>Sets: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.sets || '-'}</span></p>
                     <p>Reps: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.reps || '-'}</span></p>
-                    <p>Peso: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.weight || 'LIBRE'}</span></p>
+                    <p>Peso Objetivo: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.weight || 'LIBRE'}</span></p>
+                </div>
+
+                <div id="stats-input-${cardId}" class="hidden w-full max-w-sm mt-4 p-3 bg-[#050505] rounded-xl border border-[#FFC300]/30 grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 text-center">Peso (KG)</label>
+                        <input type="number" id="actual-weight-${cardId}" class="w-full bg-black/50 border border-white/10 rounded-lg text-white text-sm text-center py-1.5 focus:border-[#FFC300] outline-none" value="${exercise.weight !== 'LIBRE' ? exercise.weight : 0}">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 text-center">Reps Reales</label>
+                        <input type="number" id="actual-reps-${cardId}" class="w-full bg-black/50 border border-white/10 rounded-lg text-white text-sm text-center py-1.5 focus:border-[#FFC300] outline-none" value="${exercise.reps || 0}">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 text-center">RIR (0-4)</label>
+                        <input type="number" id="actual-rir-${cardId}" min="0" max="4" class="w-full bg-black/50 border border-white/10 rounded-lg text-white text-sm text-center py-1.5 focus:border-[#FFC300] outline-none" value="2">
+                    </div>
+                    <button onclick="window.confirmExerciseStats('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="col-span-3 mt-1 py-2 bg-[#FFC300] text-black text-[9px] font-black rounded-lg uppercase tracking-widest hover:bg-yellow-400 transition">
+                        Guardar Serie
+                    </button>
                 </div>
             </div>
             
             <div class="flex items-center space-x-2 md:space-x-4 w-full md:w-auto justify-end border-t border-white/5 pt-4 md:border-t-0 md:pt-0">
                 <button onclick="window.openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition group">
                     <svg class="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:text-[#FFC300] transition" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
-                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest hidden sm:inline">Play</span>
                 </button>
 
                 <div class="flex space-x-1.5 md:space-x-2 bg-black/40 p-1 rounded-lg md:rounded-xl border border-white/5"> 
@@ -244,9 +261,51 @@ function updateFinishButtonState() {
 
 window.toggleExerciseStatus = (exerciseName, statusType) => {
     const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
+    const cardId = exerciseName.replace(/\s/g, '-');
+    const statsInput = document.getElementById(`stats-input-${cardId}`);
+    
     if (!exercise) return;
-    exercise.status = exercise.status === statusType ? 'pending' : statusType;
 
+    if (statusType === 'completed') {
+        // Si no está completado, en lugar de completarlo directo, mostramos el formulario
+        if (exercise.status !== 'completed') {
+            statsInput.classList.remove('hidden');
+        } else {
+            // Si ya estaba completado y lo vuelve a tocar, lo desmarca
+            exercise.status = 'pending';
+            statsInput.classList.add('hidden');
+            updateCardUI(exerciseName, exercise.status);
+            updateFinishButtonState();
+        }
+    } else {
+        // Si hace Skip, ocultamos formulario y marcamos como saltado
+        exercise.status = exercise.status === 'skipped' ? 'pending' : 'skipped';
+        statsInput.classList.add('hidden');
+        updateCardUI(exerciseName, exercise.status);
+        updateFinishButtonState();
+    }
+};
+
+window.confirmExerciseStats = (exerciseName) => {
+    const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
+    const cardId = exerciseName.replace(/\s/g, '-');
+    
+    // Extraer valores ingresados
+    const actualWeight = parseFloat(document.getElementById(`actual-weight-${cardId}`).value) || 0;
+    const actualReps = parseInt(document.getElementById(`actual-reps-${cardId}`).value) || 0;
+    const actualRir = parseInt(document.getElementById(`actual-rir-${cardId}`).value) || 0;
+
+    // Guardar la data en el objeto del ejercicio
+    exercise.performance_data = {
+        weight: actualWeight,
+        reps: actualReps,
+        rir: actualRir
+    };
+
+    exercise.status = 'completed';
+    
+    // Ocultar formulario y actualizar UI
+    document.getElementById(`stats-input-${cardId}`).classList.add('hidden');
     updateCardUI(exerciseName, exercise.status);
     updateFinishButtonState();
 };
@@ -339,8 +398,38 @@ const surveyForm = document.getElementById('routine-survey-form');
 if (surveyForm) {
     surveyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        // Llamada futura a saveRoutineJournal
-        showModalContacto();
+        
+        const rpeSesion = document.getElementById('costo-rutina').value;
+        const sintioDolor = document.querySelector('input[name="sintio-dolor"]:checked').value === 'si';
+        const zonaDolor = document.getElementById('zona-dolor') ? document.getElementById('zona-dolor').value : '';
+        const tipoDolor = document.querySelector('input[name="tipo-dolor"]:checked') ? document.querySelector('input[name="tipo-dolor"]:checked').value : '';
+        
+        // Extraemos solo los ejercicios completados con su performance_data
+        const ejerciciosCompletados = routineExercises
+            .filter(ex => ex.status === 'completed' && ex.performance_data)
+            .map(ex => ({
+                name: ex.exerciseName,
+                ...ex.performance_data
+            }));
+
+        const payload = {
+            routine_name: document.getElementById('day-title').textContent,
+            rpe: parseInt(rpeSesion),
+            sintio_dolor: sintioDolor,
+            detalles_dolor: sintioDolor ? { zona: zonaDolor, tipo: tipoDolor } : {},
+            exercises_data: ejerciciosCompletados // 🔥 AQUÍ ENVIAMOS EL ESFUERZO REAL
+        };
+
+        try {
+            await fetch(`${API_BASE_URL}/api/journal/save_session`, {
+                method: 'POST',
+                headers: getBearerToken(),
+                body: JSON.stringify(payload)
+            });
+            showModalContacto();
+        } catch(err) {
+            showMessage("Error al guardar la bitácora en la bóveda.", "error");
+        }
     });
 }
 
