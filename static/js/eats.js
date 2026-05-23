@@ -15,98 +15,86 @@ async function loadMetabolicEngine() {
     }
 
     try {
-        // 1. Extraer Perfil Biométrico, Métricas Corporales y Carga Mecánica de Hoy de forma simultánea
-        const [profileRes, metricsRes, routineRes] = await Promise.all([
-            fetch(`${API_BASE_URL}/api/profile/me`, { headers: getBearerToken() }).then(r => r.json()),
-            fetch(`${API_BASE_URL}/api/metrics/me`, { headers: getBearerToken() }).then(r => r.json()),
-            // Llamamos a la rutina de hoy para leer el estado del Deload y la configuración base
-            fetch(`${API_BASE_URL}/api/routines/today/Lunes`, { headers: getBearerToken() }).then(r => r.json()) // Se adapta dinámicamente en producción
-        ]);
+        // 1. Llamada directa al nuevo cerebro nutricional de tu backend en Flask
+        const response = await fetch(`${API_BASE_URL}/api/eats/macros`, {
+            headers: getBearerToken()
+        });
 
-        if (!profileRes.success || !metricsRes.success) {
-            document.getElementById('loading-spinner').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-widest text-xs">⚠️ Plan Premium Requerido (Nivel ULTRA).</p>`;
+        // 🛡️ CAPA DE SEGURIDAD ZERO TRUST: Manejo del bloqueo por nivel de suscripción
+        if (response.status === 403) {
+            document.getElementById('loading-spinner').innerHTML = `
+                <div class="p-6 bg-red-950/20 border border-red-500/30 rounded-2xl text-center max-w-md mx-auto msg-animate">
+                    <p class="text-red-400 font-black uppercase tracking-widest text-xs">🔒 MÓDULO BLOQUEADO</p>
+                    <p class="text-gray-400 text-[11px] mt-2 leading-relaxed">
+                        GYMENEZ EATS (Planificación Bioquímica Avanzada) está reservado exclusivamente para atletas del 
+                        <span class="text-[#FFC300] font-bold">PLAN ULTRA</span>. Mejora tu suscripción en el panel.
+                    </p>
+                </div>`;
             return;
         }
 
-        const perfil = profileRes.profile;
-        const metricas = metricsRes.metrics;
+        const data = await response.json();
 
-        // Validar datos mínimos para la fórmula metabólica
-        const peso = parseFloat(metricas.peso) || 70;
-        const estatura = parseFloat(metricas.estatura) || 175;
-        const edad = parseInt(metricas.edad) || 23;
-        const sexo = perfil.sex || 'Hombre';
-
-        // 2. Cálculo Matemático de la Tasa Metabólica Basal (Mifflin-St Jeor)
-        let tmb = 0;
-        if (sexo === 'Hombre') {
-            tmb = (10 * peso) + (6.25 * estatura) - (5 * edad) + 5;
-        } else {
-            tmb = (10 * peso) + (6.25 * estatura) - (5 * edad) - 161;
+        if (!response.ok || !data.success) {
+            document.getElementById('loading-spinner').innerHTML = `
+                <div class="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center max-w-sm mx-auto">
+                    <p class="text-yellow-500 text-xs font-bold uppercase tracking-widest">⚠️ FICHA BIOMÉTRICA INCOMPLETA</p>
+                    <p class="text-gray-400 text-[10px] mt-1">Por favor, solicite la actualización de su peso y altura base en recepción.</p>
+                </div>`;
+            return;
         }
 
-        // 3. Captura del Gasto por Ejercicio (EAT Dinámico)
-        // El backend nos devuelve si hoy se entrenó pesado o hubo deload preventivo
-        let isDeload = false;
-        if (routineRes.success && routineRes.routines.length > 0) {
-            isDeload = routineRes.routines[0].is_deload || false;
-        }
+        // Extraemos los cálculos ya procesados limpiamente por el servidor
+        const met = data.metabolism;
+        const mac = data.macros;
 
-        // Simulación controlada del Tonelaje diario indexado en base de datos para hoy
-        // En una arquitectura ideal lee los workload_logs. Asignamos gasto calórico por esfuerzo mecánico:
-        let gastoEjercicio = isDeload ? 150 : 450; // Si hay descarga, el gasto mecánico baja drásticamente
+        // 2. Renderizado del Gasto Energético Total
+        document.getElementById('calories-display').innerHTML = `${Math.round(met.tdee)} <span class="text-xl text-gray-500 font-bold">KCAL</span>`;
+        document.getElementById('basal-display').textContent = `${Math.round(met.tmb)} kcal`;
+        document.getElementById('exercise-display').textContent = `+${met.exercise_expenditure} kcal`;
 
-        // NEAT estándar (Actividad diaria base)
-        let neat = 300; 
+        // 3. Renderizado de Macronutrientes Dinámicos Calculados
+        document.getElementById('protein-display').innerHTML = `${mac.protein_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
+        document.getElementById('carbs-display').innerHTML = `${mac.carbs_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
+        document.getElementById('fat-display').innerHTML = `${mac.fat_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
 
-        // Gasto Energético Diario Total (TDEE Proyectado)
-        let tdee = tmb + neat + gastoEjercicio;
-
-        // 4. La Partición Inteligente de Macronutrientes
-        // Proteína Estática de alto rendimiento: 2.2 gramos por kilo
-        let proteinaGramos = Math.round(peso * 2.2);
-        let proteinaCalorias = proteinaGramos * 4;
-
-        // Grasa Estable para soporte de testosterona: 25% del metabolismo basal
-        let grasaCalorias = tmb * 0.25;
-        let grasaGramos = Math.round(grasaCalorias / 9);
-
-        // Carbohidratos: El Acelerador Dinámico Ondulante (El resto del presupuesto calórico)
-        let caloriasRestantes = tdee - (proteinaCalorias + grasaCalorias);
-        let carbsGramos = Math.round(caloriasRestantes / 4);
-
-        // 5. Renderizado en Interfaz de Usuario
-        document.getElementById('calories-display').innerHTML = `${Math.round(tdee)} <span class="text-xl text-gray-500 font-bold">KCAL</span>`;
-        document.getElementById('basal-display').textContent = `${Math.round(tmb)} kcal`;
-        document.getElementById('exercise-display').textContent = `+${gastoEjercicio} kcal`;
-
-        document.getElementById('protein-display').innerHTML = `${proteinaGramos}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
-        document.getElementById('carbs-display').innerHTML = `${carbsGramos}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
-        document.getElementById('fat-display').innerHTML = `${grasaGramos}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
-
-        // Ajuste de Tags según el estado del algoritmo ACWR
+        // 4. Modificación de Estatus Visual y Banners según las directrices del Radar ACWR
         const carbsTag = document.getElementById('carbs-status-tag');
         const statusBanner = document.getElementById('status-banner');
-        if (isDeload) {
-            carbsTag.textContent = "📉 RECORTE POR DELOAD";
-            carbsTag.className = "text-[8px] text-red-400 font-bold block mt-0.5";
-            statusBanner.className = "mt-4 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-[10px] font-bold text-red-400 inline-flex items-center gap-2";
-            statusBanner.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> CONTROL DE DAÑOS ACTIVADO: CALORÍAS CONTENIDAS`;
+        
+        if (met.is_deload_active) {
+            if (carbsTag) {
+                carbsTag.textContent = "📉 RECORTE POR DELOAD";
+                carbsTag.className = "text-[8px] text-red-400 font-bold block mt-0.5";
+            }
+            if (statusBanner) {
+                statusBanner.className = "mt-4 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-[10px] font-bold text-red-400 inline-flex items-center gap-2";
+                statusBanner.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> CONTROL DE DAÑOS ACTIVADO: CALORÍAS CONTENIDAS POR SOBREFATIGA`;
+            }
         } else {
-            carbsTag.textContent = "⚡ CARGA DE ADAPTACIÓN";
-            carbsTag.className = "text-[8px] text-emerald-400 font-bold block mt-0.5";
+            if (carbsTag) {
+                carbsTag.textContent = "⚡ CARGA DE ADAPTACIÓN";
+                carbsTag.className = "text-[8px] text-emerald-400 font-bold block mt-0.5";
+            }
+            if (statusBanner) {
+                statusBanner.className = "mt-4 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 inline-flex items-center gap-2";
+                statusBanner.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> MOTOR AJUSTADO SEGÚN TU TONELAJE DE HOY`;
+            }
         }
 
-        // 6. Nutrient Timing: Inyección de Bloques de Comida
-        renderMealTiming(carbsGramos, proteinaGramos, grasaGramos);
+        // 5. Inyección Automatizada del Nutrient Timing (Distribución de Comidas en el DOM)
+        renderMealTiming(mac.carbs_g, mac.protein_g, mac.fat_g);
 
-        // Switch de carga
+        // 6. Apagar capa de carga (Spinner) y revelar el panel de control metabólico
         document.getElementById('loading-spinner').classList.add('hidden');
         document.getElementById('eats-content').classList.remove('hidden');
 
     } catch (error) {
-        console.error("Fallo crítico en el motor bioquímico:", error);
-        document.getElementById('loading-spinner').innerHTML = `<p class="text-red-500 font-black text-xs uppercase tracking-widest">❌ ERROR DE CONEXIÓN CON EL NÚCLEO FINANCIERO-BIOLÓGICO.</p>`;
+        console.error("Fallo perimetral en la conexión bioquímica:", error);
+        document.getElementById('loading-spinner').innerHTML = `
+            <p class="text-red-500 font-black text-xs uppercase tracking-widest text-center">
+                ❌ ERROR DE SINCRONIZACIÓN CON EL NÚCLEO FINANCIERO-BIOLÓGICO.
+            </p>`;
     }
 }
 
