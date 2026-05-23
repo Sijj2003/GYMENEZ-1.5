@@ -107,7 +107,7 @@ if (closeVideoBtn) {
 }
 
 // =======================================================
-// 🧩 SISTEMA DE INTERFAZ Y RUTINAS 🧩
+// 🧩 SISTEMA DE INTERFAZ Y REPRODUCTOR MULTI-SET 🧩
 // =======================================================
 
 function showMessage(message, type = 'success') {
@@ -141,16 +141,26 @@ function renderExercises(exercises) {
 
     exercises.forEach(exercise => {
         const card = document.createElement('div');
-        card.className = 'glass-item-card p-5 md:p-8 rounded-xl md:rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6';
-        
-        exercise.status = exercise.status || 'pending'; 
+        card.className = 'glass-item-card p-5 md:p-8 rounded-xl md:rounded-2xl flex flex-col gap-4';
         const cardId = exercise.exerciseName.replace(/\s/g, '-');
+        
+        // 🧬 Inicializar matriz táctica de sets si no viene estructurada del backend
+        const totalSets = parseInt(exercise.sets) || 1;
+        if (!exercise.sets_data) {
+            exercise.sets_data = Array.from({ length: totalSets }, (_, i) => ({
+                set_num: i + 1,
+                weight: (exercise.weight && exercise.weight !== 'LIBRE') ? parseFloat(exercise.weight) : 0,
+                reps: parseInt(exercise.reps) || 10,
+                rir: 2,
+                completed: false
+            }));
+        }
 
-        // 🔥 ALERTA VISUAL: Sustitución por Dolor Articular (Filtro de Seguridad)
+        // Alerta visual de Escudo Articular
         let protectionBadge = '';
         if (exercise.is_substituted) {
             protectionBadge = `
-                <div class="w-full bg-red-500/10 border border-red-500/30 p-3 rounded-xl mb-4 flex items-start gap-3 fade-in-up">
+                <div class="w-full bg-red-500/10 border border-red-500/30 p-3 rounded-xl mb-2 flex items-start gap-3 fade-in-up">
                     <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     <div>
                         <p class="text-[9px] font-black text-red-400 uppercase tracking-widest">Escudo Articular Activo</p>
@@ -159,148 +169,131 @@ function renderExercises(exercises) {
                 </div>
             `;
         }
+
+        // 📊 Renderizar el panel de control set por set
+        let setsRowsHTML = `<div class="w-full space-y-2.5 mt-2">`;
+        exercise.sets_data.forEach(s => {
+            const rowId = `${cardId}-set-${s.set_num}`;
+            setsRowsHTML += `
+                <div id="row-${rowId}" class="flex items-center justify-between gap-2 bg-black/40 p-3 rounded-xl border border-white/5 transition-all duration-300">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider pl-1">SET ${s.set_num}</span>
+                    <div class="flex items-center gap-2 max-w-[280px] flex-grow justify-end">
+                        <div class="w-20">
+                            <input type="number" id="w-${rowId}" value="${s.weight}" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-1.5 focus:border-[#FFC300] outline-none font-bold" placeholder="KG">
+                        </div>
+                        <div class="w-16">
+                            <input type="number" id="r-${rowId}" value="${s.reps}" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-1.5 focus:border-[#FFC300] outline-none font-bold" placeholder="Reps">
+                        </div>
+                        <div class="w-16">
+                            <input type="number" id="rir-${rowId}" value="${s.rir}" min="0" max="4" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-1.5 focus:border-[#FFC300] outline-none font-bold" placeholder="RIR">
+                        </div>
+                        <button id="btn-${rowId}" onclick="window.confirmSetData('${exercise.exerciseName.replace(/'/g, "\\'")}', ${s.set_num})" class="w-8 h-8 rounded-lg bg-white/5 text-gray-400 hover:text-white flex items-center justify-center transition font-bold text-xs flex-shrink-0">
+                            ✓
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        setsRowsHTML += `</div>`;
         
         card.innerHTML = `
-            <div class="w-full md:w-auto flex-grow mb-2 md:mb-0"> 
+            <div class="w-full"> 
                 ${protectionBadge}
-                <h3 class="text-lg md:text-2xl font-black text-white uppercase tracking-tighter mb-2 drop-shadow-md break-words pr-2">${exercise.exerciseName}</h3>
-                <div class="flex flex-wrap gap-3 md:gap-6 text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                    <p>Sets: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.sets || '-'}</span></p>
-                    <p>Reps: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.reps || '-'}</span></p>
-                    <p>Peso Obj: <span class="text-[#FFC300] text-xs md:text-sm">${exercise.weight || 'LIBRE'}</span></p>
-                </div>
-
-                <div id="stats-input-${cardId}" class="hidden w-full max-w-sm mt-4 p-3 bg-[#050505] rounded-xl border border-[#FFC300]/30 grid grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 text-center">Peso</label>
-                        <input type="number" id="actual-weight-${cardId}" class="w-full bg-black/50 border border-white/10 rounded-lg text-white text-sm text-center py-1.5 focus:border-[#FFC300] outline-none" value="${exercise.weight !== 'LIBRE' ? parseFloat(exercise.weight) : 0}">
-                    </div>
-                    <div>
-                        <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 text-center">Reps</label>
-                        <input type="number" id="actual-reps-${cardId}" class="w-full bg-black/50 border border-white/10 rounded-lg text-white text-sm text-center py-1.5 focus:border-[#FFC300] outline-none" value="${exercise.reps || 0}">
-                    </div>
-                    <div>
-                        <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 text-center">RIR (0-4)</label>
-                        <input type="number" id="actual-rir-${cardId}" min="0" max="4" class="w-full bg-black/50 border border-white/10 rounded-lg text-white text-sm text-center py-1.5 focus:border-[#FFC300] outline-none" value="2">
-                    </div>
-                    <button onclick="window.confirmExerciseStats('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="col-span-3 mt-1 py-2 bg-[#FFC300] text-black text-[9px] font-black rounded-lg uppercase tracking-widest hover:bg-yellow-400 transition shadow-[0_0_10px_rgba(255,195,0,0.3)]">
-                        Guardar & Iniciar Descanso
+                <div class="flex justify-between items-start gap-2 mb-1">
+                    <h3 class="text-lg md:text-2xl font-black text-white uppercase tracking-tighter drop-shadow-md break-words pr-2">${exercise.exerciseName}</h3>
+                    <button onclick="window.openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="flex items-center justify-center p-2 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition group flex-shrink-0">
+                        <svg class="w-4 h-4 group-hover:text-[#FFC300] transition" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
                     </button>
                 </div>
-            </div>
-            
-            <div class="flex items-center space-x-2 md:space-x-4 w-full md:w-auto justify-end border-t border-white/5 pt-4 md:border-t-0 md:pt-0">
-                <button onclick="window.openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" class="flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition group">
-                    <svg class="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:text-[#FFC300] transition" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
-                </button>
-
-                <div class="flex space-x-1.5 md:space-x-2 bg-black/40 p-1 rounded-lg md:rounded-xl border border-white/5"> 
-                    <button id="completed-button-${cardId}" onclick="window.toggleExerciseStatus('${exercise.exerciseName.replace(/'/g, "\\'")}', 'completed')" class="px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white transition">
-                        Check
-                    </button>
-                    <button id="skip-button-${cardId}" onclick="window.toggleExerciseStatus('${exercise.exerciseName.replace(/'/g, "\\'")}', 'skipped')" class="px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white transition">
-                        Skip
-                    </button>
+                <div class="flex gap-4 text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2 pl-0.5">
+                    <p>Sets Plan: <span class="text-white">${exercise.sets || '-'}</span></p>
+                    <p>Reps Plan: <span class="text-white">${exercise.reps || '-'}</span></p>
+                    <p>Peso Plan: <span class="text-white">${exercise.weight || 'LIBRE'}</span></p>
                 </div>
+                ${setsRowsHTML}
             </div>
         `;
         exercisesContainer.appendChild(card);
-        updateCardUI(exercise.exerciseName, exercise.status);
+        
+        // Sincronizar colores si ya se interactuó previamente
+        exercise.sets_data.forEach(s => {
+            if (s.completed) updateSetRowUI(cardId, s.set_num, true);
+        });
     });
     
     updateFinishButtonState();
 }
 
-function updateCardUI(exerciseName, status) {
-    const cardId = exerciseName.replace(/\s/g, '-');
-    const cBtn = document.getElementById(`completed-button-${cardId}`);
-    const sBtn = document.getElementById(`skip-button-${cardId}`);
-    if (!cBtn || !sBtn) return;
-    const card = cBtn.closest('.glass-item-card');
+function updateSetRowUI(cardId, setNum, isCompleted) {
+    const rowId = `${cardId}-set-${setNum}`;
+    const row = document.getElementById(`row-${rowId}`);
+    const btn = document.getElementById(`btn-${rowId}`);
+    if (!row || !btn) return;
 
-    cBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition';
-    sBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition';
-    card.classList.remove('is-completed', 'is-skipped');
-
-    if (status === 'completed') {
-        cBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] transition';
-        card.classList.add('is-completed');
-    } else if (status === 'skipped') {
-        sBtn.className = 'px-3 md:px-5 py-2 md:py-2.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-md md:rounded-lg bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] transition';
-        card.classList.add('is-skipped');
+    if (isCompleted) {
+        row.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
+        btn.className = 'w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center transition font-bold text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]';
+    } else {
+        row.classList.remove('border-emerald-500/30', 'bg-emerald-500/5');
+        btn.className = 'w-8 h-8 rounded-lg bg-white/5 text-gray-400 hover:text-white flex items-center justify-center transition font-bold text-xs';
     }
 }
 
 function updateFinishButtonState() {
     if (!finishRoutineBtn) return;
-    const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.status !== 'pending');
-    finishRoutineBtn.disabled = !allCompleted;
-    finishRoutineBtn.className = `w-full md:w-2/3 py-4 md:py-5 rounded-xl md:rounded-2xl text-[10px] md:text-sm tracking-[0.2em] font-black transition duration-300 uppercase shadow-2xl ${allCompleted ? 'bg-[#FFC300] hover:bg-yellow-400 text-black shadow-[0_0_30px_rgba(255,195,0,0.3)]' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/10'}`;
+    // La rutina está lista cuando TODOS los sets de CADA ejercicio han sido tildados
+    const allSetsCompleted = routineExercises.length > 0 && routineExercises.every(e => 
+        e.sets_data && e.sets_data.every(s => s.completed)
+    );
+    finishRoutineBtn.disabled = !allSetsCompleted;
+    finishRoutineBtn.className = `w-full md:w-2/3 py-4 md:py-5 rounded-xl md:rounded-2xl text-[10px] md:text-sm tracking-[0.2em] font-black transition duration-300 uppercase shadow-2xl ${allSetsCompleted ? 'bg-[#FFC300] hover:bg-yellow-400 text-black shadow-[0_0_30px_rgba(255,195,0,0.3)]' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/10'}`;
 }
 
-window.toggleExerciseStatus = (exerciseName, statusType) => {
-    const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
-    const cardId = exerciseName.replace(/\s/g, '-');
-    const statsInput = document.getElementById(`stats-input-${cardId}`);
-    
-    if (!exercise) return;
-
-    if (statusType === 'completed') {
-        if (exercise.status !== 'completed') {
-            statsInput.classList.remove('hidden');
-        } else {
-            exercise.status = 'pending';
-            statsInput.classList.add('hidden');
-            updateCardUI(exerciseName, exercise.status);
-            updateFinishButtonState();
-        }
-    } else {
-        exercise.status = exercise.status === 'skipped' ? 'pending' : 'skipped';
-        statsInput.classList.add('hidden');
-        updateCardUI(exerciseName, exercise.status);
-        updateFinishButtonState();
-    }
-};
-
 // =======================================================
-// ⏱️ MOTOR DEL CRONÓMETRO NEURONAL (SND CALCULATION)
+// ⏱️ MOTOR DEL CRONÓMETRO NEURONAL (SND INTELLIGENCE)
 // =======================================================
 let currentRestSeconds = 0;
 let totalRestSeconds = 0;
 
-window.confirmExerciseStats = (exerciseName) => {
+window.confirmSetData = (exerciseName, setNum) => {
     const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
-    const cardId = exerciseName.replace(/\s/g, '-');
-    
-    const actualWeight = parseFloat(document.getElementById(`actual-weight-${cardId}`).value) || 0;
-    const actualReps = parseInt(document.getElementById(`actual-reps-${cardId}`).value) || 0;
-    const actualRir = parseInt(document.getElementById(`actual-rir-${cardId}`).value) || 0;
+    if (!exercise) return;
 
-    exercise.performance_data = { weight: actualWeight, reps: actualReps, rir: actualRir };
-    exercise.status = 'completed';
+    const cardId = exerciseName.replace(/\s/g, '-');
+    const rowId = `${cardId}-set-${setNum}`;
     
-    document.getElementById(`stats-input-${cardId}`).classList.add('hidden');
-    updateCardUI(exerciseName, exercise.status);
+    const actualWeight = parseFloat(document.getElementById(`w-${rowId}`).value) || 0;
+    const actualReps = parseInt(document.getElementById(`r-${rowId}`).value) || 0;
+    const actualRir = parseInt(document.getElementById(`rir-${rowId}`).value) || 0;
+
+    const setIdx = setNum - 1;
+    const sData = exercise.sets_data[setIdx];
+
+    // Conmutador de estado (Check / Uncheck)
+    sData.completed = !sData.completed;
+    sData.weight = actualWeight;
+    sData.reps = actualReps;
+    sData.rir = actualRir;
+
+    updateSetRowUI(cardId, setNum, sData.completed);
     updateFinishButtonState();
 
-    // 🧬 CÁLCULO DE DEMANDA NEURONAL (SND) PARA DESCANSO
-    // Matemáticamente evitamos buscar el E1RM. Intensidad Relativa = 1.0278 - 0.0278 * (Reps + RIR)
-    let I_rel = 1.0278 - (0.0278 * (actualReps + actualRir));
-    if (I_rel > 1.0) I_rel = 1.0;
-    if (I_rel < 0.4) I_rel = 0.4;
+    // 🧬 Si el set acaba de completarse, disparamos el cálculo del cronómetro neuronal
+    if (sData.completed) {
+        let I_rel = 1.0278 - (0.0278 * (actualReps + actualRir));
+        if (I_rel > 1.0) I_rel = 1.0;
+        if (I_rel < 0.4) I_rel = 0.4;
 
-    const T_c = exercise.is_substituted ? 1.0 : 1.5; // Tier promedio. Aislamiento = 1.0
-    const P_f = 1 / (actualRir + 1); // Penalización por Fallo
-    const SND = (I_rel * T_c) + P_f;
-    
-    // t_rest = 60 + (SND * 60)
-    let calculatedRestTime = Math.round(60 + (SND * 60));
-    
-    // Limits de sanidad
-    if (calculatedRestTime < 60) calculatedRestTime = 60;
-    if (calculatedRestTime > 300) calculatedRestTime = 300; 
+        const T_c = exercise.is_substituted ? 1.0 : 1.5; 
+        const P_f = 1 / (actualRir + 1); 
+        const SND = (I_rel * T_c) + P_f;
+        
+        let calculatedRestTime = Math.round(60 + (SND * 60));
+        if (calculatedRestTime < 60) calculatedRestTime = 60;
+        if (calculatedRestTime > 300) calculatedRestTime = 300; 
 
-    startNeuralTimer(calculatedRestTime);
+        startNeuralTimer(calculatedRestTime);
+    }
 };
 
 function startNeuralTimer(seconds) {
@@ -310,7 +303,6 @@ function startNeuralTimer(seconds) {
     
     if (!overlay || !display || !circle) return;
 
-    // Detener cualquier timer previo
     if (neuralTimerInterval) clearInterval(neuralTimerInterval);
 
     totalRestSeconds = seconds;
@@ -325,7 +317,6 @@ function startNeuralTimer(seconds) {
 
         if (currentRestSeconds <= 0) {
             endNeuralTimer();
-            // Sonido de alerta sutil
             try { navigator.vibrate([200, 100, 200]); } catch(e){}
         }
     }, 1000);
@@ -334,12 +325,12 @@ function startNeuralTimer(seconds) {
 function updateTimerUI() {
     const display = document.getElementById('timer-display');
     const circle = document.getElementById('timer-progress');
+    if (!display || !circle) return;
     
     const minutes = Math.floor(currentRestSeconds / 60);
     const secs = currentRestSeconds % 60;
     display.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
-    // Circunferencia del círculo r=68 es ~427
     const dashoffset = 427 - (427 * (currentRestSeconds / totalRestSeconds));
     circle.style.strokeDashoffset = dashoffset;
 }
@@ -350,7 +341,6 @@ function endNeuralTimer() {
     if (overlay) overlay.classList.add('translate-y-full');
 }
 
-// Controles del Modal de Tiempo
 const addTimeBtn = document.getElementById('timer-add-btn');
 if(addTimeBtn) {
     addTimeBtn.addEventListener('click', () => {
@@ -374,7 +364,6 @@ async function loadRoutine() {
         const data = await response.json();
         
         if (data.success && data.routines.length > 0 && data.routines[0].exercises) {
-            // 🔥 ALERTA ACWR (Riesgo de Lesión por Volumen)
             if (data.routines[0].is_deload) {
                 showMessage("ALERTA ACWR: Riesgo de lesión alto. Fase de Descarga Activada.", "error");
                 if (dayTitle) dayTitle.innerHTML = `${CURRENT_DAY} <span class="block text-xl text-red-500 mt-2 tracking-widest">(DELOAD)</span>`;
@@ -398,7 +387,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // =======================================================
-// 🏁 EVENTOS DE FINALIZACIÓN Y ENCUESTA
+// 🏁 EVENTOS DE FINALIZACIÓN Y ENCUESTA DETALLADA
 // =======================================================
 if (finishRoutineBtn) {
     finishRoutineBtn.addEventListener('click', () => {
@@ -453,12 +442,22 @@ if (surveyForm) {
         const zonaDolor = document.getElementById('zona-dolor') ? document.getElementById('zona-dolor').value : '';
         const tipoDolor = document.querySelector('input[name="tipo-dolor"]:checked') ? document.querySelector('input[name="tipo-dolor"]:checked').value : '';
         
-        const ejerciciosCompletados = routineExercises
-            .filter(ex => ex.status === 'completed' && ex.performance_data)
-            .map(ex => ({
-                name: ex.original_exercise || ex.exerciseName, 
-                ...ex.performance_data
-            }));
+        // 📊 APLANADO SEGURO DE SETS COMPLETADOS PARA EL SERVER
+        const ejerciciosCompletados = [];
+        routineExercises.forEach(ex => {
+            if (ex.sets_data) {
+                ex.sets_data.forEach(s => {
+                    if (s.completed) {
+                        ejerciciosCompletados.push({
+                            name: ex.original_exercise || ex.exerciseName, 
+                            weight: s.weight,
+                            reps: s.reps,
+                            rir: s.rir
+                        });
+                    }
+                });
+            }
+        });
 
         const payload = {
             routine_name: document.getElementById('day-title').textContent,
@@ -473,7 +472,7 @@ if (surveyForm) {
                 method: 'POST',
                 headers: {
                     ...getBearerToken(),
-                    'Content-Type': 'application/json' // 🔥 Se inyecta Content-Type para solucionar el error 415
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
