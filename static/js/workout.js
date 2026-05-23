@@ -168,7 +168,6 @@ function renderExercises(exercises) {
             `;
         }
 
-        // 📊 ESTRUCTURA MATRICIAL MODERNA CON FILA GUÍA SUPERIOR
         let setsRowsHTML = `
             <div class="w-full space-y-2 mt-2">
                 <div class="grid grid-cols-12 gap-2 text-[8px] md:text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 mb-1 text-center">
@@ -256,7 +255,7 @@ function updateFinishButtonState() {
 }
 
 // =======================================================
-// ⏱️ MOTOR DEL CRONÓMETRO NEURONAL (SND INTELLIGENCE)
+// ⏱️ MOTOR DEL CRONÓMETRO NEURONAL (SND INTELLIGENCE + LÍMITES LÓGICOS)
 // =======================================================
 let currentRestSeconds = 0;
 let totalRestSeconds = 0;
@@ -268,9 +267,33 @@ window.confirmSetData = (exerciseName, setNum) => {
     const cardId = exerciseName.replace(/\s/g, '-');
     const rowId = `${cardId}-set-${setNum}`;
     
-    const actualWeight = parseFloat(document.getElementById(`w-${rowId}`).value) || 0;
-    const actualReps = parseInt(document.getElementById(`r-${rowId}`).value) || 0;
-    const actualRir = parseInt(document.getElementById(`rir-${rowId}`).value) || 0;
+    let actualWeight = parseFloat(document.getElementById(`w-${rowId}`).value) || 0;
+    let actualReps = parseInt(document.getElementById(`r-${rowId}`).value) || 0;
+    let actualRir = parseInt(document.getElementById(`rir-${rowId}`).value) || 0;
+
+    // 🛡️ BARRERAS DE SEGURIDAD ANALÍTICA (ANTI-CIFRAS DEMENCIALES)
+    if (actualWeight < 0) actualWeight = 0;
+    if (actualWeight > 1000) { 
+        actualWeight = 1000; 
+        showMessage("Peso ajustado al límite (Máx 1,000 KG)", "error"); 
+    }
+
+    if (actualReps < 0) actualReps = 0;
+    if (actualReps > 100) { 
+        actualReps = 100; 
+        showMessage("Repeticiones ajustadas al límite (Máx 100)", "error"); 
+    }
+
+    if (actualRir < 0) actualRir = 0;
+    if (actualRir > 4) { 
+        actualRir = 4; 
+        showMessage("RIR ajustado al rango analítico (0 a 4)", "error"); 
+    }
+
+    // Actualizar visualmente las celdas limpiando errores de tipeo
+    document.getElementById(`w-${rowId}`).value = actualWeight;
+    document.getElementById(`r-${rowId}`).value = actualReps;
+    document.getElementById(`rir-${rowId}`).value = actualRir;
 
     const setIdx = setNum - 1;
     const sData = exercise.sets_data[setIdx];
