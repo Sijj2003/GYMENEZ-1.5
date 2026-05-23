@@ -2,11 +2,17 @@
 
 const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
 
+// =======================================================
+// 🛡️ FUNCIÓN DE SEGURIDAD: OBTENER TOKEN
+// =======================================================
 function getBearerToken() {
     const token = localStorage.getItem('gymen_auth_token');
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
+// =======================================================
+// 🧬 CARGA Y ORQUESTACIÓN DEL MOTOR METABÓLICO
+// =======================================================
 async function loadMetabolicEngine() {
     const token = localStorage.getItem('gymen_auth_token');
     if (!token) {
@@ -15,12 +21,12 @@ async function loadMetabolicEngine() {
     }
 
     try {
-        // 1. Llamada directa al nuevo cerebro nutricional de tu backend en Flask
+        // Llamada directa al núcleo de bio-ingeniería nutricional del servidor
         const response = await fetch(`${API_BASE_URL}/api/eats/macros`, {
             headers: getBearerToken()
         });
 
-        // 🛡️ CAPA DE SEGURIDAD ZERO TRUST: Manejo del bloqueo por nivel de suscripción
+        // 🛡️ MANEJO DE ESCUDO DE PLANES (Control Zero Trust en Frontend)
         if (response.status === 403) {
             document.getElementById('loading-spinner').innerHTML = `
                 <div class="p-6 bg-red-950/20 border border-red-500/30 rounded-2xl text-center max-w-md mx-auto msg-animate">
@@ -44,21 +50,20 @@ async function loadMetabolicEngine() {
             return;
         }
 
-        // Extraemos los cálculos ya procesados limpiamente por el servidor
         const met = data.metabolism;
         const mac = data.macros;
 
-        // 2. Renderizado del Gasto Energético Total
+        // 1. Renderizado de Presupuesto Energético
         document.getElementById('calories-display').innerHTML = `${Math.round(met.tdee)} <span class="text-xl text-gray-500 font-bold">KCAL</span>`;
         document.getElementById('basal-display').textContent = `${Math.round(met.tmb)} kcal`;
         document.getElementById('exercise-display').textContent = `+${met.exercise_expenditure} kcal`;
 
-        // 3. Renderizado de Macronutrientes Dinámicos Calculados
+        // 2. Renderizado de Macronutrientes Dinámicos
         document.getElementById('protein-display').innerHTML = `${mac.protein_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
         document.getElementById('carbs-display').innerHTML = `${mac.carbs_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
         document.getElementById('fat-display').innerHTML = `${mac.fat_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
 
-        // 4. Modificación de Estatus Visual y Banners según las directrices del Radar ACWR
+        // 3. Modificación del Estatus Visual según Directrices del Radar ACWR
         const carbsTag = document.getElementById('carbs-status-tag');
         const statusBanner = document.getElementById('status-banner');
         
@@ -82,15 +87,15 @@ async function loadMetabolicEngine() {
             }
         }
 
-        // 5. Inyección Automatizada del Nutrient Timing (Distribución de Comidas en el DOM)
+        // 4. Inyección del Nutrient Timing (Distribución de Comidas Críticas)
         renderMealTiming(mac.carbs_g, mac.protein_g, mac.fat_g);
 
-        // 6. Apagar capa de carga (Spinner) y revelar el panel de control metabólico
+        // 5. Apagar Capa de Carga y mostrar panel principal
         document.getElementById('loading-spinner').classList.add('hidden');
         document.getElementById('eats-content').classList.remove('hidden');
 
     } catch (error) {
-        console.error("Fallo perimetral en la conexión bioquímica:", error);
+        console.error("Fallo perimetral en conexión bioquímica:", error);
         document.getElementById('loading-spinner').innerHTML = `
             <p class="text-red-500 font-black text-xs uppercase tracking-widest text-center">
                 ❌ ERROR DE SINCRONIZACIÓN CON EL NÚCLEO FINANCIERO-BIOLÓGICO.
@@ -98,16 +103,20 @@ async function loadMetabolicEngine() {
     }
 }
 
+// =======================================================
+// ⏰ MOTOR DE NUTRIENT TIMING (CRONO-NUTRICIÓN)
+// =======================================================
 function renderMealTiming(totalCarbs, totalProtein, totalFat) {
     const container = document.getElementById('meals-container');
+    if (!container) return;
     container.innerHTML = '';
 
-    // Mapeo bioquímico de distribución (Ventana de entrenamiento a las 7PM recomendada)
+    // Mapeo biomédico exacto de distribución de nutrientes
     const meals = [
-        { name: "Desayuno (Carga Base)", c: 0.20, p: 0.25, f: 0.30, desc: "Alineación energética e inhibición del catabolismo nocturno." },
-        { name: "Almuerzo (Pre-Entreno)", c: 0.25, p: 0.25, f: 0.30, desc: "Saturación de glucógeno y aminoácidos plasmáticos." },
-        { name: "Cena (Post-Entreno VIP)", c: 0.45, p: 0.35, f: 0.10, desc: "Disparo masivo de insulina para vaciar cortisol y reparar tejido." },
-        { name: "Snack / Colación", c: 0.10, p: 0.15, f: 0.30, desc: "Soporte lipídico estructural del sistema nervioso." }
+        { name: "Desayuno (Carga Base)", c: 0.20, p: 0.25, f: 0.30, desc: "Alineación energética basal e inhibición del catabolismo proteico nocturno." },
+        { name: "Almuerzo (Pre-Entreno)", c: 0.25, p: 0.25, f: 0.30, desc: "Optimización y saturación de glucógeno y aminoácidos plasmáticos antes de la carga." },
+        { name: "Cena (Post-Entreno VIP)", c: 0.45, p: 0.35, f: 0.10, desc: "Disparo masivo de insulina para deprimir el cortisol, reponer ATP y reparar tejido miofibrilar." },
+        { name: "Snack / Colación", c: 0.10, p: 0.15, f: 0.30, desc: "Soporte lipídico estructural y balance de ácidos grasos esenciales para el sistema nervioso." }
     ];
 
     meals.forEach(meal => {
@@ -116,7 +125,7 @@ function renderMealTiming(totalCarbs, totalProtein, totalFat) {
         const mFat = Math.round(totalFat * meal.f);
 
         const card = document.createElement('div');
-        card.className = 'p-5 bg-black/40 rounded-2xl border border-white/5 hover:border-emerald-500/20 transition-all flex flex-col justify-between';
+        card.className = 'p-5 bg-black/40 rounded-2xl border border-white/5 hover:border-emerald-500/20 transition-all flex flex-col justify-between msg-animate';
         card.innerHTML = `
             <div>
                 <h5 class="text-xs font-black uppercase text-white tracking-wider mb-1">${meal.name}</h5>
@@ -132,5 +141,5 @@ function renderMealTiming(totalCarbs, totalProtein, totalFat) {
     });
 }
 
-// Inicialización automática
+// Inicialización perimetral al cargar el árbol del DOM
 window.addEventListener('DOMContentLoaded', loadMetabolicEngine);
