@@ -107,7 +107,7 @@ if (closeVideoBtn) {
 }
 
 // =======================================================
-// 🧩 SISTEMA DE INTERFAZ Y REPRODUCTOR MULTI-SET 🧩
+// 🧩 SISTEMA DE INTERFAZ Y REPRODUCTOR MULTI-SET MATRICIAL 🧩
 // =======================================================
 
 function showMessage(message, type = 'success') {
@@ -144,7 +144,6 @@ function renderExercises(exercises) {
         card.className = 'glass-item-card p-5 md:p-8 rounded-xl md:rounded-2xl flex flex-col gap-4';
         const cardId = exercise.exerciseName.replace(/\s/g, '-');
         
-        // 🧬 Inicializar matriz táctica de sets si no viene estructurada del backend
         const totalSets = parseInt(exercise.sets) || 1;
         if (!exercise.sets_data) {
             exercise.sets_data = Array.from({ length: totalSets }, (_, i) => ({
@@ -156,7 +155,6 @@ function renderExercises(exercises) {
             }));
         }
 
-        // Alerta visual de Escudo Articular
         let protectionBadge = '';
         if (exercise.is_substituted) {
             protectionBadge = `
@@ -170,24 +168,34 @@ function renderExercises(exercises) {
             `;
         }
 
-        // 📊 Renderizar el panel de control set por set
-        let setsRowsHTML = `<div class="w-full space-y-2.5 mt-2">`;
+        // 📊 ESTRUCTURA MATRICIAL MODERNA CON FILA GUÍA SUPERIOR
+        let setsRowsHTML = `
+            <div class="w-full space-y-2 mt-2">
+                <div class="grid grid-cols-12 gap-2 text-[8px] md:text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 mb-1 text-center">
+                    <div class="col-span-2 text-left">SERIE</div>
+                    <div class="col-span-3">PESO (KG)</div>
+                    <div class="col-span-3">REPS</div>
+                    <div class="col-span-2">RIR</div>
+                    <div class="col-span-2">ESTADO</div>
+                </div>
+        `;
+
         exercise.sets_data.forEach(s => {
             const rowId = `${cardId}-set-${s.set_num}`;
             setsRowsHTML += `
-                <div id="row-${rowId}" class="flex items-center justify-between gap-2 bg-black/40 p-3 rounded-xl border border-white/5 transition-all duration-300">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider pl-1">SET ${s.set_num}</span>
-                    <div class="flex items-center gap-2 max-w-[280px] flex-grow justify-end">
-                        <div class="w-20">
-                            <input type="number" id="w-${rowId}" value="${s.weight}" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-1.5 focus:border-[#FFC300] outline-none font-bold" placeholder="KG">
-                        </div>
-                        <div class="w-16">
-                            <input type="number" id="r-${rowId}" value="${s.reps}" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-1.5 focus:border-[#FFC300] outline-none font-bold" placeholder="Reps">
-                        </div>
-                        <div class="w-16">
-                            <input type="number" id="rir-${rowId}" value="${s.rir}" min="0" max="4" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-1.5 focus:border-[#FFC300] outline-none font-bold" placeholder="RIR">
-                        </div>
-                        <button id="btn-${rowId}" onclick="window.confirmSetData('${exercise.exerciseName.replace(/'/g, "\\'")}', ${s.set_num})" class="w-8 h-8 rounded-lg bg-white/5 text-gray-400 hover:text-white flex items-center justify-center transition font-bold text-xs flex-shrink-0">
+                <div id="row-${rowId}" class="grid grid-cols-12 gap-2 items-center bg-black/40 p-2 md:p-3 rounded-xl border border-white/5 transition-all duration-300 text-center">
+                    <span class="col-span-2 text-[10px] font-black text-gray-400 uppercase tracking-wider text-left pl-1">S${s.set_num}</span>
+                    <div class="col-span-3">
+                        <input type="number" id="w-${rowId}" value="${s.weight}" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-2 focus:border-[#FFC300] outline-none font-bold select-all" placeholder="0">
+                    </div>
+                    <div class="col-span-3">
+                        <input type="number" id="r-${rowId}" value="${s.reps}" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-2 focus:border-[#FFC300] outline-none font-bold select-all" placeholder="0">
+                    </div>
+                    <div class="col-span-2">
+                        <input type="number" id="rir-${rowId}" value="${s.rir}" min="0" max="4" class="w-full bg-black/60 border border-white/10 rounded-lg text-white text-xs text-center py-2 focus:border-[#FFC300] outline-none font-bold" placeholder="2">
+                    </div>
+                    <div class="col-span-2 flex justify-center">
+                        <button id="btn-${rowId}" onclick="window.confirmSetData('${exercise.exerciseName.replace(/'/g, "\\'")}', ${s.set_num})" class="w-full max-w-[42px] h-8 rounded-lg bg-white/5 text-gray-400 hover:text-white flex items-center justify-center transition font-black text-xs">
                             ✓
                         </button>
                     </div>
@@ -215,7 +223,6 @@ function renderExercises(exercises) {
         `;
         exercisesContainer.appendChild(card);
         
-        // Sincronizar colores si ya se interactuó previamente
         exercise.sets_data.forEach(s => {
             if (s.completed) updateSetRowUI(cardId, s.set_num, true);
         });
@@ -232,16 +239,15 @@ function updateSetRowUI(cardId, setNum, isCompleted) {
 
     if (isCompleted) {
         row.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
-        btn.className = 'w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center transition font-bold text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]';
+        btn.className = 'w-full max-w-[42px] h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center transition font-black text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]';
     } else {
         row.classList.remove('border-emerald-500/30', 'bg-emerald-500/5');
-        btn.className = 'w-8 h-8 rounded-lg bg-white/5 text-gray-400 hover:text-white flex items-center justify-center transition font-bold text-xs';
+        btn.className = 'w-full max-w-[42px] h-8 rounded-lg bg-white/5 text-gray-400 hover:text-white flex items-center justify-center transition font-black text-xs';
     }
 }
 
 function updateFinishButtonState() {
     if (!finishRoutineBtn) return;
-    // La rutina está lista cuando TODOS los sets de CADA ejercicio han sido tildados
     const allSetsCompleted = routineExercises.length > 0 && routineExercises.every(e => 
         e.sets_data && e.sets_data.every(s => s.completed)
     );
@@ -269,7 +275,6 @@ window.confirmSetData = (exerciseName, setNum) => {
     const setIdx = setNum - 1;
     const sData = exercise.sets_data[setIdx];
 
-    // Conmutador de estado (Check / Uncheck)
     sData.completed = !sData.completed;
     sData.weight = actualWeight;
     sData.reps = actualReps;
@@ -278,7 +283,6 @@ window.confirmSetData = (exerciseName, setNum) => {
     updateSetRowUI(cardId, setNum, sData.completed);
     updateFinishButtonState();
 
-    // 🧬 Si el set acaba de completarse, disparamos el cálculo del cronómetro neuronal
     if (sData.completed) {
         let I_rel = 1.0278 - (0.0278 * (actualReps + actualRir));
         if (I_rel > 1.0) I_rel = 1.0;
@@ -442,7 +446,6 @@ if (surveyForm) {
         const zonaDolor = document.getElementById('zona-dolor') ? document.getElementById('zona-dolor').value : '';
         const tipoDolor = document.querySelector('input[name="tipo-dolor"]:checked') ? document.querySelector('input[name="tipo-dolor"]:checked').value : '';
         
-        // 📊 APLANADO SEGURO DE SETS COMPLETADOS PARA EL SERVER
         const ejerciciosCompletados = [];
         routineExercises.forEach(ex => {
             if (ex.sets_data) {
