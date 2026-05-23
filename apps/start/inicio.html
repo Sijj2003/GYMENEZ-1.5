@@ -19,7 +19,7 @@
             overflow-x: hidden;
         }
         
-        /* Glassmorphism de Alta Gama */
+        /* Glassmorphism de Alta Gama - Opacidad en 0.6 para soportar Firefox */
         .glass-panel {
             background: rgba(15, 15, 20, 0.6);
             backdrop-filter: blur(24px);
@@ -77,11 +77,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-
-        /* Estilos de Selección para la encuesta Matutina */
-        .score-box { @apply bg-white/5 border border-white/10 rounded-xl py-3 text-center text-xs font-black transition-all cursor-pointer select-none text-gray-400; }
-        .score-box:hover { @apply border-white/30 text-white bg-white/[0.02]; }
-        .score-box.active { background: #FFC300; border-color: #FFC300; color: #000000; box-shadow: 0 0 20px rgba(255, 195, 0, 0.4); }
     </style>
 </head>
 <body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden">
@@ -90,55 +85,6 @@
 
     <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-20 -z-10 mix-blend-screen grayscale"></div>
     <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
-
-    <div id="readiness-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-2xl z-[9998] flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-[32px] p-6 md:p-8 border border-white/10 shadow-2xl relative fade-in-up">
-            <div class="text-center mb-6">
-                <span class="px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[8px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-2">Biometric Calibration</span>
-                <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Morning Check-In</h3>
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Calibra el algoritmo de cargas antes de entrenar</p>
-            </div>
-
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">1. Calidad del Sueño (Recuperación)</label>
-                    <div class="grid grid-cols-5 gap-2" id="group-sleep">
-                        <div class="score-box" onclick="setScore('sleep', 1)">1</div>
-                        <div class="score-box" onclick="setScore('sleep', 2)">2</div>
-                        <div class="score-box active" onclick="setScore('sleep', 3)">3</div>
-                        <div class="score-box" onclick="setScore('sleep', 4)">4</div>
-                        <div class="score-box" onclick="setScore('sleep', 5)">5</div>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">2. Nivel de Estrés Perceptivo</label>
-                    <div class="grid grid-cols-5 gap-2" id="group-stress">
-                        <div class="score-box" onclick="setScore('stress', 1)">1</div>
-                        <div class="score-box" onclick="setScore('stress', 2)">2</div>
-                        <div class="score-box active" onclick="setScore('stress', 3)">3</div>
-                        <div class="score-box" onclick="setScore('stress', 4)">4</div>
-                        <div class="score-box" onclick="setScore('stress', 5)">5</div>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">3. Recuperación Muscular (DOMS)</label>
-                    <div class="grid grid-cols-5 gap-2" id="group-doms">
-                        <div class="score-box" onclick="setScore('doms', 1)">1</div>
-                        <div class="score-box" onclick="setScore('doms', 2)">2</div>
-                        <div class="score-box active" onclick="setScore('doms', 3)">3</div>
-                        <div class="score-box" onclick="setScore('doms', 4)">4</div>
-                        <div class="score-box" onclick="setScore('doms', 5)">5</div>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="submitReadinessTelemetry()" class="w-full bg-[#FFC300] hover:bg-yellow-400 text-black font-black text-xs uppercase tracking-widest py-4 rounded-2xl mt-8 transition duration-300 shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)]">
-                Calibrar Motor Biométrico
-            </button>
-        </div>
-    </div>
 
     <div id="dashboard-screen" class="min-h-screen w-full relative z-10 flex flex-col">
         
@@ -187,7 +133,7 @@
                     </div>
                     
                      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-                        <a id="workout-hub-link" href="/apps/user/routines.html" class="bg-gradient-to-r from-[#FFC300] to-[#FFB000] text-black font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] hover:scale-[1.02] transition-all">
+                        <a href="/apps/user/routines.html" class="bg-gradient-to-r from-[#FFC300] to-[#FFB000] text-black font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] hover:scale-[1.02] transition-all">
                             <span>Ir a Workout</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </a>
@@ -255,21 +201,6 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
-        // 🚀 TUNELIZACIÓN INTELIGENTE DE ENTORNO PERIMETRAL
-        const isLocalhost = window.location.hostname === '127.0.0.1' || 
-                            window.location.hostname === 'localhost' || 
-                            window.location.protocol === 'file:';
-
-        const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
-
-        // Variables de Estado de Calibración Matutina
-        let readinessTelemetry = { sleep: 3, stress: 3, doms: 3 };
-
-        function getBearerToken() {
-            const token = localStorage.getItem('gymen_auth_token');
-            return token ? { 'Authorization': `Bearer ${token}` } : {};
-        }
-
         function showMessage(message, type = 'error') {
             const messagebox = document.getElementById('message-box');
             if(!messagebox) return;
@@ -283,61 +214,6 @@
                 messagebox.style.opacity = '0';
                 messagebox.style.transform = 'translate(-50%, -20px)';
             }, 3500);
-        }
-
-        // ==========================================
-        // TACTICAL UI: INTERACCIÓN DEL CHECK-IN
-        // ==========================================
-        function setScore(metric, value) {
-            readinessTelemetry[metric] = value;
-            const container = document.getElementById(`group-${metric}`);
-            if (!container) return;
-
-            // Limpiar estados previos de los hermanos
-            container.querySelectorAll('.score-box').forEach((box, index) => {
-                if (index + 1 === value) {
-                    box.classList.add('active');
-                } else {
-                    box.classList.remove('active');
-                }
-            });
-        }
-
-        async function submitReadinessTelemetry() {
-            const token = localStorage.getItem('gymen_auth_token');
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/journal/readiness`, {
-                    method: 'POST',
-                    headers: {
-                        ...getBearerToken(),
-                        'Content-Type': 'application/json' // Blindaje anti-415
-                    },
-                    body: JSON.stringify({
-                        sleep_score: readinessTelemetry.sleep,
-                        stress_score: readinessTelemetry.stress,
-                        doms_score: readinessTelemetry.doms
-                    })
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    showMessage("Motor Calibrado Exitosamente. Cargas Actualizadas.", "success");
-                    // Sellar el día en LocalStorage para no molestar al usuario en su navegación interna
-                    localStorage.setItem(`gymen_readiness_done_${todayStr}`, 'true');
-                    
-                    // Quitar bloqueo visual
-                    const modal = document.getElementById('readiness-modal');
-                    modal.classList.add('opacity-0');
-                    setTimeout(() => modal.classList.add('hidden'), 500);
-                } else {
-                    showMessage("Error al procesar la telemetría en el núcleo.", "error");
-                }
-            } catch (err) {
-                console.error(err);
-                showMessage("Fallo crítico de red con la aduana perimetral.", "error");
-            }
         }
 
         function lockCard(cardElement, requiredLevel) {
@@ -392,6 +268,7 @@
 
         // ==========================================
         // ALGORITMO GENERADOR DE MOTIVACIÓN 
+        // 10,000 Combinaciones Neutrales y Premium
         // ==========================================
         function setMotivationalQuote() {
             const quoteEl = document.getElementById('motivational-message');
@@ -430,8 +307,11 @@
 
         // Ejecución al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Activar frase motivacional
             setMotivationalQuote();
 
+            // 2. Cargar sesión y nombre
             const storedSession = localStorage.getItem('userSession');
             
             if (storedSession) {
@@ -444,14 +324,7 @@
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
-                // 🔥 EVALUAR FILTRO DE CONTROL MATUTINO: OBLIGATORIO POR DÍA
-                const todayStr = new Date().toISOString().split('T')[0];
-                if (!localStorage.getItem(`gymen_readiness_done_${todayStr}`)) {
-                    const modal = document.getElementById('readiness-modal');
-                    modal.classList.remove('hidden');
-                }
-
-                // Fetch Nivel Suscripción protegido con Token JWT
+                // 3. Fetch Nivel Suscripción protegido con Token JWT
                 const token = localStorage.getItem('gymen_auth_token');
                 fetch(`${API_BASE_URL}/api/profile/me`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
