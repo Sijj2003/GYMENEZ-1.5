@@ -319,6 +319,17 @@ async function loadRoutine() {
         const data = await response.json();
         
         if (data.success && data.routines.length > 0 && data.routines[0].exercises) {
+            
+            // 🔥 NUEVO: Verificar si el backend decretó semana de descarga (ACWR)
+            if (data.routines[0].is_deload) {
+                showMessage("ALERTA ACWR: Riesgo de lesión alto. Fase de Supercompensación Activada. Se ha reducido el volumen de trabajo.", "error");
+                
+                // Cambiar el título para que el atleta lo note
+                if (dayTitle) {
+                    dayTitle.innerHTML = `${CURRENT_DAY} <span class="block text-xl text-red-500 mt-2 tracking-widest">(DELOAD)</span>`;
+                }
+            }
+
             renderExercises(data.routines[0].exercises);
         } else {
             if (loadingSpinner) loadingSpinner.classList.add('hidden');
