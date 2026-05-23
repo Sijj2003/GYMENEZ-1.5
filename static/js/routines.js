@@ -87,8 +87,84 @@ function highlightTodayRoutine() {
     }
 }
 
+// =======================================================
+// 🔥 INTERCEPTOR DEL READINESS CHECK-IN (INTELIGENCIA SINTIENTE)
+// =======================================================
+function setupReadinessInterceptor() {
+    // 1. Interceptar clics en las tarjetas de entrenamiento
+    document.querySelectorAll('.day-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault(); // Detenemos la navegación instantánea
+            const targetDay = card.getAttribute('data-day');
+            
+            const readinessModal = document.getElementById('readiness-modal');
+            const targetInput = document.getElementById('target-workout-day');
+            
+            if (readinessModal && targetInput) {
+                // Guardamos hacia dónde quería ir el usuario y mostramos el escaneo
+                targetInput.value = targetDay;
+                readinessModal.classList.remove('hidden');
+            } else {
+                // Si por alguna razón el modal no existe, lo dejamos pasar (Fallback)
+                window.location.href = `workout.html?day=${targetDay}`;
+            }
+        });
+    });
+
+    // 2. Manejar el envío del formulario de Readiness
+    const readinessForm = document.getElementById('readiness-form');
+    if (readinessForm) {
+        readinessForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('readiness-submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'CALIBRANDO...';
+
+            try {
+                // Capturar valores seleccionados por el atleta
+                const sleep = parseInt(document.querySelector('input[name="sleep_score"]:checked').value);
+                const stress = parseInt(document.querySelector('input[name="stress_score"]:checked').value);
+                const doms = parseInt(document.querySelector('input[name="doms_score"]:checked').value);
+                const targetDay = document.getElementById('target-workout-day').value;
+
+                // Obtenemos el token para autenticar la petición
+                const token = localStorage.getItem('gymen_auth_token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                // Enviamos la información al Motor Biométrico
+                const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
+                await fetch(`${API_BASE_URL}/api/journal/readiness`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        sleep_score: sleep, 
+                        stress_score: stress, 
+                        doms_score: doms 
+                    })
+                });
+
+                // Calibración completada: Redirigimos al túnel de entrenamiento
+                window.location.href = `workout.html?day=${targetDay}`;
+
+            } catch (error) {
+                console.error("Error sincronizando readiness:", error);
+                showMessage("Fallo de red. Procediendo con pesos estándar.", "error");
+                
+                // Fallback: Si el servidor falla, igual lo dejamos entrenar
+                const fallbackDay = document.getElementById('target-workout-day').value || 'Lunes';
+                setTimeout(() => {
+                    window.location.href = `workout.html?day=${fallbackDay}`;
+                }, 1500);
+            }
+        });
+    }
+}
+
 // Inicialización al cargar el DOM
 window.addEventListener('DOMContentLoaded', () => {
     initSession();
     highlightTodayRoutine();
+    setupReadinessInterceptor();
 });
