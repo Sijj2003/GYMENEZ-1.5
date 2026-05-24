@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ | Unirse al Ecosistema</title>
+    
+    <link rel="icon" type="image/png" href="static/img/logos/mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #030305; 
+            color: white; 
+            overflow-x: hidden;
+        }
+
+        /* 🚀 EFECTO PARALLAX NATIVO */
+        .parallax-bg {
+            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .parallax-overlay {
+            background: linear-gradient(to bottom, rgba(3,3,5,0.85) 0%, rgba(3,3,5,0.6) 50%, rgba(3,3,5,0.95) 100__);
+        }
+
+        /* Glassmorphism Premium */
+        .glass-panel {
+            background: rgba(10, 10, 15, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            border-color: #FFC300;
+            box-shadow: 0 0 0 1px rgba(255, 195, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+            outline: none;
+        }
+
+        select.glass-input option {
+            background-color: #0a0a0f;
+            color: white;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
+            color: #000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
+        }
+
+        /* Animaciones */
+        .animate-premium-in { 
+            animation: premiumReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+
+        @keyframes premiumReveal {
+            0% { opacity: 0; filter: blur(10px); transform: scale(0.98) translateY(15px); }
+            100% { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); }
+        }
+
+        /* Ocultar scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Cursor de escritura setup */
+        .typing-dot::after {
+            content: '.';
+            animation: blink 1.2s step-start infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="selection:bg-[#FFC300] selection:text-black min-h-screen parallax-bg relative">
+    <div class="absolute inset-0 parallax-overlay z-0"></div>
+
+    <!-- 🧭 NAVEGACIÓN SUPERIOR -->
+    <nav class="absolute top-0 w-full z-40 py-4 px-6 md:px-12 flex justify-between items-center bg-transparent">
+        <div class="flex items-center cursor-pointer group" onclick="window.location.href='index.html'">
+            <span class="text-[#FFC300] font-[900] text-xl md:text-2xl italic tracking-tighter">GYM</span>
+            <span class="text-white font-[900] text-xl md:text-2xl italic tracking-tighter">ENEZ</span>
+        </div>
+        <a href="login.html" class="text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase">
+            Iniciar Sesión
+        </a>
+    </nav>
+
+    <!-- 💳 PANEL DE REGISTRO -->
+    <div id="register-container" class="relative z-10 min-h-screen w-full flex items-center justify-center p-4 pt-20 md:p-8 animate-premium-in">
+        <div class="glass-panel p-6 md:p-10 w-full max-w-2xl rounded-[24px] md:rounded-[32px] my-auto">
+            
+            <div class="text-center mb-6 md:mb-8">
+                <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter mb-1">Crear Perfil Atleta</h1>
+                <p class="text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Completa tu ficha para ingresar al ecosistema</p>
+            </div>
+
+            <form id="light-register-form" class="space-y-4 md:space-y-5" onsubmit="executePremiumSetup(event)">
+                
+                <!-- Fila 1: Nombre y Apellido -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Nombre</label>
+                        <input type="text" id="reg-name" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Carlos">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Apellido</label>
+                        <input type="text" id="reg-lastname" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Mendoza">
+                    </div>
+                </div>
+
+                <!-- Fila 2: Correo y Contraseña -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Correo Electrónico</label>
+                        <input type="email" id="reg-email" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="atleta@gymenez.com">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Contraseña</label>
+                        <input type="password" id="reg-password" minlength="6" maxlength="15" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Entre 6 y 15 caracteres">
+                    </div>
+                </div>
+
+                <!-- Fila 3: Teléfono y Fecha de Nacimiento -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Teléfono Móvil (WhatsApp)</label>
+                        <div class="flex gap-2">
+                            <select id="reg-phone-prefix" class="w-20 px-2 py-3 rounded-xl glass-input text-white text-xs font-bold text-center appearance-none cursor-pointer">
+                                <option value="0414">0414</option>
+                                <option value="0424">0424</option>
+                                <option value="0412">0412</option>
+                                <option value="0416">0416</option>
+                                <option value="0426">0426</option>
+                            </select>
+                            <input type="text" id="reg-phone-num" required class="flex-1 glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="1234567" maxlength="7" oninput="this.value = this.value.replace(/\D/g, '')">
+                        </div>
+                        <span class="block text-[8px] text-gray-500 mt-1 ml-1">Para el seguimiento personalizado de tu entrenador. Cero spam.</span>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Fecha de Nacimiento</label>
+                        <input type="text" id="reg-dob" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-mono" placeholder="DD/MM/YYYY" maxlength="10" oninput="applyDateMask(event)">
+                    </div>
+                </div>
+
+                <!-- Fila 4: Sexo Biológico -->
+                <div>
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Sexo Biológico</label>
+                    <select id="reg-sex" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer" required>
+                        <option value="" disabled selected>Selecciona una opción...</option>
+                        <option value="Hombre">Hombre</option>
+                        <option value="Mujer">Mujer</option>
+                    </select>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full btn-gold py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.25em]">
+                        Registrarme e Iniciar
+                    </button>
+                </div>
+            </form>
+            
+            <p class="text-center text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-6">
+                Al registrarte, aceptas los términos de acondicionamiento físico del ecosistema.
+            </p>
+        </div>
+    </div>
+
+    <!-- 📱 PANTALLA DE CONFIGURACIÓN DINÁMICA ESTILO IPHONE -->
+    <div id="setup-screen" class="fixed inset-0 bg-[#030305] backdrop-blur-3xl z-[5000] hidden flex flex-col items-center justify-center p-6 text-center transition-all duration-500 opacity-0">
+        <div class="w-20 h-20 bg-[#FFC300]/10 rounded-[2rem] border border-[#FFC300]/20 flex items-center justify-center mb-10 shadow-[0_0_50px_rgba(255,195,0,0.1)] relative">
+            <!-- Spinner sutil circular alrededor -->
+            <div class="absolute inset-[-4px] border-2 border-transparent border-t-[#FFC300] rounded-[2.2rem] animate-spin"></div>
+            <svg class="w-10 h-10 text-[#FFC300]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
+            </svg>
+        </div>
+        
+        <!-- Mensajes del Setup -->
+        <h2 id="setup-message" class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter max-w-md h-16 transition-all duration-300 transform scale-95 opacity-0">
+            Hola Atleta
+        </h2>
+        
+        <p class="text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] mt-2">
+            Protocolo de inicio perimetral
+        </p>
+    </div>
+
+    <!-- MÁSCARA AUTOMÁTICA DE FECHA (UX OPTIMIZADA) -->
+    <script>
+        function applyDateMask(e) {
+            if (e.inputType === 'deleteContentBackward') return;
+            const input = e.target;
+            let v = input.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.substring(0, 8);
+            
+            let formatted = v;
+            if (v.length >= 5) formatted = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+            else if (v.length >= 3) formatted = `${v.substring(0, 2)}/${v.substring(2)}`;
+            
+            input.value = formatted;
+        }
+
+        // 📱 LOGICA DE CONFIGURACIÓN ANIMADA (ESTILO IPHONE SETUP - MAX 8 SEG)
+        function executePremiumSetup(event) {
+            event.preventDefault(); // Detener envío tradicional para correr la animación de ventas
+            
+            const registerContainer = document.getElementById('register-container');
+            const setupScreen = document.getElementById('setup-screen');
+            const msgElement = document.getElementById('setup-message');
+            const athleteName = document.getElementById('reg-name').value.trim();
+
+            // Ocultar formulario de forma elegante
+            registerContainer.style.transition = 'all 0.5s ease';
+            registerContainer.style.opacity = '0';
+            registerContainer.style.transform = 'scale(0.98)';
+
+            setTimeout(() => {
+                registerContainer.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+                
+                // Animación de entrada de la pantalla de carga
+                setTimeout(() => {
+                    setupScreen.classList.remove('opacity-0');
+                    startTextSequence();
+                }, 50);
+            }, 500);
+
+            // Secuencia milimétrica de mensajes (Duración total: ~7.5 segundos)
+            const steps = [
+                { text: `Hola, ${athleteName}`, delay: 0 },
+                { text: "Configurando tu espacio personal...", delay: 1600 },
+                { text: "Alineando tus bloques de entrenamiento...", delay: 3400 },
+                { text: "Calibrando tus zonas de recuperación...", delay: 5200 },
+                { text: "¡Todo listo! Ingresando al Portal...", delay: 6800 }
+            ];
+
+            function startTextSequence() {
+                steps.forEach((step) => {
+                    setTimeout(() => {
+                        // Desvanecer texto anterior
+                        msgElement.classList.add('opacity-0', 'scale-95');
+                        
+                        setTimeout(() => {
+                            msgElement.textContent = step.text;
+                            msgElement.classList.remove('opacity-0', 'scale-95');
+                            msgElement.classList.add('opacity-100', 'scale-100');
+                        }, 200);
+                        
+                    }, step.delay);
+                });
+
+                // Redirección definitiva al llegar al segundo 7.8
+                setTimeout(() => {
+                    setupScreen.style.transition = 'all 0.4s ease';
+                    setupScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 400);
+                }, 7600);
+            }
+        }
+    </script>
+</body>
+</html>
