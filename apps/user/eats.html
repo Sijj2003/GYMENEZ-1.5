@@ -112,13 +112,21 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-3 glass-panel rounded-[24px] md:rounded-[32px] p-6 md:p-8">
-                    <h4 class="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-3 mb-6 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Ventanas Crono-Nutricionales Soportadas
-                    </h4>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="meals-container">
+                <div class="lg:col-span-3 mt-4">
+                    <div class="flex flex-col md:flex-row justify-between md:items-end mb-6 border-b border-white/10 pb-4 gap-4">
+                        <div>
+                            <h4 class="text-sm md:text-base font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Generador Dinámico de Platos
+                            </h4>
+                            <p class="text-[10px] md:text-xs text-gray-400 mt-1 font-medium">Presiona el ícono 🔄 para cambiar un ingrediente. El motor recalculará los gramos exactos al instante.</p>
                         </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="meals-container">
+                        <div class="text-center py-10 text-gray-500 font-black text-[10px] tracking-widest uppercase col-span-full">
+                            Desplegando arsenal bioquímico...
+                        </div>
+                    </div>
                 </div>
 
             </div>
