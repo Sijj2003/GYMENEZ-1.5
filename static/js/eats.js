@@ -1,145 +1,167 @@
-// static/js/eats.js - Motor Bioquímico de Precisión GYMENEZ
+// static/js/eats.js - GYMENEZ METABOLIC SYSTEMS
 
-const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
+// 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
+const isLocalhostEnv = window.location.hostname === '127.0.0.1' || 
+                        window.location.hostname === 'localhost' || 
+                        window.location.protocol === 'file:';
+
+const API_BASE_URL = isLocalhostEnv ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
+
+const messagebox = document.getElementById('message-box');
+const loadingSpinner = document.getElementById('loading-spinner');
+const eatsContent = document.getElementById('eats-content');
 
 // =======================================================
-// 🛡️ FUNCIÓN DE SEGURIDAD: OBTENER TOKEN
+// 🛡️ SEGURIDAD DE LA BÓVEDA: CONFIGURACIÓN DE CABECERAS
 // =======================================================
 function getBearerToken() {
     const token = localStorage.getItem('gymen_auth_token');
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
-// =======================================================
-// 🧬 CARGA Y ORQUESTACIÓN DEL MOTOR METABÓLICO
-// =======================================================
-async function loadMetabolicEngine() {
-    const token = localStorage.getItem('gymen_auth_token');
-    if (!token) {
-        window.location.href = '/apps/start/login.html';
-        return;
-    }
+function showMessage(message, type = 'success') {
+    if (!messagebox) return;
+    messagebox.textContent = message;
+    messagebox.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-300 text-center border border-white/10 w-11/12 max-w-[350px]';
+    messagebox.classList.add(type === 'success' ? 'bg-emerald-600' : 'bg-red-600', 'text-white');
+    messagebox.style.opacity = '1';
+    messagebox.style.transform = 'translate(-50%, 0)';
+    setTimeout(() => {
+        messagebox.style.opacity = '0';
+        messagebox.style.transform = 'translate(-50%, -20px)';
+    }, 3000);
+}
 
+// =======================================================
+// ⚡ MOTOR DE CARGA Y PROCESAMIENTO BIOQUÍMICO
+// =======================================================
+async function loadMetabolicPlan() {
     try {
-        // Llamada directa al núcleo de bio-ingeniería nutricional del servidor
         const response = await fetch(`${API_BASE_URL}/api/eats/macros`, {
+            method: 'GET',
             headers: getBearerToken()
         });
 
-        // 🛡️ MANEJO DE ESCUDO DE PLANES (Control Zero Trust en Frontend)
+        // Control perimetral de acceso por nivel de plan (Aduana Flask)
         if (response.status === 403) {
-            document.getElementById('loading-spinner').innerHTML = `
-                <div class="p-6 bg-red-950/20 border border-red-500/30 rounded-2xl text-center max-w-md mx-auto msg-animate">
-                    <p class="text-red-400 font-black uppercase tracking-widest text-xs">🔒 MÓDULO BLOQUEADO</p>
-                    <p class="text-gray-400 text-[11px] mt-2 leading-relaxed">
-                        GYMENEZ EATS (Planificación Bioquímica Avanzada) está reservado exclusivamente para atletas del 
-                        <span class="text-[#FFC300] font-bold">PLAN ULTRA</span>. Mejora tu suscripción en el panel.
-                    </p>
-                </div>`;
+            handleRestrictedAccess("REQUIERE PLAN ULTRA", "Este módulo ejecuta el reparto bioquímico avanzado basado en tonelaje real. Mejora tu cuenta al Plan Ultra para desbloquearlo.");
+            return;
+        }
+        if (response.status === 401) {
+            showMessage("Sesión expirada. Por favor, re-inicia sesión.", "error");
+            setTimeout(() => window.location.href = '/apps/start/login.html', 2000);
+            return;
+        }
+        if (response.status === 404) {
+            handleRestrictedAccess("FICHA INCOMPLETA", "El motor no puede calcular tu TDEE porque aún no has rellenado tus métricas corporales base (Peso o Estatura) en tu perfil.");
             return;
         }
 
         const data = await response.json();
 
-        if (!response.ok || !data.success) {
-            document.getElementById('loading-spinner').innerHTML = `
-                <div class="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center max-w-sm mx-auto">
-                    <p class="text-yellow-500 text-xs font-bold uppercase tracking-widest">⚠️ FICHA BIOMÉTRICA INCOMPLETA</p>
-                    <p class="text-gray-400 text-[10px] mt-1">Por favor, solicite la actualización de su peso y altura base en recepción.</p>
-                </div>`;
-            return;
-        }
-
-        const met = data.metabolism;
-        const mac = data.macros;
-
-        // 1. Renderizado de Presupuesto Energético
-        document.getElementById('calories-display').innerHTML = `${Math.round(met.tdee)} <span class="text-xl text-gray-500 font-bold">KCAL</span>`;
-        document.getElementById('basal-display').textContent = `${Math.round(met.tmb)} kcal`;
-        document.getElementById('exercise-display').textContent = `+${met.exercise_expenditure} kcal`;
-
-        // 2. Renderizado de Macronutrientes Dinámicos
-        document.getElementById('protein-display').innerHTML = `${mac.protein_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
-        document.getElementById('carbs-display').innerHTML = `${mac.carbs_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
-        document.getElementById('fat-display').innerHTML = `${mac.fat_g}<span class="text-xs text-gray-500 ml-0.5">G</span>`;
-
-        // 3. Modificación del Estatus Visual según Directrices del Radar ACWR
-        const carbsTag = document.getElementById('carbs-status-tag');
-        const statusBanner = document.getElementById('status-banner');
-        
-        if (met.is_deload_active) {
-            if (carbsTag) {
-                carbsTag.textContent = "📉 RECORTE POR DELOAD";
-                carbsTag.className = "text-[8px] text-red-400 font-bold block mt-0.5";
-            }
-            if (statusBanner) {
-                statusBanner.className = "mt-4 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-[10px] font-bold text-red-400 inline-flex items-center gap-2";
-                statusBanner.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> CONTROL DE DAÑOS ACTIVADO: CALORÍAS CONTENIDAS POR SOBREFATIGA`;
-            }
+        if (data.success) {
+            renderMetabolicDashboard(data);
         } else {
-            if (carbsTag) {
-                carbsTag.textContent = "⚡ CARGA DE ADAPTACIÓN";
-                carbsTag.className = "text-[8px] text-emerald-400 font-bold block mt-0.5";
-            }
-            if (statusBanner) {
-                statusBanner.className = "mt-4 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 inline-flex items-center gap-2";
-                statusBanner.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> MOTOR AJUSTADO SEGÚN TU TONELAJE DE HOY`;
-            }
+            showMessage("Error al procesar el cálculo bionutricional.", "error");
         }
-
-        // 4. Inyección del Nutrient Timing (Distribución de Comidas Críticas)
-        renderMealTiming(mac.carbs_g, mac.protein_g, mac.fat_g);
-
-        // 5. Apagar Capa de Carga y mostrar panel principal
-        document.getElementById('loading-spinner').classList.add('hidden');
-        document.getElementById('eats-content').classList.remove('hidden');
-
-    } catch (error) {
-        console.error("Fallo perimetral en conexión bioquímica:", error);
-        document.getElementById('loading-spinner').innerHTML = `
-            <p class="text-red-500 font-black text-xs uppercase tracking-widest text-center">
-                ❌ ERROR DE SINCRONIZACIÓN CON EL NÚCLEO FINANCIERO-BIOLÓGICO.
-            </p>`;
+    } catch (e) {
+        console.error(e);
+        if (loadingSpinner) {
+            loadingSpinner.innerHTML = `<p class="text-red-500 font-black uppercase tracking-widest text-[10px]">Fallo crítico de conexión con el núcleo metabólico.</p>`;
+        }
     }
 }
 
 // =======================================================
-// ⏰ MOTOR DE NUTRIENT TIMING (CRONO-NUTRICIÓN)
+// 📊 RENDERIZACIÓN TÁCTICA DEL COCKPIT METABÓLICO
 // =======================================================
-function renderMealTiming(totalCarbs, totalProtein, totalFat) {
-    const container = document.getElementById('meals-container');
-    if (!container) return;
-    container.innerHTML = '';
+function renderMetabolicDashboard(data) {
+    const meta = data.metabolism;
+    const macros = data.macros;
 
-    // Mapeo biomédico exacto de distribución de nutrientes
-    const meals = [
-        { name: "Desayuno (Carga Base)", c: 0.20, p: 0.25, f: 0.30, desc: "Alineación energética basal e inhibición del catabolismo proteico nocturno." },
-        { name: "Almuerzo (Pre-Entreno)", c: 0.25, p: 0.25, f: 0.30, desc: "Optimización y saturación de glucógeno y aminoácidos plasmáticos antes de la carga." },
-        { name: "Cena (Post-Entreno VIP)", c: 0.45, p: 0.35, f: 0.10, desc: "Disparo masivo de insulina para deprimir el cortisol, reponer ATP y reparar tejido miofibrilar." },
-        { name: "Snack / Colación", c: 0.10, p: 0.15, f: 0.30, desc: "Soporte lipídico estructural y balance de ácidos grasos esenciales para el sistema nervioso." }
-    ];
+    // 1. Inyección de valores en Tarjetas Bento Principales
+    document.getElementById('calories-display').innerHTML = `${meta.tdee} <span class="text-xl text-gray-500 font-bold">KCAL</span>`;
+    document.getElementById('basal-display').textContent = `${meta.tmb} kcal`;
+    document.getElementById('exercise-display').textContent = `${meta.exercise_expenditure} kcal`;
 
-    meals.forEach(meal => {
-        const mCarbs = Math.round(totalCarbs * meal.c);
-        const mProtein = Math.round(totalProtein * meal.p);
-        const mFat = Math.round(totalFat * meal.f);
+    document.getElementById('protein-display').innerHTML = `${macros.protein_g}<span class="text-xs text-gray-500 ml-0.5 font-bold">G</span>`;
+    document.getElementById('carbs-display').innerHTML = `${macros.carbs_g}<span class="text-xs text-emerald-600 ml-0.5 font-bold">G</span>`;
+    document.getElementById('fat-display').innerHTML = `${macros.fat_g}<span class="text-xs text-gray-500 ml-0.5 font-bold">G</span>`;
 
-        const card = document.createElement('div');
-        card.className = 'p-5 bg-black/40 rounded-2xl border border-white/5 hover:border-emerald-500/20 transition-all flex flex-col justify-between msg-animate';
-        card.innerHTML = `
-            <div>
-                <h5 class="text-xs font-black uppercase text-white tracking-wider mb-1">${meal.name}</h5>
-                <p class="text-[10px] text-gray-500 font-medium leading-relaxed mb-4">${meal.desc}</p>
-            </div>
-            <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-center text-[10px] font-mono font-bold">
-                <div class="text-emerald-400">HC: ${mCarbs}g</div>
-                <div class="text-sky-400">PRO: ${mProtein}g</div>
-                <div class="text-yellow-500">GR: ${mFat}g</div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
+    // 2. Modificación dinámica de etiquetas según el Radar ACWR (Fase Deload)
+    const statusBanner = document.getElementById('status-banner');
+    const carbsStatusTag = document.getElementById('carbs-status-tag');
+
+    if (meta.is_deload_active) {
+        statusBanner.className = 'mt-4 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-[10px] font-bold text-red-400 inline-flex items-center gap-2 animate-pulse';
+        statusBanner.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> ALERTA ACWR: MODO DESCARGA ACTIVO (ENERGÍA AMORTIGUADA)`;
+        carbsStatusTag.textContent = "Restringido por Fatiga Alta";
+        carbsStatusTag.className = "text-[8px] text-red-400 block mt-0.5 font-bold";
+    } else {
+        carbsStatusTag.textContent = "Combustible de Carga Progresiva";
+    }
+
+    // 3. PARTICIÓN DE VENTANAS CRONO-NUTRICIONALES (4 Comidas de Alto Rendimiento)
+    const mealsContainer = document.getElementById('meals-container');
+    if (mealsContainer) {
+        mealsContainer.innerHTML = ''; // Limpiar contenedor
+        
+        // Estrategia de reparto balanceado por objetivos biológicos
+        const mealsSetup = [
+            { name: "Comida 1: Carga Inicial", desc: "Pre-Entreno / Activación Mecánica", p: 0.25, c: 0.30, f: 0.20 },
+            { name: "Comida 2: Ventana Anabólica", desc: "Post-Entreno / Síntesis de Glucógeno", p: 0.30, c: 0.35, f: 0.15 },
+            { name: "Comida 3: Soporte Sistémico", desc: "Merienda de Absorción Intermedia", p: 0.20, c: 0.20, f: 0.30 },
+            { name: "Comida 4: Reparación Nocturna", desc: "Cena / Modulación Estructural", p: 0.25, c: 0.15, f: 0.35 }
+        ];
+
+        mealsSetup.forEach(meal => {
+            const pGrams = Math.round(macros.protein_g * meal.p);
+            const cGrams = Math.round(macros.carbs_g * meal.c);
+            const fGrams = Math.round(macros.fat_g * meal.f);
+            const mealCalories = Math.round((pGrams * 4) + (cGrams * 4) + (fGrams * 9));
+
+            const card = document.createElement('div');
+            card.className = 'bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col justify-between transition duration-300 hover:border-emerald-500/20';
+            card.innerHTML = `
+                <div>
+                    <h5 class="text-xs font-black text-white uppercase tracking-tight">${meal.name}</h5>
+                    <p class="text-[9px] text-gray-500 font-medium leading-tight mt-0.5">${meal.desc}</p>
+                    <p class="text-md font-black text-emerald-400 mt-2 tracking-tighter">${mealCalories} <span class="text-[9px] text-gray-400 font-bold">KCAL</span></p>
+                </div>
+                <div class="grid grid-cols-3 gap-1 mt-4 pt-2 border-t border-white/5 text-center text-[10px] font-mono font-bold">
+                    <div class="bg-white/5 p-1 rounded-lg"><span class="text-sky-400 block text-[8px] font-sans font-black">P</span>${pGrams}g</div>
+                    <div class="bg-emerald-500/5 border border-emerald-500/10 p-1 rounded-lg"><span class="text-emerald-400 block text-[8px] font-sans font-black">C</span>${cGrams}g</div>
+                    <div class="bg-white/5 p-1 rounded-lg"><span class="text-yellow-500 block text-[8px] font-sans font-black">G</span>${fGrams}g</div>
+                </div>
+            `;
+            mealsContainer.appendChild(card);
+        });
+    }
+
+    // Quitar estados de carga
+    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+    if (eatsContent) eatsContent.classList.remove('hidden');
 }
 
-// Inicialización perimetral al cargar el árbol del DOM
-window.addEventListener('DOMContentLoaded', loadMetabolicEngine);
+// =======================================================
+// 🚫 MANEJO DEFENSIVO DE ACCESOS Y ERRORES DE PERFIL
+// =======================================================
+function handleRestrictedAccess(title, description) {
+    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+    if (eatsContent) eatsContent.classList.add('hidden');
+    
+    // Inyectar un panel táctico de bloqueo elegante
+    const mainSection = document.querySelector('main');
+    const lockPanel = document.createElement('div');
+    lockPanel.className = 'w-full max-w-xl mx-auto glass-panel rounded-[32px] p-8 border border-white/10 text-center mt-10 fade-in-up';
+    lockPanel.innerHTML = `
+        <div class="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-red-400 font-black text-lg">🔒</div>
+        <h3 class="text-xl font-black text-white uppercase tracking-tighter">${title}</h3>
+        <p class="text-xs text-gray-400 mt-3 leading-relaxed font-medium">${description}</p>
+        <a href="/apps/start/inicio.html" class="inline-block mt-6 px-6 py-3 bg-white text-black font-black text-xs uppercase tracking-widest rounded-xl hover:bg-gray-200 transition">Regresar al Hub</a>
+    `;
+    mainSection.appendChild(lockPanel);
+}
+
+// Inicialización Automática al Desplegar el DOM
+window.addEventListener('DOMContentLoaded', loadMetabolicPlan);
