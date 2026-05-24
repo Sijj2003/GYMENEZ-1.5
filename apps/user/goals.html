@@ -3,114 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ | Módulo en Desarrollo</title>
+    <title>GYMENEZ | Macrociclos y Evolución</title>
     
     <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #030305;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-        
-        /* Glassmorphism Premium */
-        .glass-panel {
-            background: rgba(15, 15, 20, 0.6);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-        }
-
-        /* Botón Dorado */
-        .btn-gold {
-            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
-            color: #000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
-        }
-
-        /* Animación de Entrada */
-        .fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0; 
-            transform: translateY(20px);
-        }
-        @keyframes fadeInUp { 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        /* Ambient Glow Automático */
-        .ambient-glow {
-            animation: pulseGlow 4s ease-in-out infinite alternate;
-        }
-        @keyframes pulseGlow {
-            0% { opacity: 0.4; transform: scale(0.95) translateX(-50%); }
-            100% { opacity: 0.7; transform: scale(1.05) translateX(-50%); }
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #030305; color: #ffffff; overflow-x: hidden; }
+        .glass-panel { background: rgba(15, 15, 20, 0.6); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .progress-bar-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fade-in-up { animation: fadeInUp 0.8s forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        /* Efecto Bloqueo ULTRA */
+        .locked-content { filter: blur(4px) grayscale(100%); opacity: 0.5; pointer-events: none; user-select: none; }
     </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black min-h-screen flex flex-col">
+<body class="selection:bg-emerald-500 selection:text-black">
 
-    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-10 -z-10 mix-blend-screen grayscale pointer-events-none"></div>
-    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10 pointer-events-none"></div>
-    
-    <div class="ambient-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] bg-[#FFC300]/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-full text-[10px] font-black tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center border border-white/10"></div>
 
-    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2 md:gap-3">
-                <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter block">
-                    <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
-                </h1>
+    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-5 -z-10 grayscale"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/80 to-[#030305] -z-10"></div>
+
+    <div class="min-h-screen flex flex-col relative z-10">
+        
+        <header class="w-full border-b border-white/5 bg-black/50 backdrop-blur-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                <h1 class="text-lg font-black uppercase tracking-tighter"><span class="text-emerald-500">GYM</span>ENEZ MACROCICLOS</h1>
+                <a href="/apps/start/inicio.html" class="px-5 py-2 rounded-full border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest hover:bg-white hover:text-black transition">Volver</a>
             </div>
-            <button onclick="history.back()" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-                Volver al Hub
-            </button>
-        </div>
-    </header>
+        </header>
 
-    <main class="flex-grow flex items-center justify-center p-4 md:p-6 w-full relative z-10">
-        <div class="glass-panel p-8 md:p-14 w-full max-w-2xl mx-auto rounded-[32px] md:rounded-[40px] text-center fade-in-up border-t border-[#FFC300]/30 relative overflow-hidden">
-            
-            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-[#FFC300]/10 blur-[40px] rounded-full pointer-events-none"></div>
-            
-            <div class="w-20 h-20 md:w-24 md:h-24 mx-auto bg-[#FFC300]/10 rounded-[24px] flex items-center justify-center border border-[#FFC300]/20 mb-6 md:mb-8 relative z-10">
-                <svg class="w-10 h-10 md:w-12 md:h-12 text-[#FFC300] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
+        <main class="max-w-5xl mx-auto w-full px-4 py-8 flex-grow space-y-8">
+
+            <div id="loading-spinner" class="flex justify-center py-20">
+                <div class="w-8 h-8 border-4 border-white/10 border-t-emerald-500 rounded-full animate-spin"></div>
             </div>
 
-            <span class="text-[#FFC300] text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.4em] mb-2 block relative z-10">Módulo Restringido</span>
-            <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white mb-4 relative z-10 drop-shadow-lg leading-none">
-                En <span class="text-[#FFC300]">Desarrollo</span>
-            </h2>
-            
-            <p class="text-gray-400 text-xs md:text-sm leading-relaxed max-w-md mx-auto mb-8 md:mb-10 font-medium relative z-10">
-                Nuestros ingenieros están forjando el código de esta sección. 
-                Pronto tendrás acceso a las funcionalidades completas de <span class="text-white font-bold tracking-wider">GYMENEZ ON, GOALS y PULSE CENTER</span>. 
-                <br><br>La excelencia requiere tiempo.
-            </p>
+            <section id="active-goal-section" class="hidden fade-in-up">
+                <div class="glass-panel p-6 md:p-8 rounded-[32px] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full -z-10"></div>
+                    
+                    <div class="flex flex-col md:flex-row justify-between md:items-end mb-8 gap-4 border-b border-white/10 pb-6">
+                        <div>
+                            <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[8px] font-black rounded uppercase tracking-widest mb-3 inline-block border border-emerald-500/20">Contrato Activo</span>
+                            <h2 id="goal-objective-title" class="text-3xl md:text-4xl font-black uppercase tracking-tighter">--</h2>
+                            <p class="text-xs text-gray-400 mt-2 font-medium">No se admiten modificaciones hasta finalizar el ciclo.</p>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Días Restantes</p>
+                            <p id="days-remaining" class="text-4xl font-black text-white">--</p>
+                        </div>
+                    </div>
 
-            <div class="relative z-10 flex flex-col justify-center items-center">
-                <button onclick="history.back()" class="btn-gold w-full sm:w-auto px-10 py-4 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,195,0,0.2)]">
-                    Regresar al Hub
-                </button>
-            </div>
-        </div>
-    </main>
+                    <div class="space-y-6" id="progress-bars-container">
+                        </div>
+                </div>
+            </section>
 
-    <footer class="text-center py-6 border-t border-white/5 mt-auto relative z-10">
-        <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
-    </footer>
+            <section id="create-goal-section" class="hidden fade-in-up">
+                <div class="glass-panel p-6 md:p-8 rounded-[32px] border border-white/10">
+                    <h3 class="text-2xl font-black uppercase tracking-tighter text-white mb-2">Fijar Nuevo <span class="text-emerald-500">Macrociclo</span></h3>
+                    <p class="text-[11px] text-gray-400 mb-6 border-b border-white/10 pb-6">Establece tu meta para los próximos 90 días. Este contrato es irrevocable para evitar el "Goal Hopping" y forzar la adaptación fisiológica.</p>
+                    
+                    <form id="goal-form" class="space-y-5">
+                        <div>
+                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Objetivo Biológico Principal</label>
+                            <select id="goal-objective" class="w-full bg-black border border-white/10 rounded-xl text-white py-3 px-3 focus:border-emerald-500 outline-none font-bold text-xs uppercase">
+                                <option value="VOLUMEN">Hipertrofia Muscular (Volumen)</option>
+                                <option value="DEFINICION">Pérdida de Grasa (Definición)</option>
+                                <option value="TONIFICACION">Recomposición (Isocalórico)</option>
+                            </select>
+                        </div>
 
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-black/40 rounded-2xl border border-white/5">
+                                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">Métrica Inicial (Hoy)</p>
+                                <input type="number" id="start-weight" placeholder="Tu peso actual (kg)" required class="w-full bg-transparent border-b border-white/20 text-white pb-2 mb-4 outline-none font-bold text-sm focus:border-emerald-500">
+                                <input type="number" id="start-waist" placeholder="Cintura actual (cm)" class="w-full bg-transparent border-b border-white/20 text-white pb-2 outline-none font-bold text-sm focus:border-emerald-500">
+                            </div>
+                            <div class="p-4 bg-black/40 rounded-2xl border border-emerald-500/20">
+                                <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-3">Métrica Objetivo (Día 90)</p>
+                                <input type="number" id="target-weight" placeholder="Peso objetivo (kg)" required class="w-full bg-transparent border-b border-white/20 text-white pb-2 mb-4 outline-none font-bold text-sm focus:border-emerald-500">
+                                <input type="number" id="target-waist" placeholder="Cintura objetivo (cm)" class="w-full bg-transparent border-b border-white/20 text-white pb-2 outline-none font-bold text-sm focus:border-emerald-500">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 bg-white text-black font-black text-[11px] uppercase tracking-widest rounded-xl hover:bg-gray-200 transition mt-4">Sellar Contrato de 90 Días</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="historical-section" class="hidden fade-in-up">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <h3 class="text-sm font-black text-white uppercase tracking-widest">Bóveda de Informes Históricos</h3>
+                </div>
+
+                <div class="relative group">
+                    <div id="ultra-lock-overlay" class="absolute inset-0 z-20 bg-black/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center border border-white/5 transition duration-300 hidden">
+                        <span class="text-3xl mb-2">👑</span>
+                        <h4 class="text-white font-black text-sm uppercase tracking-widest">Requiere GYMENEZ ULTRA</h4>
+                        <p class="text-[10px] text-gray-400 mt-2 max-w-xs text-center">Tus reportes fotográficos y análisis evolutivos detallados están archivados bajo encriptación de élite.</p>
+                        <a href="#" class="mt-4 px-6 py-2 bg-amber-500 text-black text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-amber-400">Mejorar Plan</a>
+                    </div>
+
+                    <div id="historical-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="/static/js/goals.js"></script>
 </body>
 </html>
