@@ -1,19 +1,17 @@
-// static/js/eats.js - GYMENEZ METABOLIC SYSTEMS
+// static/js/eats.js - GYMENEZ METABOLIC SYSTEMS CON SWAPPER DINÁMICO
 
-// 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
-const isLocalhostEnv = window.location.hostname === '127.0.0.1' || 
-                        window.location.hostname === 'localhost' || 
-                        window.location.protocol === 'file:';
-
+const isLocalhostEnv = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.protocol === 'file:';
 const API_BASE_URL = isLocalhostEnv ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
 const messagebox = document.getElementById('message-box');
 const loadingSpinner = document.getElementById('loading-spinner');
 const eatsContent = document.getElementById('eats-content');
+const mealsContainer = document.getElementById('meals-container');
 
-// =======================================================
-// 🛡️ SEGURIDAD DE LA BÓVEDA: CONFIGURACIÓN DE CABECERAS
-// =======================================================
+// Variables globales para la IA del Frontend
+let currentMenu = [];
+let foodDictionary = {};
+
 function getBearerToken() {
     const token = localStorage.getItem('gymen_auth_token');
     return token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -26,60 +24,39 @@ function showMessage(message, type = 'success') {
     messagebox.classList.add(type === 'success' ? 'bg-emerald-600' : 'bg-red-600', 'text-white');
     messagebox.style.opacity = '1';
     messagebox.style.transform = 'translate(-50%, 0)';
-    setTimeout(() => {
-        messagebox.style.opacity = '0';
-        messagebox.style.transform = 'translate(-50%, -20px)';
-    }, 3000);
+    setTimeout(() => { messagebox.style.opacity = '0'; messagebox.style.transform = 'translate(-50%, -20px)'; }, 3000);
 }
 
-// =======================================================
-// ⚡ MOTOR DE CARGA Y PROCESAMIENTO BIOQUÍMICO
-// =======================================================
+// 1. CARGAR DATOS BASE Y EL DICCIONARIO
 async function loadMetabolicPlan() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/eats/macros`, {
-            method: 'GET',
-            headers: getBearerToken()
-        });
+        const resMacros = await fetch(`${API_BASE_URL}/api/eats/macros`, { headers: getBearerToken() });
+        if (resMacros.status === 403) return handleRestrictedAccess("REQUIERE PLAN ULTRA", "Mejora tu cuenta al Plan Ultra para desbloquear el generador de dietas.");
+        if (resMacros.status === 401) { showMessage("Sesión expirada.", "error"); return; }
+        
+        const dataMacros = await resMacros.json();
+        if (dataMacros.success) renderMetabolicDashboard(dataMacros);
 
-        // Control perimetral de acceso por nivel de plan (Aduana Flask)
-        if (response.status === 403) {
-            handleRestrictedAccess("REQUIERE PLAN ULTRA", "Este módulo ejecuta el reparto bioquímico avanzado basado en tonelaje real. Mejora tu cuenta al Plan Ultra para desbloquearlo.");
-            return;
-        }
-        if (response.status === 401) {
-            showMessage("Sesión expirada. Por favor, re-inicia sesión.", "error");
-            setTimeout(() => window.location.href = '/apps/start/login.html', 2000);
-            return;
-        }
-        if (response.status === 404) {
-            handleRestrictedAccess("FICHA INCOMPLETA", "El motor no puede calcular tu TDEE porque aún no has rellenado tus métricas corporales base (Peso o Estatura) en tu perfil.");
-            return;
+        // 2. Cargar Menú y Diccionario Dinámico de Firebase
+        const resMenu = await fetch(`${API_BASE_URL}/api/eats/suggested_meals`, { headers: getBearerToken() });
+        const dataMenu = await resMenu.json();
+        
+        if (dataMenu.success) {
+            currentMenu = dataMenu.menu;
+            foodDictionary = dataMenu.food_pools; // Aquí guardamos el arsenal de ingredientes
+            renderDynamicMeals();
         }
 
-        const data = await response.json();
-
-        if (data.success) {
-            renderMetabolicDashboard(data);
-        } else {
-            showMessage("Error al procesar el cálculo bionutricional.", "error");
-        }
     } catch (e) {
         console.error(e);
-        if (loadingSpinner) {
-            loadingSpinner.innerHTML = `<p class="text-red-500 font-black uppercase tracking-widest text-[10px]">Fallo crítico de conexión con el núcleo metabólico.</p>`;
-        }
+        if (loadingSpinner) loadingSpinner.innerHTML = `<p class="text-red-500 font-black uppercase text-[10px]">Fallo crítico de conexión.</p>`;
     }
 }
 
-// =======================================================
-// 📊 RENDERIZACIÓN TÁCTICA DEL COCKPIT METABÓLICO
-// =======================================================
 function renderMetabolicDashboard(data) {
     const meta = data.metabolism;
     const macros = data.macros;
 
-    // 1. Inyección de valores en Tarjetas Bento Principales
     document.getElementById('calories-display').innerHTML = `${meta.tdee} <span class="text-xl text-gray-500 font-bold">KCAL</span>`;
     document.getElementById('basal-display').textContent = `${meta.tmb} kcal`;
     document.getElementById('exercise-display').textContent = `${meta.exercise_expenditure} kcal`;
@@ -88,7 +65,6 @@ function renderMetabolicDashboard(data) {
     document.getElementById('carbs-display').innerHTML = `${macros.carbs_g}<span class="text-xs text-emerald-600 ml-0.5 font-bold">G</span>`;
     document.getElementById('fat-display').innerHTML = `${macros.fat_g}<span class="text-xs text-gray-500 ml-0.5 font-bold">G</span>`;
 
-    // 2. Modificación dinámica de etiquetas según el Radar ACWR (Fase Deload)
     const statusBanner = document.getElementById('status-banner');
     const carbsStatusTag = document.getElementById('carbs-status-tag');
 
@@ -101,56 +77,99 @@ function renderMetabolicDashboard(data) {
         carbsStatusTag.textContent = "Combustible de Carga Progresiva";
     }
 
-    // 3. PARTICIÓN DE VENTANAS CRONO-NUTRICIONALES (4 Comidas de Alto Rendimiento)
-    const mealsContainer = document.getElementById('meals-container');
-    if (mealsContainer) {
-        mealsContainer.innerHTML = ''; // Limpiar contenedor
-        
-        // Estrategia de reparto balanceado por objetivos biológicos
-        const mealsSetup = [
-            { name: "Comida 1: Carga Inicial", desc: "Pre-Entreno / Activación Mecánica", p: 0.25, c: 0.30, f: 0.20 },
-            { name: "Comida 2: Ventana Anabólica", desc: "Post-Entreno / Síntesis de Glucógeno", p: 0.30, c: 0.35, f: 0.15 },
-            { name: "Comida 3: Soporte Sistémico", desc: "Merienda de Absorción Intermedia", p: 0.20, c: 0.20, f: 0.30 },
-            { name: "Comida 4: Reparación Nocturna", desc: "Cena / Modulación Estructural", p: 0.25, c: 0.15, f: 0.35 }
-        ];
-
-        mealsSetup.forEach(meal => {
-            const pGrams = Math.round(macros.protein_g * meal.p);
-            const cGrams = Math.round(macros.carbs_g * meal.c);
-            const fGrams = Math.round(macros.fat_g * meal.f);
-            const mealCalories = Math.round((pGrams * 4) + (cGrams * 4) + (fGrams * 9));
-
-            const card = document.createElement('div');
-            card.className = 'bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col justify-between transition duration-300 hover:border-emerald-500/20';
-            card.innerHTML = `
-                <div>
-                    <h5 class="text-xs font-black text-white uppercase tracking-tight">${meal.name}</h5>
-                    <p class="text-[9px] text-gray-500 font-medium leading-tight mt-0.5">${meal.desc}</p>
-                    <p class="text-md font-black text-emerald-400 mt-2 tracking-tighter">${mealCalories} <span class="text-[9px] text-gray-400 font-bold">KCAL</span></p>
-                </div>
-                <div class="grid grid-cols-3 gap-1 mt-4 pt-2 border-t border-white/5 text-center text-[10px] font-mono font-bold">
-                    <div class="bg-white/5 p-1 rounded-lg"><span class="text-sky-400 block text-[8px] font-sans font-black">P</span>${pGrams}g</div>
-                    <div class="bg-emerald-500/5 border border-emerald-500/10 p-1 rounded-lg"><span class="text-emerald-400 block text-[8px] font-sans font-black">C</span>${cGrams}g</div>
-                    <div class="bg-white/5 p-1 rounded-lg"><span class="text-yellow-500 block text-[8px] font-sans font-black">G</span>${fGrams}g</div>
-                </div>
-            `;
-            mealsContainer.appendChild(card);
-        });
-    }
-
-    // Quitar estados de carga
     if (loadingSpinner) loadingSpinner.classList.add('hidden');
     if (eatsContent) eatsContent.classList.remove('hidden');
 }
 
 // =======================================================
-// 🚫 MANEJO DEFENSIVO DE ACCESOS Y ERRORES DE PERFIL
+// 🧠 INTELIGENCIA DE RENDERIZADO Y SWAP (CAMBIO DINÁMICO)
 // =======================================================
+function renderDynamicMeals() {
+    if (!mealsContainer) return;
+    mealsContainer.innerHTML = '';
+
+    currentMenu.forEach((meal, mealIndex) => {
+        // Calcular calorías totales del plato dinámicamente
+        let totalCals = 0;
+        const ingredientsHTML = ['PROTEINA', 'CARBOHIDRATO', 'GRASA'].map(cat => {
+            const item = meal.ingredients[cat];
+            const calPerGram = (item.data.calories || 0) / 100;
+            totalCals += (item.grams * calPerGram);
+
+            const colors = cat === 'PROTEINA' ? 'text-sky-400 bg-sky-400/10 border-sky-400/20' : 
+                           (cat === 'CARBOHIDRATO' ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' : 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20');
+
+            return `
+                <div class="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/5 group">
+                    <div class="flex-1 pr-3">
+                        <span class="text-[8px] font-black uppercase tracking-widest ${colors.split(' ')[0]}">${cat}</span>
+                        <p class="text-xs font-black text-white uppercase tracking-tight mt-0.5 leading-none">${item.data.name}</p>
+                        <p class="text-[10px] text-gray-500 font-bold mt-1">${item.grams} Gramos Netos</p>
+                    </div>
+                    <button onclick="swapIngredient(${mealIndex}, '${cat}')" class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-[#FFC300] hover:text-black hover:border-[#FFC300] transition group-hover:scale-105" title="Cambiar Ingrediente">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        const card = document.createElement('div');
+        card.className = 'glass-panel p-5 md:p-6 rounded-2xl flex flex-col gap-4 border border-white/10 relative overflow-hidden';
+        card.innerHTML = `
+            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-full -z-10"></div>
+            <div class="border-b border-white/5 pb-3">
+                <h5 class="text-sm font-black text-white uppercase tracking-tighter">${meal.window_title}</h5>
+                <p class="text-xl font-black text-emerald-400 mt-1">${Math.round(totalCals)} <span class="text-[10px] text-gray-400">KCAL</span></p>
+            </div>
+            <div class="space-y-2.5">
+                ${ingredientsHTML}
+            </div>
+        `;
+        mealsContainer.appendChild(card);
+    });
+}
+
+// 🔥 LA MAGIA MATEMÁTICA: CAMBIO Y RECALCULO AL VUELO
+window.swapIngredient = function(mealIndex, category) {
+    const meal = currentMenu[mealIndex];
+    const targetMacroGrams = meal.macro_targets[category.toLowerCase() === 'grasa' ? 'fats' : category.toLowerCase()]; 
+    
+    // Obtener catálogo disponible para esa categoría desde el diccionario descargado
+    const pool = foodDictionary[category];
+    if (!pool || pool.length <= 1) {
+        showMessage("No hay más alternativas en el diccionario.", "error");
+        return;
+    }
+
+    // Elegir uno aleatorio que no sea el actual
+    const currentName = meal.ingredients[category].data.name;
+    let newFood;
+    do {
+        newFood = pool[Math.floor(Math.random() * pool.length)];
+    } while (newFood.name === currentName);
+
+    // REGLA DE 3 INVERSA: ¿Cuántos gramos necesito de la nueva comida?
+    let mainMacroProp = category === 'PROTEINA' ? newFood.protein : (category === 'CARBOHIDRATO' ? newFood.carbs : newFood.fats);
+    mainMacroProp = parseFloat(mainMacroProp) || 1; // Evitar división por cero
+
+    const newGramsRequired = Math.round((targetMacroGrams / mainMacroProp) * 100.0);
+
+    // Actualizar el estado del menú y volver a dibujar instantáneamente
+    meal.ingredients[category] = {
+        data: newFood,
+        grams: newGramsRequired
+    };
+
+    renderDynamicMeals();
+    
+    // Feedback táctico
+    try { navigator.vibrate(50); } catch(e){}
+};
+
 function handleRestrictedAccess(title, description) {
     if (loadingSpinner) loadingSpinner.classList.add('hidden');
     if (eatsContent) eatsContent.classList.add('hidden');
     
-    // Inyectar un panel táctico de bloqueo elegante
     const mainSection = document.querySelector('main');
     const lockPanel = document.createElement('div');
     lockPanel.className = 'w-full max-w-xl mx-auto glass-panel rounded-[32px] p-8 border border-white/10 text-center mt-10 fade-in-up';
@@ -163,5 +182,4 @@ function handleRestrictedAccess(title, description) {
     mainSection.appendChild(lockPanel);
 }
 
-// Inicialización Automática al Desplegar el DOM
 window.addEventListener('DOMContentLoaded', loadMetabolicPlan);
