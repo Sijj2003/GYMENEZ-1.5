@@ -142,15 +142,15 @@
             <div class="flex space-x-8 px-6 py-4 md:py-2">
                 <button onclick="scrollToPlan('BASICO')" id="tab-BASICO" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Básico</button>
                 <button onclick="scrollToPlan('STANDARD')" id="tab-STANDARD" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Standard</button>
-              #  <button onclick="scrollToPlan('PLUS')" id="tab-PLUS" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs active">Plus</button>
-             #   <button onclick="scrollToPlan('ULTRA')" id="tab-ULTRA" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Ultra</button>
+                <button onclick="scrollToPlan('PLUS')" id="tab-PLUS" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs active">Plus</button>
+                <button onclick="scrollToPlan('ULTRA')" id="tab-ULTRA" class="plan-tab text-gray-500 font-black uppercase tracking-widest text-[10px] md:text-xs">Ultra</button>
             </div>
         </div>
 
         <div id="plans-carousel" class="plans-carousel w-full"></div>
 
         <p class="mt-12 text-gray-600 text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-black text-center px-4">
-            Gymenez Ecosystem &copy; 2026 • Modificación de planes instantánea
+            Gymenez Ecosystem &copy; 2026 • FASE ALPHA BETA
         </p>
     </main>
 
@@ -160,7 +160,6 @@
         let currentUserPlan = 'BASICO'; 
         let currentUserId = null;
         
-        // 🔄 El array nace vacío. El backend dicta cuáles son los planes y sus precios.
         let plansData = []; 
 
         window.onload = async () => {
@@ -176,38 +175,32 @@
                 const user = JSON.parse(storedSession);
                 currentUserId = user.id || user._id; 
                 
-                // 1. 🛡️ Peticiones controladas al servidor
                 let dataProfile = { success: false };
                 try {
                     const resProfile = await fetch(`${API_URL}/api/profile/me`, { headers: { 'Authorization': `Bearer ${token}` } });
                     if (resProfile.ok) dataProfile = await resProfile.json();
-                    else console.error("Fallo Perfil:", resProfile.status);
-                } catch(e) { console.error("Error de red en Perfil:", e); }
+                } catch(e) {}
 
                 let dataCatalog = { success: false };
                 try {
                     const resCatalog = await fetch(`${API_URL}/api/plans/catalog`);
                     if (resCatalog.ok) dataCatalog = await resCatalog.json();
-                    else console.error("Fallo Catálogo:", resCatalog.status);
-                } catch(e) { console.error("Error de red en Catálogo:", e); }
+                } catch(e) {}
 
                 let dataBcv = { success: false };
                 try {
                     const resBcv = await fetch(`${API_URL}/api/bcv-rate`);
                     if (resBcv.ok) dataBcv = await resBcv.json();
-                    else console.error("Fallo Tasa BCV:", resBcv.status);
-                } catch(e) { console.error("Error de red en Tasa BCV:", e); }
+                } catch(e) {}
                 
-                // 2. Procesar datos obtenidos
                 if (dataProfile.success && dataProfile.profile) {
                     currentUserPlan = (dataProfile.profile.subscription_level || 'BASICO').toUpperCase();
                 }
 
-                // Llenamos la variable local con la verdad del servidor
                 if (dataCatalog.success && dataCatalog.plans) {
                     plansData = dataCatalog.plans;
                 } else {
-                    throw new Error("El Catálogo de membresías devolvió error. Contacte a soporte.");
+                    throw new Error("El Catálogo de membresías devolvió error.");
                 }
 
                 if (dataBcv.success) {
@@ -217,7 +210,6 @@
                     document.getElementById('tasa-bcv-display').textContent = `ERR BCV`;
                 }
 
-                // 3. Ejecutar renderizado
                 renderCards();
                 setupScrollObserver();
 
@@ -229,8 +221,7 @@
                 }, 500);
 
             } catch (e) {
-                console.error("Fallo crítico en sincronización de pasarela:", e);
-                alert(e.message);
+                console.error("Fallo crítico en sincronización:", e);
                 window.location.href = '../apps/start/inicio.html';
             }
         };
@@ -246,10 +237,14 @@
                 const bsPrice = tasaBcvActual > 0 ? (plan.priceUSD * tasaBcvActual).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '...';
                 
                 let buttonHTML = '';
+                
                 if (isCurrentPlan) {
                     buttonHTML = `<button disabled class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] bg-[#1a1a1a] text-[#FFC300] border border-[#FFC300]/30 cursor-default shadow-inner">Plan Actual Activo</button>`;
-                } else if (plan.priceUSD === 0) {
+                } else if (plan.priceUSD === 0 || plan.id === 'BASICO') {
                     buttonHTML = `<button disabled class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] bg-[#1a1a1a] text-white border border-white/10 cursor-default">Incluido Gratis</button>`;
+                } else if (plan.id === 'PLUS' || plan.id === 'ULTRA') {
+                    // BLOQUEO DE PLANES PREMIUM CON "PRÓXIMAMENTE"
+                    buttonHTML = `<button disabled class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] bg-[#1a1a1a] text-gray-500 border border-white/10 cursor-not-allowed border-dashed">Próximamente</button>`;
                 } else {
                     const actionText = (currentUserPlan === 'BASICO') ? 'Obtener Nivel' : 'Cambiar a Nivel';
                     buttonHTML = `<button onclick="goToPayment('${plan.id}', ${plan.priceUSD})" class="mt-8 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all transform active:scale-95 ${plan.btnClass}">${actionText} ${plan.name}</button>`;
@@ -349,6 +344,7 @@
         }
 
         function goToPayment(plan, usdPrice) {
+            // Esta función ahora solo es accesible para el plan STANDARD si no es el actual
             if (!currentUserId) {
                 window.location.href = '../apps/start/login.html';
                 return;
