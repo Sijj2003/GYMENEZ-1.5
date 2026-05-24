@@ -7,7 +7,7 @@
     
     <link rel="icon" type="image/png" href="static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
     <style>
         body { 
@@ -15,40 +15,48 @@
             background-color: #030305; 
             color: white; 
             overflow-x: hidden;
+            min-h-screen: 100vh;
         }
 
-        /* 🚀 EFECTO PARALLAX NATIVO */
+        /* 🚀 COHERENCIA VISUAL TOTAL CON INDEX.HTML */
         .parallax-bg {
             background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070');
             background-attachment: fixed;
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
+            position: absolute;
+            inset: 0;
+            z-index: 0;
         }
 
         .parallax-overlay {
-            background: linear-gradient(to bottom, rgba(3,3,5,0.85) 0%, rgba(3,3,5,0.6) 50%, rgba(3,3,5,0.95) 100__);
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(3,3,5,0.85) 0%, rgba(3,3,5,0.6) 50%, rgba(3,3,5,0.95) 100%);
+            z-index: 1;
         }
 
-        /* Glassmorphism Premium */
+        /* Glassmorphism de Alta Gama */
         .glass-panel {
-            background: rgba(10, 10, 15, 0.65);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            background: rgba(10, 10, 15, 0.45);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
         }
 
         .glass-input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .glass-input:focus {
             border-color: #FFC300;
-            box-shadow: 0 0 0 1px rgba(255, 195, 0, 0.3);
-            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 15px rgba(255, 195, 0, 0.2);
+            background: rgba(0, 0, 0, 0.8);
             outline: none;
         }
 
@@ -60,152 +68,230 @@
         .btn-gold {
             background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
             color: #000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 900;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .btn-gold:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
+            box-shadow: 0 15px 30px -5px rgba(255, 195, 0, 0.35);
         }
 
-        /* Animaciones */
-        .animate-premium-in { 
-            animation: premiumReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        .btn-gold:active { transform: translateY(0); }
+
+        /* 📱 KINETIC CORE ANIMATION (Estilo Boot de Lujo OS) */
+        .kinetic-orb {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,195,0,0.15) 0%, transparent 70%);
+        }
+        
+        .kinetic-ring {
+            position: absolute;
+            inset: 0;
+            border: 2px solid transparent;
+            border-top-color: #FFC300;
+            border-radius: 50%;
+            animation: spinRing 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            filter: drop-shadow(0 0 8px #FFC300);
         }
 
-        @keyframes premiumReveal {
-            0% { opacity: 0; filter: blur(10px); transform: scale(0.98) translateY(15px); }
-            100% { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); }
+        .kinetic-ring-inner {
+            position: absolute;
+            inset: 8px;
+            border: 1.5px solid transparent;
+            border-bottom-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: spinRingInverse 1.5s linear infinite;
         }
 
-        /* Ocultar scrollbar */
+        @keyframes spinRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinRingInverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Líneas de Progreso de Pasos (Subtles) */
+        .step-dot {
+            width: 33.33%;
+            height: 3px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.5s ease;
+        }
+        .step-dot.active {
+            background: #FFC300;
+            box-shadow: 0 0 10px rgba(255,195,0,0.5);
+        }
+
+        /* Secuencias de transiciones fluidas de los pasos */
+        .step-section {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Cursor de escritura setup */
-        .typing-dot::after {
-            content: '.';
-            animation: blink 1.2s step-start infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black min-h-screen parallax-bg relative">
-    <div class="absolute inset-0 parallax-overlay z-0"></div>
+<body class="selection:bg-[#FFC300] selection:text-black min-h-screen relative flex flex-col justify-between">
+    
+    <!-- FONDO PARALLAX EMPATADO CON INDEX.HTML -->
+    <div class="parallax-bg"></div>
+    <div class="parallax-overlay"></div>
 
-    <!-- 🧭 NAVEGACIÓN SUPERIOR -->
-    <nav class="absolute top-0 w-full z-40 py-4 px-6 md:px-12 flex justify-between items-center bg-transparent">
+    <!-- 🧭 NAVEGACIÓN -->
+    <nav class="relative w-full z-40 py-5 px-6 md:px-12 flex justify-between items-center bg-transparent">
         <div class="flex items-center cursor-pointer group" onclick="window.location.href='index.html'">
-            <span class="text-[#FFC300] font-[900] text-xl md:text-2xl italic tracking-tighter">GYM</span>
-            <span class="text-white font-[900] text-xl md:text-2xl italic tracking-tighter">ENEZ</span>
+            <span class="text-[#FFC300] font-[900] text-2xl md:text-3xl italic tracking-tighter transition-transform group-hover:scale-105">GYM</span>
+            <span class="text-white font-[900] text-2xl md:text-3xl italic tracking-tighter">ENEZ</span>
         </div>
         <a href="login.html" class="text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase">
-            Iniciar Sesión
+            Ingresar
         </a>
     </nav>
 
-    <!-- 💳 PANEL DE REGISTRO -->
-    <div id="register-container" class="relative z-10 min-h-screen w-full flex items-center justify-center p-4 pt-20 md:p-8 animate-premium-in">
-        <div class="glass-panel p-6 md:p-10 w-full max-w-2xl rounded-[24px] md:rounded-[32px] my-auto">
+    <!-- 💳 CARD MULTI-PASOS PRINCIPAL -->
+    <main id="register-container" class="relative z-10 w-full flex-grow flex items-center justify-center p-4 md:p-8 transition-all duration-700">
+        <div class="glass-panel p-6 md:p-10 w-full max-w-xl rounded-[28px] md:rounded-[36px] flex flex-col justify-between relative overflow-hidden min-h-[460px]">
             
-            <div class="text-center mb-6 md:mb-8">
-                <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter mb-1">Crear Perfil Atleta</h1>
-                <p class="text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Completa tu ficha para ingresar al ecosistema</p>
+            <!-- Barra superior de Progreso estilo iOS Setup -->
+            <div class="absolute top-0 left-0 w-full flex">
+                <div id="dot-1" class="step-dot active"></div>
+                <div id="dot-2" class="step-dot"></div>
+                <div id="dot-3" class="step-dot"></div>
             </div>
 
-            <form id="light-register-form" class="space-y-4 md:space-y-5" onsubmit="executePremiumSetup(event)">
+            <!-- Cabecera Dinámica -->
+            <div class="text-center mb-6 mt-2">
+                <h1 id="register-title" class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter transition-all duration-300">Identidad Base</h1>
+                <p id="register-subtitle" class="text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.25em] mt-1">Paso 1 de 3 • Datos de Cuenta</p>
+            </div>
+
+            <!-- Formulario Seccionado -->
+            <form id="multi-step-form" class="flex-grow flex flex-col justify-between" onsubmit="return false;">
                 
-                <!-- Fila 1: Nombre y Apellido -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Nombre</label>
-                        <input type="text" id="reg-name" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Carlos">
+                <!-- 🟡 PASO 1: Identidad Básica -->
+                <div id="step-section-1" class="step-section space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Nombre</label>
+                            <input type="text" id="reg-name" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Carlos">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Apellido</label>
+                            <input type="text" id="reg-lastname" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Mendoza">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Apellido</label>
-                        <input type="text" id="reg-lastname" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Mendoza">
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Correo Electrónico</label>
+                        <input type="email" id="reg-email" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-xs font-medium" placeholder="atleta@gymenez.com">
+                    </div>
+                    <div class="pt-4">
+                        <button type="button" onclick="goToStep(2)" class="w-full btn-gold py-4 rounded-xl text-[10px] uppercase tracking-[0.25em]">
+                            Continuar
+                        </button>
                     </div>
                 </div>
 
-                <!-- Fila 2: Correo y Contraseña -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Correo Electrónico</label>
-                        <input type="email" id="reg-email" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="atleta@gymenez.com">
+                <!-- 🟢 PASO 2: Biometría de Contacto -->
+                <div id="step-section-2" class="step-section space-y-4 hidden opacity-0 transform scale-95">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Fecha de Nacimiento</label>
+                            <input type="text" id="reg-dob" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-xs font-mono" placeholder="DD/MM/YYYY" maxlength="10" oninput="applyDateMask(event)">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Sexo Biológico</label>
+                            <select id="reg-sex" class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer" required>
+                                <option value="" disabled selected>Selecciona tu sexo...</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                            </select>
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Contraseña</label>
-                        <input type="password" id="reg-password" minlength="6" maxlength="15" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="Entre 6 y 15 caracteres">
-                    </div>
-                </div>
-
-                <!-- Fila 3: Teléfono y Fecha de Nacimiento -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Teléfono Móvil (WhatsApp)</label>
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Teléfono Móvil (WhatsApp)</label>
                         <div class="flex gap-2">
-                            <select id="reg-phone-prefix" class="w-20 px-2 py-3 rounded-xl glass-input text-white text-xs font-bold text-center appearance-none cursor-pointer">
+                            <select id="reg-phone-prefix" class="w-20 px-2 py-3.5 rounded-xl glass-input text-white text-xs font-bold text-center appearance-none cursor-pointer">
                                 <option value="0414">0414</option>
                                 <option value="0424">0424</option>
                                 <option value="0412">0412</option>
                                 <option value="0416">0416</option>
                                 <option value="0426">0426</option>
                             </select>
-                            <input type="text" id="reg-phone-num" required class="flex-1 glass-input px-4 py-3 rounded-xl text-white text-xs" placeholder="1234567" maxlength="7" oninput="this.value = this.value.replace(/\D/g, '')">
+                            <input type="text" id="reg-phone-num" required class="flex-1 glass-input px-4 py-3.5 rounded-xl text-white text-xs font-mono" placeholder="1234567" maxlength="7" oninput="this.value = this.value.replace(/\D/g, '')">
                         </div>
-                        <span class="block text-[8px] text-gray-500 mt-1 ml-1">Para el seguimiento personalizado de tu entrenador. Cero spam.</span>
                     </div>
+                    <div class="grid grid-cols-3 gap-3 pt-4">
+                        <button type="button" onclick="goToStep(1)" class="col-span-1 bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition">
+                            Atrás
+                        </button>
+                        <button type="button" onclick="goToStep(3)" class="col-span-2 btn-gold py-4 rounded-xl text-[10px] uppercase tracking-[0.25em]">
+                            Continuar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🔴 PASO 3: Seguridad Definitiva -->
+                <div id="step-section-3" class="step-section space-y-4 hidden opacity-0 transform scale-95">
                     <div>
-                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Fecha de Nacimiento</label>
-                        <input type="text" id="reg-dob" required class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-mono" placeholder="DD/MM/YYYY" maxlength="10" oninput="applyDateMask(event)">
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Establece tu Clave de Acceso</label>
+                        <input type="password" id="reg-password" minlength="6" maxlength="15" required class="w-full glass-input px-4 py-4 rounded-xl text-white text-center text-sm font-mono tracking-widest" placeholder="••••••••">
+                        <span class="block text-[8px] text-gray-500 text-center uppercase tracking-widest mt-2">Debe tener entre 6 y 15 caracteres de longitud</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 pt-4">
+                        <button type="button" onclick="goToStep(2)" class="col-span-1 bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition">
+                            Atrás
+                        </button>
+                        <button type="button" onclick="triggerCinematicSetup()" class="col-span-2 btn-gold py-4 rounded-xl text-[10px] uppercase tracking-[0.25em]">
+                            Aceptar y Registrarme
+                        </button>
                     </div>
                 </div>
 
-                <!-- Fila 4: Sexo Biológico -->
-                <div>
-                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Sexo Biológico</label>
-                    <select id="reg-sex" class="w-full glass-input px-4 py-3 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer" required>
-                        <option value="" disabled selected>Selecciona una opción...</option>
-                        <option value="Hombre">Hombre</option>
-                        <option value="Mujer">Mujer</option>
-                    </select>
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="w-full btn-gold py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.25em]">
-                        Registrarme e Iniciar
-                    </button>
-                </div>
             </form>
-            
-            <p class="text-center text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-6">
-                Al registrarte, aceptas los términos de acondicionamiento físico del ecosistema.
-            </p>
         </div>
-    </div>
+    </main>
 
-    <!-- 📱 PANTALLA DE CONFIGURACIÓN DINÁMICA ESTILO IPHONE -->
-    <div id="setup-screen" class="fixed inset-0 bg-[#030305] backdrop-blur-3xl z-[5000] hidden flex flex-col items-center justify-center p-6 text-center transition-all duration-500 opacity-0">
-        <div class="w-20 h-20 bg-[#FFC300]/10 rounded-[2rem] border border-[#FFC300]/20 flex items-center justify-center mb-10 shadow-[0_0_50px_rgba(255,195,0,0.1)] relative">
-            <!-- Spinner sutil circular alrededor -->
-            <div class="absolute inset-[-4px] border-2 border-transparent border-t-[#FFC300] rounded-[2.2rem] animate-spin"></div>
-            <svg class="w-10 h-10 text-[#FFC300]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
-            </svg>
+    <!-- 📱 PANTALLA DE CONFIGURACIÓN CINEMATOGRÁFICA (Estilo Apple / Premium Boot) -->
+    <div id="setup-screen" class="fixed inset-0 bg-[#030305] z-[5000] hidden flex flex-col items-center justify-center p-6 text-center transition-all duration-1000 opacity-0">
+        
+        <!-- Elegant Kinetic Orb Loading -->
+        <div class="kinetic-orb mb-12 flex items-center justify-center">
+            <div class="kinetic-ring"></div>
+            <div class="kinetic-ring-inner"></div>
+            <!-- Glowing Core Point -->
+            <div class="w-2 h-2 bg-[#FFC300] rounded-full shadow-[0_0_12px_#FFC300]"></div>
         </div>
         
-        <!-- Mensajes del Setup -->
-        <h2 id="setup-message" class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter max-w-md h-16 transition-all duration-300 transform scale-95 opacity-0">
-            Hola Atleta
-        </h2>
+        <!-- Secuencia de Textos Fluida con Filtros Cinematográficos -->
+        <div class="h-20 flex flex-col justify-center items-center">
+            <h2 id="setup-message" class="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter max-w-lg transition-all duration-700 transform scale-95 opacity-0 filter blur-[4px]">
+                Iniciando
+            </h2>
+        </div>
         
-        <p class="text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] mt-2">
-            Protocolo de inicio perimetral
+        <p class="text-gray-600 text-[8px] md:text-[9px] font-black uppercase tracking-[0.5em] mt-6 transition-opacity duration-1000 delay-300">
+            Ecosistema de Optimización Humana
         </p>
     </div>
 
-    <!-- MÁSCARA AUTOMÁTICA DE FECHA (UX OPTIMIZADA) -->
+    <!-- 🏁 FOOTER -->
+    <footer class="relative z-10 py-6 text-center border-t border-white/5 opacity-40">
+        <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.5em] text-gray-600">
+            © 2026 GYMENEZ PERFORMANCE • EL ESTÁNDAR DE EXCELENCIA
+        </p>
+    </footer>
+
+    <!-- LÓGICA DE CONTROL DE INTERFAZ -->
     <script>
+        let activeStep = 1;
+
+        // Máscara inteligente para fechas
         function applyDateMask(e) {
             if (e.inputType === 'deleteContentBackward') return;
             const input = e.target;
@@ -219,63 +305,127 @@
             input.value = formatted;
         }
 
-        // 📱 LOGICA DE CONFIGURACIÓN ANIMADA (ESTILO IPHONE SETUP - MAX 8 SEG)
-        function executePremiumSetup(event) {
-            event.preventDefault(); // Detener envío tradicional para correr la animación de ventas
+        // Validación y control de Pasos con Transiciones Fluidas
+        function validateFields(step) {
+            if (step === 1) {
+                const name = document.getElementById('reg-name').value.trim();
+                const lastname = document.getElementById('reg-lastname').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                if (!name || !lastname || !email || !document.getElementById('reg-email').checkValidity()) {
+                    alert("Por favor, completa tus datos de cuenta con un correo válido.");
+                    return false;
+                }
+            }
+            if (step === 2) {
+                const dob = document.getElementById('reg-dob').value.trim();
+                const sex = document.getElementById('reg-sex').value;
+                const phone = document.getElementById('reg-phone-num').value.trim();
+                if (dob.length !== 10 || !sex || phone.length < 7) {
+                    alert("Completa tu información biológica y un número de contacto válido.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function goToStep(nextStep) {
+            if (nextStep > activeStep && !validateFields(activeStep)) return;
+
+            // Ocultar sección actual
+            const currentSection = document.getElementById(`step-section-${activeStep}`);
+            currentSection.classList.add('opacity-0', 'scale-95');
             
+            // Actualizar barras de progreso superiores
+            document.getElementById(`dot-${activeStep}`).classList.remove('active');
+            if(nextStep < activeStep) {
+                // Si va hacia atrás se limpia la barra
+                document.getElementById(`dot-${activeStep}`).classList.remove('active');
+            }
+
+            setTimeout(() => {
+                currentSection.classList.add('hidden');
+                
+                // Mostrar nueva sección
+                const nextSection = document.getElementById(`step-section-${nextStep}`);
+                nextSection.classList.remove('hidden');
+                
+                // Forzar reflujo de renderizado para animación limpia
+                nextSection.offsetHeight; 
+                
+                nextSection.classList.remove('opacity-0', 'scale-95');
+                nextSection.classList.add('opacity-100', 'scale-100');
+                
+                // Actualizar títulos y textos de estado
+                const titles = { 1: "Identidad Base", 2: "Biometría Básica", 3: "Seguridad" };
+                document.getElementById('register-title').textContent = titles[nextStep];
+                document.getElementById('register-subtitle').textContent = `Paso ${nextStep} de 3 • ${nextStep === 1 ? 'Datos de Cuenta' : nextStep === 2 ? 'Contacto' : 'Clave de Acceso'}`;
+                
+                document.getElementById(`dot-${nextStep}`).classList.add('active');
+                activeStep = nextStep;
+            }, 250);
+        }
+
+        // 📱 ANIMACIÓN DE ARRANQUE PREMIUM CINEMATOGRÁFICA (Estilo iOS / Android Premium Boot)
+        function triggerCinematicSetup() {
+            const password = document.getElementById('reg-password').value;
+            if(password.length < 6 || password.length > 15) {
+                alert("La contraseña debe tener entre 6 and 15 caracteres.");
+                return;
+            }
+
             const registerContainer = document.getElementById('register-container');
             const setupScreen = document.getElementById('setup-screen');
             const msgElement = document.getElementById('setup-message');
-            const athleteName = document.getElementById('reg-name').value.trim();
+            const athleteName = document.getElementById('reg-name').value.trim().toUpperCase();
 
-            // Ocultar formulario de forma elegante
-            registerContainer.style.transition = 'all 0.5s ease';
+            // Animación fluida de salida para el contenedor
+            registerContainer.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
             registerContainer.style.opacity = '0';
-            registerContainer.style.transform = 'scale(0.98)';
+            registerContainer.style.transform = 'scale(0.95) translateY(-10px)';
 
             setTimeout(() => {
                 registerContainer.classList.add('hidden');
                 setupScreen.classList.remove('hidden');
                 
-                // Animación de entrada de la pantalla de carga
                 setTimeout(() => {
                     setupScreen.classList.remove('opacity-0');
-                    startTextSequence();
-                }, 50);
-            }, 500);
+                    executeSequence();
+                }, 100);
+            }, 600);
 
-            // Secuencia milimétrica de mensajes (Duración total: ~7.5 segundos)
-            const steps = [
-                { text: `Hola, ${athleteName}`, delay: 0 },
-                { text: "Configurando tu espacio personal...", delay: 1600 },
-                { text: "Alineando tus bloques de entrenamiento...", delay: 3400 },
-                { text: "Calibrando tus zonas de recuperación...", delay: 5200 },
-                { text: "¡Todo listo! Ingresando al Portal...", delay: 6800 }
+            // Secuencia calmada y lujosa de carga (Total: ~8 segundos)
+            const sequences = [
+                { text: `Hola, ${athleteName}`, time: 0 },
+                { text: "Creando tu perfil en el ecosistema...", time: 1600 },
+                { text: "Estructurando tus bloques de fuerza...", time: 3400 },
+                { text: "Calibrando tus zonas de recuperación...", time: 5200 },
+                { text: "Preparando tu acceso seguro...", time: 6800 }
             ];
 
-            function startTextSequence() {
-                steps.forEach((step) => {
+            function changeSetupText(newText) {
+                msgElement.classList.add('opacity-0', 'scale-95', 'blur-[6px]');
+                setTimeout(() => {
+                    msgElement.textContent = newText;
+                    msgElement.classList.remove('opacity-0', 'scale-95', 'blur-[6px]');
+                    msgElement.classList.add('opacity-100', 'scale-100', 'blur-0');
+                }, 300);
+            }
+
+            function executeSequence() {
+                sequences.forEach((seq) => {
                     setTimeout(() => {
-                        // Desvanecer texto anterior
-                        msgElement.classList.add('opacity-0', 'scale-95');
-                        
-                        setTimeout(() => {
-                            msgElement.textContent = step.text;
-                            msgElement.classList.remove('opacity-0', 'scale-95');
-                            msgElement.classList.add('opacity-100', 'scale-100');
-                        }, 200);
-                        
-                    }, step.delay);
+                        changeSetupText(seq.text);
+                    }, seq.time);
                 });
 
-                // Redirección definitiva al llegar al segundo 7.8
+                // Redirección limpia al login
                 setTimeout(() => {
-                    setupScreen.style.transition = 'all 0.4s ease';
+                    setupScreen.style.transition = 'all 0.5s ease';
                     setupScreen.style.opacity = '0';
                     setTimeout(() => {
                         window.location.href = 'login.html';
-                    }, 400);
-                }, 7600);
+                    }, 500);
+                }, 8200);
             }
         }
     </script>
