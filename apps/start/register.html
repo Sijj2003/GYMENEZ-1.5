@@ -188,7 +188,7 @@
                         <input type="email" id="reg-email" required class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs font-medium" placeholder="atleta@gymenez.com">
                     </div>
                     <div class="pt-6">
-                        <button type="button" onclick="goToStep(2)" class="w-full btn-gold py-4.5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Continuar</button>
+                        <button type="button" onclick="goToStep(2)" class="w-full btn-gold py-4 md:py-5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Continuar</button>
                     </div>
                 </div>
 
@@ -210,15 +210,15 @@
                     <div>
                         <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">WhatsApp</label>
                         <div class="flex gap-2">
-                            <select id="reg-phone-prefix" class="w-24 px-2 py-4 rounded-xl glass-input text-white text-xs font-bold text-center">
+                            <select id="reg-phone-prefix" class="w-24 px-2 py-4 rounded-xl glass-input text-white text-xs font-bold text-center cursor-pointer">
                                 <option value="0414">0414</option><option value="0424">0424</option><option value="0412">0412</option>
                             </select>
                             <input type="text" id="reg-phone-num" required class="flex-1 glass-input px-5 py-4 rounded-xl text-white text-xs" placeholder="7654321" maxlength="7">
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-3 pt-6">
-                        <button type="button" onclick="goToStep(1)" class="bg-white/5 border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition">Atrás</button>
-                        <button type="button" onclick="goToStep(3)" class="col-span-2 btn-gold py-4.5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Continuar</button>
+                        <button type="button" onclick="goToStep(1)" class="bg-white/5 border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition py-4 md:py-5">Atrás</button>
+                        <button type="button" onclick="goToStep(3)" class="col-span-2 btn-gold py-4 md:py-5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Continuar</button>
                     </div>
                 </div>
 
@@ -228,8 +228,8 @@
                         <input type="password" id="reg-password" minlength="6" maxlength="15" required class="w-full glass-input px-5 py-5 rounded-xl text-white text-center text-xl font-mono tracking-[0.5em]" placeholder="••••••">
                     </div>
                     <div class="grid grid-cols-3 gap-3 pt-4">
-                        <button type="button" onclick="goToStep(2)" class="bg-white/5 border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition">Atrás</button>
-                        <button type="button" onclick="processSecureRegistration()" class="col-span-2 btn-gold py-4.5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Activar Perfil</button>
+                        <button type="button" onclick="goToStep(2)" class="bg-white/5 border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition py-4 md:py-5">Atrás</button>
+                        <button type="button" onclick="processSecureRegistration()" class="col-span-2 btn-gold py-4 md:py-5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Activar Perfil</button>
                     </div>
                 </div>
 
@@ -252,20 +252,17 @@
     </footer>
 
     <script>
-        // 🚀 TRANSICIÓN DE ENTRADA SUAVE
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             const nav = document.getElementById('main-nav');
             const footer = document.getElementById('main-footer');
 
-            // Quitar velo negro
             preloader.style.opacity = '0';
             setTimeout(() => {
                 preloader.style.display = 'none';
                 document.body.classList.add('loaded');
                 document.body.style.overflow = 'auto';
                 
-                // Mostrar nav y footer
                 nav.classList.remove('opacity-0', '-translate-y-4');
                 footer.classList.remove('opacity-0');
             }, 1000);
@@ -285,7 +282,49 @@
             input.value = formatted;
         }
 
+        function showUIFeedback(message, type = 'error') {
+            const box = document.getElementById('message-box');
+            if(!box) return;
+            box.textContent = message;
+            box.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-full text-[10px] font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-400 text-center border backdrop-blur-md w-11/12 max-w-[360px]';
+            if(type === 'success') {
+                box.classList.add('bg-emerald-950/80', 'text-emerald-400', 'border-emerald-500/30');
+            } else {
+                box.classList.add('bg-red-950/80', 'text-red-400', 'border-red-500/30');
+            }
+            box.style.opacity = '1';
+            box.style.transform = 'translate(-50%, 0)';
+            setTimeout(() => {
+                box.style.opacity = '0';
+                box.style.transform = 'translate(-50%, -20px)';
+            }, 4000);
+        }
+
+        function validateFields(step) {
+            if (step === 1) {
+                const name = document.getElementById('reg-name').value.trim();
+                const lastname = document.getElementById('reg-lastname').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                if (!name || !lastname || !email || !document.getElementById('reg-email').checkValidity()) {
+                    showUIFeedback("Completa tus datos con un correo electrónico válido.", "error");
+                    return false;
+                }
+            }
+            if (step === 2) {
+                const dob = document.getElementById('reg-dob').value.trim();
+                const sex = document.getElementById('reg-sex').value;
+                const phone = document.getElementById('reg-phone-num').value.trim();
+                if (dob.length !== 10 || !sex || phone.length < 7) {
+                    showUIFeedback("Ingresa una fecha de nacimiento válida y tu número móvil.", "error");
+                    return false;
+                }
+            }
+            return true;
+        }
+
         function goToStep(nextStep) {
+            if (nextStep > activeStep && !validateFields(activeStep)) return;
+
             const currentSection = document.getElementById(`step-section-${activeStep}`);
             const nextSection = document.getElementById(`step-section-${nextStep}`);
             
@@ -310,8 +349,50 @@
         }
 
         async function processSecureRegistration() {
+            const password = document.getElementById('reg-password').value;
+            if(password.length < 6 || password.length > 15) {
+                showUIFeedback("La contraseña debe contener entre 6 y 15 caracteres.", "error");
+                return;
+            }
+
             const athleteName = document.getElementById('reg-name').value.trim().toUpperCase();
-            triggerCinematicSetup(athleteName);
+            const btn = document.querySelector('#step-section-3 .btn-gold');
+            btn.disabled = true;
+            btn.textContent = "VALIDANDO...";
+
+            const ciPlaceholder = `V-TEMP-${Date.now().toString().slice(-6)}`; 
+            const payload = {
+                email: document.getElementById('reg-email').value.trim().toLowerCase(),
+                password: password,
+                name: athleteName,
+                last_name: document.getElementById('reg-lastname').value.trim().toUpperCase(),
+                id_number: ciPlaceholder,
+                phone_number: `${document.getElementById('reg-phone-prefix').value}-${document.getElementById('reg-phone-num').value.trim()}`,
+                dob: document.getElementById('reg-dob').value.trim(),
+                sex: document.getElementById('reg-sex').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    triggerCinematicSetup(athleteName);
+                } else {
+                    showUIFeedback(data.error || "Error al procesar el alta.", "error");
+                    btn.disabled = false;
+                    btn.textContent = "Activar Perfil";
+                }
+            } catch (err) {
+                showUIFeedback("Error de enlace perimetral con el servidor.", "error");
+                btn.disabled = false;
+                btn.textContent = "Activar Perfil";
+            }
         }
 
         function triggerCinematicSetup(name) {
