@@ -17,24 +17,44 @@
             overflow-x: hidden;
         }
         .glass-panel {
-            background: rgba(15, 15, 20, 0.6);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 15, 20, 0.4);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
-        .bento-card { transition: all 0.3s ease; }
+        .bento-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .bento-card:hover {
-            border-color: rgba(16, 185, 129, 0.4);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.2);
+            transform: translateY(-4px);
         }
         .fade-in-up {
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0; transform: translateY(20px);
+            opacity: 0; transform: translateY(30px);
         }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+
+        /* === ESTILOS PARALLAX SHOWCASE === */
+        .parallax-section {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+        }
+        .parallax-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(3,3,5,0.9) 0%, rgba(3,3,5,0.4) 50%, rgba(3,3,5,1) 100%);
+            z-index: 1;
+        }
+        .reveal-scroll { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-scroll.active { opacity: 1; transform: translateY(0); }
+        .glow-emerald-text { text-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
     </style>
 </head>
 <body class="selection:bg-emerald-500 selection:text-black">
@@ -46,97 +66,227 @@
 
     <div class="min-h-screen w-full relative z-10 flex flex-col">
         
-        <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
+        <header class="w-full border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter block">
                         <span class="text-emerald-500">GYM</span><span class="text-white">ENEZ EATS</span>
                     </h1>
                 </div>
-                <a href="/apps/start/inicio.html" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition">
+                <a href="/apps/start/inicio.html" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-emerald-500 hover:border-emerald-500 hover:text-black transition shadow-[0_0_15px_rgba(16,185,129,0.05)]">
                     Volver al Hub
                 </a>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto w-full px-4 md:px-6 py-6 md:py-10 flex-grow">
-            
-            <div class="mb-8 md:mb-10 fade-in-up">
-                <p class="text-emerald-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-1 md:mb-2">Sincronización Metabólica Automatizada</p>
-                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none text-white">
-                    Combustible <span class="text-emerald-500">Bioquímico.</span>
+        <main id="main-dashboard" class="max-w-7xl mx-auto w-full px-4 md:px-6 py-6 md:py-10 flex-grow hidden">
+            <div class="mb-8 md:mb-12 fade-in-up">
+                <p class="text-emerald-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-1 md:mb-2 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Sincronización Metabólica
+                </p>
+                <h2 class="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-none text-white">
+                    Motor <span class="text-emerald-500">Bioquímico.</span>
                 </h2>
-                <div id="status-banner" class="mt-4 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 inline-flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> MOTOR AJUSTADO SEGÚN TU TONELAJE DE HOY
+                <div id="status-banner" class="mt-5 px-5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                    CALIBRADO SEGÚN TU DESGASTE NEUROMUSCULAR DE HOY
                 </div>
             </div>
 
             <div id="loading-spinner" class="flex flex-col items-center justify-center py-20">
-                <div class="w-10 h-10 border-4 border-white/10 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Calculando Balance Calórico...</p>
+                <div class="w-12 h-12 border-4 border-white/10 border-t-emerald-500 rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
+                <p class="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">Optimizando Macros...</p>
             </div>
 
-            <div id="eats-content" class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 auto-rows-auto hidden">
+            <div id="eats-content" class="grid grid-cols-1 lg:grid-cols-12 gap-6 auto-rows-auto hidden">
                 
-                <div class="lg:col-span-1 glass-panel bento-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-emerald-500/5 to-transparent">
+                <div class="lg:col-span-4 glass-panel bento-card rounded-[32px] p-8 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-emerald-900/20 to-transparent">
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none"></div>
                     <div>
-                        <span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-[8px] md:text-[9px] font-black rounded border border-emerald-500/20 uppercase tracking-widest inline-block mb-4">Gasto Diario Total</span>
-                        <h3 class="text-gray-400 font-bold text-xs uppercase tracking-widest">Prescripción Calórica</h3>
-                        <p id="calories-display" class="text-5xl md:text-6xl font-black text-white tracking-tighter mt-2">-- <span class="text-xl text-gray-500">KCAL</span></p>
+                        <span class="px-3 py-1 bg-white/10 text-white text-[9px] font-black rounded-full border border-white/20 uppercase tracking-widest inline-block mb-6 backdrop-blur-md">Gasto Diario (TDEE)</span>
+                        <p id="calories-display" class="text-6xl font-black text-white tracking-tighter drop-shadow-lg">--</p>
+                        <p class="text-emerald-400 font-bold tracking-widest text-xs uppercase mt-1">Kilocalorías</p>
                     </div>
-                    <div class="mt-6 pt-4 border-t border-white/5 space-y-2 text-[11px] text-gray-400 font-medium">
-                        <div class="flex justify-between"><span>Metabolismo Basal:</span><span id="basal-display" class="font-bold text-white">-- kcal</span></div>
-                        <div class="flex justify-between"><span>Gasto por Ejercicio (Tonnage):</span><span id="exercise-display" class="font-bold text-emerald-400">-- kcal</span></div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2 glass-panel bento-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-center">
-                    <span class="px-2.5 py-1 bg-white/5 text-gray-400 text-[8px] md:text-[9px] font-black rounded border border-white/10 uppercase tracking-widest inline-block mb-4 self-start">Estrategia de Partición</span>
-                    
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div class="p-4 bg-black/40 rounded-2xl border border-white/5">
-                            <p id="protein-display" class="text-2xl md:text-4xl font-black text-white tracking-tighter">--<span class="text-xs text-gray-500 ml-0.5">G</span></p>
-                            <p class="text-[8px] md:text-[9px] text-sky-400 uppercase font-black tracking-widest mt-1">Proteínas 🛡️</p>
-                            <span class="text-[8px] text-gray-500 block mt-0.5">Reparación Fibrilar</span>
-                        </div>
-                        <div class="p-4 bg-black/40 rounded-2xl border border-emerald-500/30 bg-emerald-500/5">
-                            <p id="carbs-display" class="text-2xl md:text-4xl font-black text-emerald-400 tracking-tighter">--<span class="text-xs text-gray-500 ml-0.5">G</span></p>
-                            <p class="text-[8px] md:text-[9px] text-emerald-400 uppercase font-black tracking-widest mt-1">Carbohidratos ⚡</p>
-                            <span id="carbs-status-tag" class="text-[8px] text-emerald-500/60 block mt-0.5">Combustible Adaptado</span>
-                        </div>
-                        <div class="p-4 bg-black/40 rounded-2xl border border-white/5">
-                            <p id="fat-display" class="text-2xl md:text-4xl font-black text-white tracking-tighter">--<span class="text-xs text-gray-500 ml-0.5">G</span></p>
-                            <p class="text-[8px] md:text-[9px] text-yellow-500 uppercase font-black tracking-widest mt-1">Grasas 🧠</p>
-                            <span class="text-[8px] text-gray-500 block mt-0.5">Soporte Hormonal</span>
-                        </div>
+                    <div class="mt-8 space-y-3 text-xs text-gray-300 font-medium bg-black/40 p-5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center"><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-gray-500 rounded-full"></span> Basal (TMB):</span><span id="basal-display" class="font-bold text-white">--</span></div>
+                        <div class="flex justify-between items-center"><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Tensión Mecánica:</span><span id="exercise-display" class="font-bold text-emerald-400">--</span></div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-3 mt-4">
-                    <div class="flex flex-col md:flex-row justify-between md:items-end mb-6 border-b border-white/10 pb-4 gap-4">
+                <div class="lg:col-span-8 glass-panel bento-card rounded-[32px] p-8 flex flex-col justify-center">
+                    <span class="px-3 py-1 bg-white/5 text-gray-400 text-[9px] font-black rounded-full border border-white/10 uppercase tracking-widest inline-block mb-6 self-start">Estrategia de Partición (Gramos)</span>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div class="p-6 bg-gradient-to-b from-black/60 to-black/20 rounded-[24px] border border-white/5 hover:border-sky-500/30 transition-colors group">
+                            <p class="text-[10px] text-sky-400 uppercase font-black tracking-widest mb-2 flex justify-center items-center gap-1">🛡️ Proteínas</p>
+                            <p id="protein-display" class="text-4xl md:text-5xl font-black text-white tracking-tighter group-hover:text-sky-400 transition-colors">--</p>
+                            <span class="text-[9px] text-gray-500 block mt-3 font-bold uppercase tracking-wider">Reparación Fibrilar</span>
+                        </div>
+                        <div class="p-6 bg-gradient-to-b from-emerald-900/20 to-black/20 rounded-[24px] border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.05)] group hover:border-emerald-400 transition-colors relative overflow-hidden">
+                            <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
+                            <div class="relative z-10">
+                                <p class="text-[10px] text-emerald-400 uppercase font-black tracking-widest mb-2 flex justify-center items-center gap-1">⚡ Carbohidratos</p>
+                                <p id="carbs-display" class="text-4xl md:text-5xl font-black text-emerald-400 tracking-tighter drop-shadow-md">--</p>
+                                <span id="carbs-status-tag" class="text-[9px] text-emerald-500/80 block mt-3 font-bold uppercase tracking-wider">Combustible Adaptado</span>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-gradient-to-b from-black/60 to-black/20 rounded-[24px] border border-white/5 hover:border-yellow-500/30 transition-colors group">
+                            <p class="text-[10px] text-yellow-500 uppercase font-black tracking-widest mb-2 flex justify-center items-center gap-1">🧠 Grasas</p>
+                            <p id="fat-display" class="text-4xl md:text-5xl font-black text-white tracking-tighter group-hover:text-yellow-500 transition-colors">--</p>
+                            <span class="text-[9px] text-gray-500 block mt-3 font-bold uppercase tracking-wider">Soporte Hormonal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-12 mt-4 glass-panel rounded-[32px] p-8 border-t border-[#FFC300]/20 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FFC300]/50 to-transparent"></div>
+                    <div class="flex flex-col md:flex-row justify-between md:items-end mb-8 gap-4">
                         <div>
-                            <h4 class="text-sm md:text-base font-black text-white uppercase tracking-widest flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Generador Dinámico de Platos
+                            <h4 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[#FFC300]/20 flex items-center justify-center text-[#FFC300]">🔄</div> 
+                                Generador Dinámico de Platos
                             </h4>
-                            <p class="text-[10px] md:text-xs text-gray-400 mt-1 font-medium">Presiona el ícono 🔄 para cambiar un ingrediente. El motor recalculará los gramos exactos al instante.</p>
+                            <p class="text-xs text-gray-400 mt-2 font-medium max-w-2xl">¿Te aburriste de un ingrediente? Presiona el ícono amarillo para rotarlo por otra opción de tu despensa. El motor bioquímico recalculará los gramos exactos instantáneamente para no romper tu balance.</p>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="meals-container">
-                        <div class="text-center py-10 text-gray-500 font-black text-[10px] tracking-widest uppercase col-span-full">
-                            Desplegando arsenal bioquímico...
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="meals-container">
                         </div>
-                    </div>
                 </div>
 
             </div>
         </main>
-        
-        <footer class="text-center py-6 border-t border-white/5 mt-auto">
+
+        <div id="ultra-showcase" class="hidden w-full relative bg-[#030305] z-20">
+            
+            <section class="parallax-section min-h-screen flex items-center justify-center text-center px-4" style="background-image: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2000');">
+                <div class="parallax-overlay"></div>
+                <div class="relative z-10 max-w-4xl reveal-scroll active">
+                    <div class="w-20 h-20 mx-auto bg-emerald-500/10 border border-emerald-500/30 rounded-[24px] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.3)] backdrop-blur-md">
+                        <span class="text-3xl">💎</span>
+                    </div>
+                    <span class="text-emerald-400 font-black text-[10px] md:text-xs tracking-[0.4em] uppercase mb-4 block">Experiencia Exclusiva</span>
+                    <h1 class="text-5xl md:text-8xl font-[900] italic tracking-tighter uppercase text-white mb-6 leading-none">
+                        CONOCE <br><span class="text-emerald-500 glow-emerald-text">GYMENEZ EATS</span>
+                    </h1>
+                    <p class="text-gray-300 text-base md:text-xl max-w-2xl mx-auto font-medium leading-relaxed mb-10">
+                        Una nutrición que evoluciona contigo todos los días. Calculamos tu energía, ajustamos tus porciones y te dejamos elegir qué comer sin salirte de tu objetivo.
+                    </p>
+                    <div class="animate-bounce mt-10">
+                        <span class="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">Desliza para explorar</span>
+                        <div class="w-px h-10 bg-gradient-to-b from-emerald-500 to-transparent mx-auto mt-2"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-24 px-6 relative bg-[#050505]">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                    <div class="reveal-scroll">
+                        <span class="text-[#FFC300] font-black text-[10px] tracking-[0.3em] uppercase mb-2 block">Inteligencia Artificial</span>
+                        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6 text-white leading-tight">Tu dieta cambia <br>si tú cambias.</h2>
+                        <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6">
+                            El sistema se conecta directamente con tu historial de entrenamiento en el Workout Hub. Si hoy levantaste cargas pesadas, tus carbohidratos se elevan para recuperarte. Si descansaste, el motor recorta la energía sobrante para que quemes grasa.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3 text-xs font-bold text-gray-300 uppercase"><span class="text-emerald-500">✓</span> Evita la acumulación de grasa</li>
+                            <li class="flex items-center gap-3 text-xs font-bold text-gray-300 uppercase"><span class="text-emerald-500">✓</span> Garantiza la recuperación muscular</li>
+                        </ul>
+                    </div>
+                    <div class="relative reveal-scroll glass-panel p-8 rounded-[32px] border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.05)]">
+                        <div class="border-b border-white/10 pb-4 mb-4">
+                            <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Gasto de Hoy</p>
+                            <p class="text-4xl font-black text-white">2,850 <span class="text-sm text-gray-500">KCAL</span></p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-black/50 p-4 rounded-xl border border-white/5">
+                                <p class="text-[10px] text-sky-400 font-bold uppercase mb-1">Proteína</p>
+                                <p class="text-2xl font-black text-white">180g</p>
+                            </div>
+                            <div class="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/30">
+                                <p class="text-[10px] text-emerald-400 font-bold uppercase mb-1">Carbos (Alto)</p>
+                                <p class="text-2xl font-black text-emerald-400">320g</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-24 px-6 relative bg-gradient-to-b from-[#050505] to-[#0a0a0f]">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 md:order-1 relative reveal-scroll">
+                         <div class="glass-panel p-6 rounded-[24px] border-[#FFC300]/20 relative">
+                            <div class="absolute -top-4 -right-4 w-12 h-12 bg-[#FFC300] rounded-full flex items-center justify-center text-black text-xl shadow-[0_0_20px_rgba(255,195,0,0.5)] z-10 animate-bounce">🔄</div>
+                            <p class="text-[10px] font-black text-[#FFC300] uppercase tracking-widest mb-4">Comida 1</p>
+                            <div class="space-y-3">
+                                <div class="bg-black/60 p-4 rounded-xl border border-white/5 flex justify-between items-center opacity-50 line-through">
+                                    <div>
+                                        <p class="text-[9px] text-sky-400 font-bold uppercase">Proteína</p>
+                                        <p class="text-sm font-black text-white">Pechuga de Pollo</p>
+                                        <p class="text-[10px] text-gray-500 mt-1">200g</p>
+                                    </div>
+                                </div>
+                                <div class="flex justify-center text-[#FFC300] text-lg">↓</div>
+                                <div class="bg-sky-500/10 p-4 rounded-xl border border-sky-500/30 flex justify-between items-center transform scale-105 shadow-lg">
+                                    <div>
+                                        <p class="text-[9px] text-sky-400 font-bold uppercase">Proteína (Nuevo)</p>
+                                        <p class="text-sm font-black text-white">Huevos Enteros</p>
+                                        <p class="text-[10px] text-gray-400 mt-1">Calculando gramos exactos...</p>
+                                    </div>
+                                    <span class="text-sky-400 font-black">285g</span>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                    <div class="order-1 md:order-2 reveal-scroll">
+                        <span class="text-sky-400 font-black text-[10px] tracking-[0.3em] uppercase mb-2 block">Libertad Absoluta</span>
+                        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6 text-white leading-tight">Come lo que hay <br>en tu nevera.</h2>
+                        <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6">
+                            ¿Te aburriste del arroz o el pollo está muy caro? El <span class="text-white font-bold">Generador Dinámico de Platos</span> te permite intercambiar cualquier ingrediente por otro de su misma familia con un solo clic. El sistema hace la regla de 3 inversa al instante para decirte exactamente cuántos gramos necesitas de la nueva comida para no alterar tus resultados.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-32 relative flex flex-col items-center justify-center text-center px-4" style="background: radial-gradient(circle at center, rgba(16,185,129,0.1) 0%, #030305 70%);">
+                <div class="reveal-scroll max-w-2xl">
+                    <h2 class="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-6 text-white">
+                        Desbloquea tu <br><span class="text-[#FFC300]">Verdadero Potencial.</span>
+                    </h2>
+                    <p class="text-gray-400 text-sm md:text-base mb-10 leading-relaxed font-medium">
+                        GYMENEZ EATS está reservado exclusivamente para los atletas del <strong>Plan Ultra</strong>. Da el salto definitivo y deja que la tecnología trabaje en tu físico.
+                    </p>
+                    <a href="/billing/planes.html" class="inline-block w-full sm:w-auto px-12 py-5 bg-[#FFC300] text-black font-black text-[11px] uppercase tracking-[0.2em] rounded-2xl hover:bg-yellow-400 transition shadow-[0_0_30px_rgba(255,195,0,0.3)] transform hover:-translate-y-1">
+                        Mejorar a Plan Ultra
+                    </a>
+                    <button onclick="history.back()" class="block w-full text-center mt-6 text-[10px] text-gray-500 uppercase tracking-widest font-bold hover:text-white transition">
+                        Volver atrás
+                    </button>
+                </div>
+            </section>
+
+        </div>
+
+        <footer class="text-center py-8 border-t border-white/5 mt-auto bg-[#030305] relative z-30">
             <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.5em] text-gray-600">© 2026 GYMENEZ METABOLIC SYSTEMS</p>
         </footer>
     </div>
 
     <script src="/static/js/eats.js"></script>
+    <script>
+        // Lógica visual para la experiencia parallax
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, observerOptions);
+
+            // Observamos los elementos reveal solo si existen en el DOM
+            const reveals = document.querySelectorAll('.reveal-scroll');
+            reveals.forEach(el => observer.observe(el));
+        });
+    </script>
 </body>
 </html>
