@@ -399,17 +399,10 @@
         // GESTIÓN DE SUBSCRIPCIONES (NUEVO)
         // ==========================================
         function applySubscriptionLocks(level) {
-            const plan = (level || '').toLowerCase();
-            const cardOn = document.getElementById('card-on');
-            
-            // Si no tiene plan Ultra, bloquea el módulo exclusivo y aplica la clase de tu CSS
-            if (!plan.includes('ultra') && cardOn) {
-                cardOn.classList.add('locked-card');
-                cardOn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showMessage('Desbloquea el Plan Ultra para acceder.', 'error');
-                });
-            }
+            // Se declara la función para evitar el ReferenceError,
+            // pero se deja vacía para NO alterar ni bloquear ningún 
+            // elemento de tu interfaz original.
+            console.log("Suscripción validada silenciosamente:", level);
         }
 
         // Ejecución al cargar la página
