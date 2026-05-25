@@ -14,122 +14,113 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
+            background-color: #030305; 
             color: #ffffff;
             overflow-x: hidden;
-            background-color: #030305;
-        }
-
-        /* --- FONDO AMBIENTAL INMERSIVO --- */
-        .bg-ambient { position: fixed; inset: 0; z-index: -10; background: #030305; overflow: hidden; }
-        .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: float 15s infinite alternate ease-in-out; pointer-events: none; }
-        .orb-gold { background: rgba(255, 195, 0, 0.12); width: 45vw; height: 45vw; top: -10%; left: -10%; }
-        .orb-emerald { background: rgba(16, 185, 129, 0.08); width: 40vw; height: 40vw; bottom: -10%; right: -5%; animation-delay: -5s; }
-        .orb-red { background: rgba(220, 38, 38, 0.08); width: 35vw; height: 35vw; top: 30%; left: 40%; animation-delay: -10s; }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(60px, 40px) scale(1.1); }
         }
         
-        /* --- PREMIUM GLASS & TRUE 3D DEPTH --- */
+        /* Glassmorphism de Alta Gama - Opacidad en 0.6 para soportar Firefox */
         .glass-panel {
-            background: linear-gradient(135deg, rgba(20, 20, 25, 0.5) 0%, rgba(10, 10, 15, 0.7) 100%);
+            background: rgba(15, 15, 20, 0.6);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            /* Borde superior metálico sutil para volumen físico */
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0,0,0,0.6);
-            /* preserve-3d es LA CLAVE para que los hijos sobresalgan */
-            transform-style: preserve-3d;
-            position: relative;
-            transition: transform 0.1s linear, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        .bento-card { cursor: pointer; perspective: 1500px; }
-
-        /* Luz reactiva al Mouse */
-        .bento-card::before {
-            content: ''; position: absolute; inset: 0; border-radius: inherit;
-            background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
-            opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;
+        /* Hover effects para las tarjetas Bento */
+        .bento-card { transition: all 0.3s ease; cursor: pointer; }
+        .bento-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: rgba(255, 195, 0, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 195, 0, 0.1);
+            z-index: 10;
         }
-        .bento-card:hover::before { opacity: 1; }
 
-        /* Efecto 3D de Elementos Internos */
-        .pop-out {
-            /* Empuja el texto hacia el usuario en el eje Z */
-            transform: translateZ(30px);
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            -webkit-font-smoothing: antialiased; /* Mantiene bordes afilados */
+        /* Variantes de color para hover */
+        .hover-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.15); }
+        .hover-red:hover { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(220, 38, 38, 0.15); }
+        .hover-sky:hover { border-color: rgba(56, 189, 248, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(56, 189, 248, 0.15); }
+
+        /* Estilo para tarjetas bloqueadas */
+        .locked-card {
+            filter: grayscale(100%);
+            opacity: 0.6;
+            cursor: not-allowed !important;
         }
-        .bento-card:hover .pop-out { transform: translateZ(60px) scale(1.02); }
-
-        /* --- ETIQUETAS NÍTIDAS (CRISP BADGES) --- 
-           Cero blur, cero text-shadow. Contraste puro. */
-        .crisp-badge {
-            display: inline-block; padding: 4px 10px; border-radius: 6px;
-            font-size: 9px; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
+        .locked-card:hover {
+            transform: none !important;
+            border-color: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: none !important;
         }
-        .crisp-badge.gold { background: rgba(255, 195, 0, 0.1); color: #FFC300; border-color: rgba(255, 195, 0, 0.3); }
-        .crisp-badge.emerald { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
-        .crisp-badge.sky { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
-        .crisp-badge.red { background: rgba(220, 38, 38, 0.1); color: #ef4444; border-color: rgba(220, 38, 38, 0.3); }
 
-        /* --- HOVER GLOWS --- */
-        .hover-gold:hover { border-color: rgba(255, 195, 0, 0.4); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(255, 195, 0, 0.15); }
-        .hover-emerald:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(16, 185, 129, 0.15); }
-        .hover-sky:hover { border-color: rgba(56, 189, 248, 0.4); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(56, 189, 248, 0.15); }
-        .hover-red:hover { border-color: rgba(220, 38, 38, 0.4); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(220, 38, 38, 0.15); }
-
-        /* Fondos Internos de Sinergia (Imágenes) */
-        .bg-eats, .bg-on { position: relative; overflow: hidden; }
-        .bg-eats::after, .bg-on::after {
-            content: ''; position: absolute; inset: 0; z-index: -1;
-            background-size: cover; background-position: center; opacity: 0.3;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+        /* Imágenes de fondo para módulos Premium */
+        .bg-eats {
+            background: linear-gradient(to top, rgba(5,5,5,1) 10%, rgba(5,5,5,0.4)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800');
+            background-size: cover; background-position: center;
         }
-        .bg-eats::after { background-image: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800'); }
-        .bg-on::after { background-image: url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800'); }
-        
-        .bento-card:hover.bg-eats::after, .bento-card:hover.bg-on::after { transform: scale(1.1); opacity: 0.5; }
+        .bg-on {
+            background: linear-gradient(to top, rgba(5,5,5,1) 10%, rgba(5,5,5,0.4)), url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800');
+            background-size: cover; background-position: center;
+        }
+        .bg-workout {
+            background: radial-gradient(circle at top right, rgba(255,195,0,0.1), transparent 50%);
+        }
 
-        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+        /* Animación de entrada suave */
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; transform: translateY(20px);
+        }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        
-        /* Modal selection fixes */
+
+        /* Estilos de Selección para la encuesta Matutina */
         .score-box {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; padding: 12px 0; text-align: center; font-size: 12px; font-weight: 900;
-            transition: all 0.3s ease; cursor: pointer; user-select: none; color: #9ca3af;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 900;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+            color: #9ca3af;
         }
-        .score-box:hover { border-color: rgba(255, 255, 255, 0.3); color: #ffffff; background: rgba(255, 255, 255, 0.02); }
-        .score-box.active { background: #FFC300; border-color: #FFC300; color: #000000; box-shadow: 0 0 20px rgba(255, 195, 0, 0.4); }
+        .score-box:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .score-box.active {
+            background: #FFC300;
+            border-color: #FFC300;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(255, 195, 0, 0.4);
+        }
     </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black">
-
-    <!-- Fondo de Orbes Ambientales -->
-    <div class="bg-ambient">
-        <div class="orb orb-gold"></div>
-        <div class="orb orb-emerald"></div>
-        <div class="orb orb-red"></div>
-    </div>
+<body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden">
 
     <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-2xl z-[9999] opacity-0 transition-all duration-500 pointer-events-none text-center w-11/12 max-w-[350px] border border-white/10"></div>
 
+    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-20 -z-10 mix-blend-screen grayscale"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10"></div>
+
     <div id="readiness-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-2xl z-[9998] flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-[32px] p-6 md:p-8 relative fade-in-up">
-            <div class="text-center mb-6 pop-out">
-                <span class="crisp-badge gold mb-2">Biometric Calibration</span>
+        <div class="glass-panel w-full max-w-md rounded-[32px] p-6 md:p-8 border border-white/10 shadow-2xl relative fade-in-up">
+            <div class="text-center mb-6">
+                <span class="px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[8px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-2">Biometric Calibration</span>
                 <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Morning Check-In</h3>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">Calibra el algoritmo de cargas antes de entrenar</p>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Calibra el algoritmo de cargas antes de entrenar</p>
             </div>
 
-            <div class="space-y-5 pop-out">
+            <div class="space-y-5">
                 <div>
                     <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">1. Calidad del Sueño (Recuperación)</label>
                     <div class="grid grid-cols-5 gap-2" id="group-sleep">
@@ -164,7 +155,7 @@
                 </div>
             </div>
 
-            <button onclick="submitReadinessTelemetry()" class="pop-out w-full bg-[#FFC300] hover:bg-yellow-400 text-black font-black text-xs uppercase tracking-widest py-4 rounded-2xl mt-8 transition duration-300 shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)]">
+            <button onclick="submitReadinessTelemetry()" class="w-full bg-[#FFC300] hover:bg-yellow-400 text-black font-black text-xs uppercase tracking-widest py-4 rounded-2xl mt-8 transition duration-300 shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)]">
                 Calibrar Motor Biométrico
             </button>
         </div>
@@ -198,7 +189,7 @@
         <main class="max-w-7xl mx-auto w-full px-4 md:px-6 py-6 md:py-10 flex-grow">
             
             <div class="mb-8 md:mb-10 fade-in-up" style="animation-delay: 0.1s;">
-                <p id="current-date" class="text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] mb-1 md:mb-2"></p>
+                <p id="current-date" class="text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] mb-1 md:mb-2"></p>
                 <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none break-words">
                     Hola, <span id="welcome-name" class="text-[#FFC300]">Atleta</span>
                 </h2>
@@ -206,72 +197,70 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-auto">
 
-                <div class="md:col-span-2 lg:col-span-2 row-span-2 glass-panel bento-card hover-gold rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between relative overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-                    <!-- Decoración interna del módulo central -->
-                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#FFC300]/5 rounded-full blur-[40px] pointer-events-none"></div>
-
-                    <div class="relative z-10 pop-out">
-                        <span class="crisp-badge gold mb-4">Módulo Central</span>
-                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 break-words">Rendimiento Físico</h3>
+                <div class="md:col-span-2 lg:col-span-2 row-span-2 glass-panel bento-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between relative overflow-hidden bg-workout fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="relative z-10">
+                        <span class="px-2 md:px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[8px] md:text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-3 md:mb-4">Core Module</span>
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 break-words">Fitness Performance</h3>
+                        
                         <p id="motivational-message" class="text-gray-300 italic text-xs md:text-sm max-w-sm tracking-wide leading-relaxed min-h-[40px]">
                             Cargando motivación...
                         </p>
                     </div>
                     
-                    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 pop-out">
-                        <a href="/apps/user/routines.html" class="bg-gradient-to-r from-[#FFC300] to-[#eab308] text-black font-black text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] transition-all">
+                     <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                        <a href="/apps/user/routines.html" class="bg-gradient-to-r from-[#FFC300] to-[#FFB000] text-black font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] hover:scale-[1.02] transition-all">
                             <span>Ir a Workout</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </a>
-                        <a href="/apps/user/recovery.html" class="bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between hover:border-sky-400/50 hover:bg-sky-400/10 hover:text-sky-400 transition-all">
+                        <a href="/apps/user/recovery.html" class="bg-white/5 border border-white/10 text-white font-semibold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between hover:border-sky-400/50 hover:bg-sky-400/10 hover:text-sky-400 transition-all">
                             <span>Recovery Room</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </a>
                     </div>
                 </div>
 
-                <a href="/apps/user/eats.html" id="card-eats" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-emerald rounded-[24px] md:rounded-[32px] p-6 md:p-8 bg-eats flex flex-col justify-end min-h-[200px] fade-in-up" style="animation-delay: 0.3s;">
-                    <div class="relative z-10 pop-out">
-                        <span class="crisp-badge emerald mb-2 shadow-lg shadow-emerald-500/20">💎 ULTRA</span>
-                        <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white drop-shadow-md">GYMENEZ EATS</h3>
+                <a href="/apps/user/eats.html" id="card-eats" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-green rounded-[24px] md:rounded-[32px] p-5 md:p-6 bg-eats flex flex-col justify-end min-h-[180px] md:min-h-[220px] fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="relative z-10">
+                        <span class="badge-tag text-[8px] md:text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1 block">Nutrición</span>
+                        <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">GYMENEZ EATS</h3>
                     </div>
                 </a>
 
-                <a href="/apps/user/on.html" id="card-on" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-red rounded-[24px] md:rounded-[32px] p-6 md:p-8 bg-on flex flex-col justify-end min-h-[200px] fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="relative z-10 pop-out">
-                        <span class="crisp-badge red mb-2 shadow-lg shadow-red-500/20">🔥 PLUS EXCLUSIVO</span>
-                        <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white drop-shadow-md">GYMENEZ ON</h3>
+                <a href="/apps/user/on.html" id="card-on" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-red rounded-[24px] md:rounded-[32px] p-5 md:p-6 bg-on flex flex-col justify-end min-h-[180px] md:min-h-[220px] fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="relative z-10">
+                        <span class="badge-tag bg-red-600 text-white text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block shadow-lg">Exclusivo</span>
+                        <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">GYMENEZ ON</h3>
                     </div>
                 </a>
 
-                <a href="/apps/user/goals.html" id="card-goals" class="md:col-span-1 lg:col-span-1 glass-panel bento-card hover-gold rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between min-h-[160px] fade-in-up" style="animation-delay: 0.5s;">
-                    <div class="text-[#FFC300] mb-2 pop-out">
+                <a href="/apps/user/goals.html" id="card-goals" class="md:col-span-1 lg:col-span-1 glass-panel bento-card rounded-[24px] md:rounded-[32px] p-5 md:p-6 flex flex-col justify-between min-h-[140px] md:min-h-[180px] fade-in-up" style="animation-delay: 0.5s;">
+                    <div class="text-[#FFC300] mb-2">
                         <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <div class="pop-out">
-                        <span class="crisp-badge gold mb-2">✨ PLUS</span>
+                    <div>
+                        <span class="badge-tag hidden"></span>
                         <h3 class="text-lg md:text-xl font-black uppercase tracking-tighter">Mis Objetivos</h3>
-                        <p class="text-[10px] md:text-xs text-gray-400 font-medium mt-1">Métricas y evolución.</p>
+                        <p class="text-[10px] md:text-xs text-gray-500 font-medium mt-1">Control de métricas históricas.</p>
                     </div>
                 </a>
 
-                <a href="/apps/user/pulse.html" class="md:col-span-1 lg:col-span-1 glass-panel bento-card hover-sky rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between min-h-[160px] fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="text-sky-400 mb-2 flex justify-between items-start pop-out">
+                <a href="/apps/user/pulse.html" class="md:col-span-1 lg:col-span-1 glass-panel bento-card hover-sky rounded-[24px] md:rounded-[32px] p-5 md:p-6 flex flex-col justify-between min-h-[140px] md:min-h-[180px] fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="text-sky-400 mb-2 flex justify-between items-start">
                         <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path></svg>
-                        <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_10px_rgba(56,189,248,0.8)]"></span>
+                        <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_10px_rgba(56,189,248,0.8)]"></span>
                     </div>
-                    <div class="pop-out">
+                    <div>
                         <h3 class="text-lg md:text-xl font-black uppercase tracking-tighter">Pulse Center</h3>
-                        <p class="text-[10px] md:text-xs text-gray-400 font-medium mt-1">Alertas y mensajería.</p>
+                        <p class="text-[10px] md:text-xs text-gray-500 font-medium mt-1">Mensajería y notificaciones.</p>
                     </div>
                 </a>
 
-                <div class="md:col-span-3 lg:col-span-2 glass-panel rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between border-t border-[#FFC300]/20 bg-gradient-to-r from-[#FFC300]/5 to-transparent fade-in-up" style="animation-delay: 0.7s;">
+                <div class="md:col-span-3 lg:col-span-2 glass-panel rounded-[24px] md:rounded-[32px] p-5 md:p-8 flex flex-col sm:flex-row items-center justify-between border-t border-[#FFC300]/20 bg-gradient-to-r from-[#FFC300]/5 to-transparent fade-in-up" style="animation-delay: 0.7s;">
                     <div class="mb-4 sm:mb-0 text-center sm:text-left">
                         <h4 id="upgrade-banner-title" class="text-base md:text-lg font-black uppercase tracking-tighter text-white">Desbloquea tu potencial</h4>
                         <p id="upgrade-banner-desc" class="text-[10px] md:text-xs text-gray-400 max-w-xs mt-1">Lleva tus resultados al límite contratando el Plan Ultra. Nutrición y Contenido sin restricciones.</p>
                     </div>
-                    <a href="/billing/planes.html" id="upgrade-banner-btn" class="px-6 py-3 rounded-full border border-[#FFC300] text-[#FFC300] font-black text-[10px] uppercase tracking-widest hover:bg-[#FFC300] hover:text-black transition whitespace-nowrap shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+                    <a href="/billing/planes.html" id="upgrade-banner-btn" class="px-5 py-2.5 md:px-6 md:py-3 rounded-full border border-[#FFC300] text-[#FFC300] font-black text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-[#FFC300] hover:text-black transition whitespace-nowrap shadow-[0_0_15px_rgba(251,191,36,0.1)]">
                         Mejorar Plan
                     </a>
                 </div>
@@ -279,7 +268,7 @@
             </div>
         </main>
         
-        <footer class="text-center py-6 border-t border-white/5 mt-auto relative z-10">
+        <footer class="text-center py-6 border-t border-white/5 mt-auto">
             <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
         </footer>
     </div>
@@ -287,10 +276,12 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
+        // 🚀 TUNELIZACIÓN ENTORNO LOCAL/PRODUCCIÓN AISLADO PARA EVITAR COLISIÓN CON AUTH.JS
         const isLocalHostEnvironment = window.location.hostname === '127.0.0.1' || 
                                        window.location.hostname === 'localhost' || 
                                        window.location.protocol === 'file:';
 
+        // 🔥 Se renombra a LOCAL_API_URL para erradicar el SyntaxError global
         const LOCAL_API_URL = isLocalHostEnvironment ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
         let readinessTelemetry = { sleep: 3, stress: 3, doms: 3 };
@@ -315,6 +306,9 @@
             }, 3500);
         }
 
+        // ==========================================
+        // TACTICAL UI: INTERACCIÓN DEL CHECK-IN
+        // ==========================================
         function setScore(metric, value) {
             readinessTelemetry[metric] = value;
             const container = document.getElementById(`group-${metric}`);
@@ -363,46 +357,41 @@
             }
         }
 
-        // ==========================================
-        // MOTOR PARALLAX 3D (TRUE DEPTH EFFECT)
-        // ==========================================
-        function initParallaxEffects() {
-            const cards = document.querySelectorAll('.bento-card');
+        function lockCard(cardElement, requiredLevel) {
+            if (!cardElement) return;
             
-            cards.forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left; 
-                    const y = e.clientY - rect.top;
-                    
-                    // Actualiza la posición de la luz (Radial Gradient)
-                    card.style.setProperty('--mouse-x', `${x}px`);
-                    card.style.setProperty('--mouse-y', `${y}px`);
+            cardElement.href = "javascript:void(0)"; 
+            cardElement.onclick = (e) => {
+                e.preventDefault();
+                showMessage(`MÓDULO BLOQUEADO: Requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
+            };
 
-                    // Cálculo de inclinación 3D (Max ~10 deg para que no sea exagerado pero sí notable)
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    
-                    const rotateX = ((y - centerY) / centerY) * -10; 
-                    const rotateY = ((x - centerX) / centerX) * 10;
+            cardElement.classList.add('locked-card');
+            cardElement.classList.remove('hover-green', 'hover-red', 'hover-sky'); 
 
-                    // Aplicamos rotación. Los hijos con .pop-out se encargarán del Z-index
-                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    // Retorno suave y elástico
-                    card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-                });
-            });
+            const tag = cardElement.querySelector('.badge-tag');
+            if (tag) {
+                tag.innerHTML = `🔒 PLAN ${requiredLevel}`;
+                tag.className = 'badge-tag bg-gray-800/80 text-gray-300 text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block border border-gray-600 shadow-md';
+                tag.classList.remove('hidden'); 
+            }
         }
 
-        // ==========================================
-        // GESTIÓN DE BANNER DE SUSCRIPCIÓN (UPSALE STRATEGY)
-        // ==========================================
         function applySubscriptionLocks(level) {
             const normalizedLevel = (level || 'No Suscrito').toUpperCase();
+            
+            const cardEats = document.getElementById('card-eats');
+            const cardOn = document.getElementById('card-on');
+            const cardGoals = document.getElementById('card-goals');
+
             const isUltra = normalizedLevel === 'ULTRA';
+            const isPlus = normalizedLevel === 'PLUS' || isUltra;
+
+            if (!isUltra) lockCard(cardEats, 'ULTRA');
+            if (!isPlus) {
+                lockCard(cardOn, 'PLUS');    
+                lockCard(cardGoals, 'PLUS'); 
+            }
 
             if (isUltra) {
                 const bannerTitle = document.getElementById('upgrade-banner-title');
@@ -418,15 +407,36 @@
             }
         }
 
+        // ==========================================
+        // ALGORITMO GENERADOR DE MOTIVACIÓN 
+        // ==========================================
         function setMotivationalQuote() {
             const quoteEl = document.getElementById('motivational-message');
             if (!quoteEl) return;
 
             const parts = {
-                p1: ["La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", "La dedicación innegociable", "Cada gota de sudor"],
-                p2: ["forja", "construye", "materializa", "desencadena", "garantiza"],
-                p3: ["tu mejor versión física", "resultados matemáticos", "un progreso innegable", "una fuerza interior brutal", "el rendimiento a largo plazo"],
-                p4: ["día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", "superando los límites del cuerpo.", "en cada fase del entrenamiento."]
+                p1: [
+                    "La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", 
+                    "La dedicación innegociable", "Cada gota de sudor", "Una mentalidad de hierro", 
+                    "El enfoque milimétrico", "La verdadera resiliencia", "El trabajo inteligente", 
+                    "La intensidad calculada"
+                ],
+                p2: [
+                    "forja", "construye", "materializa", "desencadena", "garantiza", 
+                    "consolida", "despierta", "maximiza", "blinda", "potencia"
+                ],
+                p3: [
+                    "tu mejor versión física", "resultados matemáticos", "un progreso innegable", 
+                    "una fuerza interior brutal", "el rendimiento a largo plazo", "un sistema inquebrantable", 
+                    "tu capacidad de adaptación", "la verdadera excelencia", "una genética de élite", 
+                    "tu resistencia ante la fatiga"
+                ],
+                p4: [
+                    "día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", 
+                    "superando los límites del cuerpo.", "en cada fase del entrenamiento.", "para alcanzar tu pico de rendimiento.", 
+                    "venciendo la comodidad.", "un 1% a la vez.", "con cada repetición.", 
+                    "manteniendo la visión clara."
+                ]
             };
 
             const r = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -435,9 +445,9 @@
             quoteEl.textContent = finalQuote;
         }
 
+        // Ejecución al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
             setMotivationalQuote();
-            initParallaxEffects();
 
             const storedSession = localStorage.getItem('userSession');
             
@@ -451,12 +461,14 @@
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
+                // 🔥 EVALUAR FILTRO DE CONTROL MATUTINO: OBLIGATORIO POR DÍA
                 const todayStr = new Date().toISOString().split('T')[0];
                 if (!localStorage.getItem(`gymen_readiness_done_${todayStr}`)) {
                     const modal = document.getElementById('readiness-modal');
                     modal.classList.remove('hidden');
                 }
 
+                // Fetch Nivel Suscripción protegido con Token JWT utilizando LOCAL_API_URL
                 const token = localStorage.getItem('gymen_auth_token');
                 fetch(`${LOCAL_API_URL}/api/profile/me`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
