@@ -7,7 +7,7 @@
     
     <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;600;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="/static/css/auth.css">
     
@@ -25,36 +25,41 @@
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+            transform-style: preserve-3d;
         }
         
-        /* Hover effects para las tarjetas Bento */
-        .bento-card { transition: all 0.3s ease; cursor: pointer; }
-        .bento-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            border-color: rgba(255, 195, 0, 0.3);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 195, 0, 0.1);
-            z-index: 10;
+        /* Contenedor Bento general */
+        .bento-card { 
+            cursor: pointer; 
+            position: relative;
+            perspective: 1000px;
         }
 
-        /* Variantes de color para hover */
-        .hover-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.15); }
-        .hover-red:hover { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(220, 38, 38, 0.15); }
-        .hover-sky:hover { border-color: rgba(56, 189, 248, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(56, 189, 248, 0.15); }
-
-        /* Estilo para tarjetas bloqueadas */
-        .locked-card {
-            filter: grayscale(100%);
-            opacity: 0.6;
-            cursor: not-allowed !important;
-        }
-        .locked-card:hover {
-            transform: none !important;
-            border-color: rgba(255, 255, 255, 0.05) !important;
-            box-shadow: none !important;
+        /* Efectos de brillo interno para simular luz reflejada en el Parallax */
+        .bento-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1;
         }
 
-        /* Imágenes de fondo para módulos Premium */
+        .bento-card:hover::after {
+            opacity: 1;
+        }
+
+        /* Variantes de color para hover sin deformar el JS */
+        .hover-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 30px rgba(16, 185, 129, 0.15); }
+        .hover-red:hover { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 30px rgba(220, 38, 38, 0.15); }
+        .hover-sky:hover { border-color: rgba(56, 189, 248, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 30px rgba(56, 189, 248, 0.15); }
+        .hover-gold:hover { border-color: rgba(255, 195, 0, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 30px rgba(255, 195, 0, 0.15); }
+
+        /* Imágenes de fondo para módulos Premium con movimiento suave */
         .bg-eats {
             background: linear-gradient(to top, rgba(5,5,5,1) 10%, rgba(5,5,5,0.4)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800');
             background-size: cover; background-position: center;
@@ -197,17 +202,17 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-auto">
 
-                <div class="md:col-span-2 lg:col-span-2 row-span-2 glass-panel bento-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between relative overflow-hidden bg-workout fade-in-up" style="animation-delay: 0.2s;">
+                <div class="md:col-span-2 lg:col-span-2 row-span-2 glass-panel bento-card hover-gold rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between relative overflow-hidden bg-workout fade-in-up" style="animation-delay: 0.2s;">
                     <div class="relative z-10">
-                        <span class="px-2 md:px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[8px] md:text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-3 md:mb-4">Core Module</span>
-                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 break-words">Fitness Performance</h3>
+                        <span class="px-2 md:px-3 py-1 bg-[#FFC300]/10 text-[#FFC300] text-[8px] md:text-[9px] font-black rounded border border-[#FFC300]/20 uppercase tracking-widest inline-block mb-3 md:mb-4">Módulo Central</span>
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 break-words">Rendimiento Físico</h3>
                         
                         <p id="motivational-message" class="text-gray-300 italic text-xs md:text-sm max-w-sm tracking-wide leading-relaxed min-h-[40px]">
                             Cargando motivación...
                         </p>
                     </div>
                     
-                     <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
                         <a href="/apps/user/routines.html" class="bg-gradient-to-r from-[#FFC300] to-[#FFB000] text-black font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(255,195,0,0.2)] hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] hover:scale-[1.02] transition-all">
                             <span>Ir a Workout</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -221,24 +226,24 @@
 
                 <a href="/apps/user/eats.html" id="card-eats" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-green rounded-[24px] md:rounded-[32px] p-5 md:p-6 bg-eats flex flex-col justify-end min-h-[180px] md:min-h-[220px] fade-in-up" style="animation-delay: 0.3s;">
                     <div class="relative z-10">
-                        <span class="badge-tag text-[8px] md:text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1 block">Nutrición</span>
+                        <span class="badge-tag text-[8px] md:text-[9px] font-black text-[#FFC300] uppercase tracking-widest mb-1 block shadow-lg">💎 ULTRA</span>
                         <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">GYMENEZ EATS</h3>
                     </div>
                 </a>
 
                 <a href="/apps/user/on.html" id="card-on" class="md:col-span-1 lg:col-span-1 row-span-1 glass-panel bento-card hover-red rounded-[24px] md:rounded-[32px] p-5 md:p-6 bg-on flex flex-col justify-end min-h-[180px] md:min-h-[220px] fade-in-up" style="animation-delay: 0.4s;">
                     <div class="relative z-10">
-                        <span class="badge-tag bg-red-600 text-white text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block shadow-lg">Exclusivo</span>
+                        <span class="badge-tag bg-red-600 text-white text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block shadow-lg">🔥 EXCLUSIVO PLUS</span>
                         <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">GYMENEZ ON</h3>
                     </div>
                 </a>
 
-                <a href="/apps/user/goals.html" id="card-goals" class="md:col-span-1 lg:col-span-1 glass-panel bento-card rounded-[24px] md:rounded-[32px] p-5 md:p-6 flex flex-col justify-between min-h-[140px] md:min-h-[180px] fade-in-up" style="animation-delay: 0.5s;">
+                <a href="/apps/user/goals.html" id="card-goals" class="md:col-span-1 lg:col-span-1 glass-panel bento-card hover-gold rounded-[24px] md:rounded-[32px] p-5 md:p-6 flex flex-col justify-between min-h-[140px] md:min-h-[180px] fade-in-up" style="animation-delay: 0.5s;">
                     <div class="text-[#FFC300] mb-2">
                         <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div>
-                        <span class="badge-tag hidden"></span>
+                        <span class="badge-tag text-[8px] md:text-[9px] font-black text-[#FFC300] uppercase tracking-widest mb-2 block">✨ PLUS</span>
                         <h3 class="text-lg md:text-xl font-black uppercase tracking-tighter">Mis Objetivos</h3>
                         <p class="text-[10px] md:text-xs text-gray-500 font-medium mt-1">Control de métricas históricas.</p>
                     </div>
@@ -276,12 +281,10 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
-        // 🚀 TUNELIZACIÓN ENTORNO LOCAL/PRODUCCIÓN AISLADO PARA EVITAR COLISIÓN CON AUTH.JS
         const isLocalHostEnvironment = window.location.hostname === '127.0.0.1' || 
                                        window.location.hostname === 'localhost' || 
                                        window.location.protocol === 'file:';
 
-        // 🔥 Se renombra a LOCAL_API_URL para erradicar el SyntaxError global
         const LOCAL_API_URL = isLocalHostEnvironment ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
         let readinessTelemetry = { sleep: 3, stress: 3, doms: 3 };
@@ -306,9 +309,6 @@
             }, 3500);
         }
 
-        // ==========================================
-        // TACTICAL UI: INTERACCIÓN DEL CHECK-IN
-        // ==========================================
         function setScore(metric, value) {
             readinessTelemetry[metric] = value;
             const container = document.getElementById(`group-${metric}`);
@@ -357,42 +357,44 @@
             }
         }
 
-        function lockCard(cardElement, requiredLevel) {
-            if (!cardElement) return;
+        // ==========================================
+        // MOTOR PARALLAX 3D (TILT EFFECT)
+        // ==========================================
+        function initParallaxEffects() {
+            const cards = document.querySelectorAll('.bento-card');
             
-            cardElement.href = "javascript:void(0)"; 
-            cardElement.onclick = (e) => {
-                e.preventDefault();
-                showMessage(`MÓDULO BLOQUEADO: Requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
-            };
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; 
+                    const y = e.clientY - rect.top;
+                    
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
 
-            cardElement.classList.add('locked-card');
-            cardElement.classList.remove('hover-green', 'hover-red', 'hover-sky'); 
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -6; 
+                    const rotateY = ((x - centerX) / centerX) * 6;
 
-            const tag = cardElement.querySelector('.badge-tag');
-            if (tag) {
-                tag.innerHTML = `🔒 PLAN ${requiredLevel}`;
-                tag.className = 'badge-tag bg-gray-800/80 text-gray-300 text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 inline-block border border-gray-600 shadow-md';
-                tag.classList.remove('hidden'); 
-            }
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
         }
 
+        // ==========================================
+        // GESTIÓN DE BANNER DE SUSCRIPCIÓN (UPSALE STRATEGY)
+        // ==========================================
         function applySubscriptionLocks(level) {
             const normalizedLevel = (level || 'No Suscrito').toUpperCase();
-            
-            const cardEats = document.getElementById('card-eats');
-            const cardOn = document.getElementById('card-on');
-            const cardGoals = document.getElementById('card-goals');
-
             const isUltra = normalizedLevel === 'ULTRA';
-            const isPlus = normalizedLevel === 'PLUS' || isUltra;
 
-            if (!isUltra) lockCard(cardEats, 'ULTRA');
-            if (!isPlus) {
-                lockCard(cardOn, 'PLUS');    
-                lockCard(cardGoals, 'PLUS'); 
-            }
-
+            // Tarjetas desbloqueadas intencionalmente para incentivar clics y redirección al Paywall/Muro de pago interno.
             if (isUltra) {
                 const bannerTitle = document.getElementById('upgrade-banner-title');
                 const bannerDesc = document.getElementById('upgrade-banner-desc');
@@ -407,36 +409,15 @@
             }
         }
 
-        // ==========================================
-        // ALGORITMO GENERADOR DE MOTIVACIÓN 
-        // ==========================================
         function setMotivationalQuote() {
             const quoteEl = document.getElementById('motivational-message');
             if (!quoteEl) return;
 
             const parts = {
-                p1: [
-                    "La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", 
-                    "La dedicación innegociable", "Cada gota de sudor", "Una mentalidad de hierro", 
-                    "El enfoque milimétrico", "La verdadera resiliencia", "El trabajo inteligente", 
-                    "La intensidad calculada"
-                ],
-                p2: [
-                    "forja", "construye", "materializa", "desencadena", "garantiza", 
-                    "consolida", "despierta", "maximiza", "blinda", "potencia"
-                ],
-                p3: [
-                    "tu mejor versión física", "resultados matemáticos", "un progreso innegable", 
-                    "una fuerza interior brutal", "el rendimiento a largo plazo", "un sistema inquebrantable", 
-                    "tu capacidad de adaptación", "la verdadera excelencia", "una genética de élite", 
-                    "tu resistencia ante la fatiga"
-                ],
-                p4: [
-                    "día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", 
-                    "superando los límites del cuerpo.", "en cada fase del entrenamiento.", "para alcanzar tu pico de rendimiento.", 
-                    "venciendo la comodidad.", "un 1% a la vez.", "con cada repetición.", 
-                    "manteniendo la visión clara."
-                ]
+                p1: ["La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", "La dedicación innegociable", "Cada gota de sudor"],
+                p2: ["forja", "construye", "materializa", "desencadena", "garantiza"],
+                p3: ["tu mejor versión física", "resultados matemáticos", "un progreso innegable", "una fuerza interior brutal", "el rendimiento a largo plazo"],
+                p4: ["día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", "superando los límites del cuerpo.", "en cada fase del entrenamiento."]
             };
 
             const r = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -445,9 +426,9 @@
             quoteEl.textContent = finalQuote;
         }
 
-        // Ejecución al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
             setMotivationalQuote();
+            initParallaxEffects();
 
             const storedSession = localStorage.getItem('userSession');
             
@@ -461,14 +442,12 @@
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
-                // 🔥 EVALUAR FILTRO DE CONTROL MATUTINO: OBLIGATORIO POR DÍA
                 const todayStr = new Date().toISOString().split('T')[0];
                 if (!localStorage.getItem(`gymen_readiness_done_${todayStr}`)) {
                     const modal = document.getElementById('readiness-modal');
                     modal.classList.remove('hidden');
                 }
 
-                // Fetch Nivel Suscripción protegido con Token JWT utilizando LOCAL_API_URL
                 const token = localStorage.getItem('gymen_auth_token');
                 fetch(`${LOCAL_API_URL}/api/profile/me`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
