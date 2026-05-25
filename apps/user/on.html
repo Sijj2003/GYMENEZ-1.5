@@ -3,114 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ | Módulo en Desarrollo</title>
+    <title>GYMENEZ ON | Contenido Exclusivo</title>
     
     <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="/static/css/auth.css">
+    
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #030305;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #030305; 
             color: #ffffff;
             overflow-x: hidden;
         }
         
-        /* Glassmorphism Premium */
+        /* Glassmorphism base */
         .glass-panel {
             background: rgba(15, 15, 20, 0.6);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
-        /* Botón Dorado */
-        .btn-gold {
-            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
-            color: #000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Efecto Parallax para la pantalla de bloqueo */
+        .parallax-lock {
+            background-image: url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1920');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
         }
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
+        
+        .parallax-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(3, 3, 5, 0.6), rgba(3, 3, 5, 0.95));
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
-        /* Animación de Entrada */
+        /* Animación de entrada suave */
         .fade-in-up {
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0; 
-            transform: translateY(20px);
+            opacity: 0; transform: translateY(20px);
         }
-        @keyframes fadeInUp { 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        /* Ambient Glow Automático */
-        .ambient-glow {
-            animation: pulseGlow 4s ease-in-out infinite alternate;
-        }
-        @keyframes pulseGlow {
-            0% { opacity: 0.4; transform: scale(0.95) translateX(-50%); }
-            100% { opacity: 0.7; transform: scale(1.05) translateX(-50%); }
-        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body class="selection:bg-[#FFC300] selection:text-black min-h-screen flex flex-col">
 
-    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-10 -z-10 mix-blend-screen grayscale pointer-events-none"></div>
-    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10 pointer-events-none"></div>
-    
-    <div class="ambient-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] bg-[#FFC300]/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+    <!-- Fondo Global -->
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305] to-[#0a0a0f] -z-20"></div>
 
-    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
+    <!-- Navegación -->
+    <header class="w-full border-b border-white/5 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2 md:gap-3">
-                <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter block">
-                    <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
+            <div class="flex items-center gap-3">
+                <a href="/apps/user/dashboard.html" class="text-gray-400 hover:text-[#FFC300] transition">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </a>
+                <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter">
+                    <span class="text-red-500">GYM</span><span class="text-white">ENEZ ON</span>
                 </h1>
             </div>
-            <button onclick="history.back()" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-                Volver al Hub
-            </button>
+            
+            <div class="flex items-center gap-3">
+                <div class="text-right mr-2">
+                    <p id="header-user-name" class="text-[10px] md:text-xs font-bold text-white uppercase tracking-widest">Cargando...</p>
+                    <p id="header-subscription" class="text-[8px] md:text-[9px] text-[#FFC300] font-black uppercase tracking-[0.3em]">Atleta Activo</p>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center p-4 md:p-6 w-full relative z-10">
-        <div class="glass-panel p-8 md:p-14 w-full max-w-2xl mx-auto rounded-[32px] md:rounded-[40px] text-center fade-in-up border-t border-[#FFC300]/30 relative overflow-hidden">
+    <!-- Contenedor Principal -->
+    <main class="max-w-7xl mx-auto w-full px-4 md:px-6 py-8 md:py-12 flex-grow flex flex-col relative z-10">
+        
+        <!-- ESTADO 1: BLOQUEADO (Efecto Parallax) -->
+        <div id="locked-view" class="parallax-lock w-full rounded-[32px] min-h-[60vh] flex flex-col items-center justify-center overflow-hidden border border-white/10 shadow-2xl fade-in-up">
+            <div class="parallax-overlay"></div>
             
-            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-[#FFC300]/10 blur-[40px] rounded-full pointer-events-none"></div>
-            
-            <div class="w-20 h-20 md:w-24 md:h-24 mx-auto bg-[#FFC300]/10 rounded-[24px] flex items-center justify-center border border-[#FFC300]/20 mb-6 md:mb-8 relative z-10">
-                <svg class="w-10 h-10 md:w-12 md:h-12 text-[#FFC300] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-            </div>
-
-            <span class="text-[#FFC300] text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.4em] mb-2 block relative z-10">Módulo Restringido</span>
-            <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white mb-4 relative z-10 drop-shadow-lg leading-none">
-                En <span class="text-[#FFC300]">Desarrollo</span>
-            </h2>
-            
-            <p class="text-gray-400 text-xs md:text-sm leading-relaxed max-w-md mx-auto mb-8 md:mb-10 font-medium relative z-10">
-                Nuestros ingenieros están forjando el código de esta sección. 
-                Pronto tendrás acceso a las funcionalidades completas de <span class="text-white font-bold tracking-wider">GYMENEZ ON, GOALS y PULSE CENTER</span>. 
-                <br><br>La excelencia requiere tiempo.
-            </p>
-
-            <div class="relative z-10 flex flex-col justify-center items-center">
-                <button onclick="history.back()" class="btn-gold w-full sm:w-auto px-10 py-4 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,195,0,0.2)]">
-                    Regresar al Hub
-                </button>
+            <div class="glass-panel z-10 p-8 md:p-12 max-w-lg w-11/12 rounded-[24px] border border-red-500/20 text-center shadow-[0_0_50px_rgba(220,38,38,0.1)] relative">
+                <div class="w-16 h-16 md:w-20 md:h-20 mx-auto bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/30">
+                    <svg class="w-8 h-8 md:w-10 md:h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                
+                <span class="badge-tag text-[9px] font-black text-red-500 uppercase tracking-widest mb-2 block">Acceso Restringido</span>
+                <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-4">Módulo Ultra</h2>
+                <p class="text-xs md:text-sm text-gray-400 mb-8 leading-relaxed max-w-sm mx-auto">
+                    GYMENEZ ON contiene material exclusivo de entrenamiento, técnicas avanzadas y contenido que tu plan actual no soporta.
+                </p>
+                
+                <a href="/billing/planes.html" class="inline-block w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-800 text-white font-black text-xs uppercase tracking-widest py-4 px-8 rounded-full hover:shadow-[0_0_30px_rgba(220,38,38,0.4)] hover:scale-105 transition-all duration-300">
+                    Mejorar a Plan Ultra
+                </a>
             </div>
         </div>
-    </main>
 
+        <!-- ESTADO 2: DESBLOQUEADO (Carcasa Genérica) -->
+        <div id="unlocked-view" class="hidden flex-col h-full fade-in-up">
+            <div class="mb-8">
+                <span class="px-3 py-1 bg-red-500/10 text-red-500 text-[9px] font-black rounded border border-red-500/20 uppercase tracking-widest inline-block mb-3">Acceso Total</span>
+                <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter text-white">
+                    GYMENEZ <span class="text-red-500">ON</span>
+                </h2>
+                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-wider mt-2">Área de Rendimiento Avanzado</p>
+            </div>
+
+            <!-- Placeholder para tu futuro desarrollo -->
+            <div class="glass-panel flex-grow rounded-[32px] p-8 md:p-12 border border-[#FFC300]/20 flex flex-col items-center justify-center text-center min-h-[50vh] border-dashed">
+                <div class="text-[#FFC300] mb-4 opacity-50">
+                    <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                </div>
+                <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white mb-2">Lienzo en Construcción</h3>
+                <p class="text-xs text-gray-400 max-w-md">
+                    Tu suscripción está activa. Este espacio está reservado para el contenido en video, masterclasses y técnicas especializadas. Pronto se habilitarán los módulos internos.
+                </p>
+            </div>
+        </div>
+
+    </main>
+    
     <footer class="text-center py-6 border-t border-white/5 mt-auto relative z-10">
-        <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
+        <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
     </footer>
 
+    <script src="/static/js/auth.js"></script>
+    
+    <script>
+        const isLocalHostEnvironment = window.location.hostname === '127.0.0.1' || 
+                                       window.location.hostname === 'localhost' || 
+                                       window.location.protocol === 'file:';
+
+        const LOCAL_API_URL = isLocalHostEnvironment ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const storedSession = localStorage.getItem('userSession');
+            
+            // Renderizado de nombre base
+            if (storedSession) {
+                const user = JSON.parse(storedSession);
+                const firstName = user.name ? user.name.split(' ')[0] : 'Atleta';
+                document.getElementById('header-user-name').textContent = `${firstName} ${user.last_name ? user.last_name.split(' ')[0] : ''}`;
+            }
+
+            const token = localStorage.getItem('gymen_auth_token');
+            const lockedView = document.getElementById('locked-view');
+            const unlockedView = document.getElementById('unlocked-view');
+
+            // Lógica de Validación de Suscripción
+            fetch(`${LOCAL_API_URL}/api/profile/me`, {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.profile) {
+                    const subLevel = (data.profile.subscription_level || '').toLowerCase();
+                    document.getElementById('header-subscription').textContent = `Plan ${data.profile.subscription_level || 'Básico'}`;
+                    
+                    // Si el plan incluye "ultra", ocultar parallax y mostrar carcasa genérica
+                    if (subLevel.includes('ultra') || subLevel.includes('pro')) { // Ajusta las palabras clave según tu BD
+                        lockedView.classList.add('hidden');
+                        unlockedView.classList.remove('hidden');
+                        unlockedView.classList.add('flex');
+                    } else {
+                        // Dejar bloqueado (Estado por defecto)
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("Error validando acceso a ON:", err);
+                // Si hay error, se mantiene la pantalla de bloqueo por seguridad visual
+            });
+        });
+    </script>
 </body>
 </html>
