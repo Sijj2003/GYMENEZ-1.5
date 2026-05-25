@@ -1,4 +1,4 @@
-// static/js/profile.js
+// static/js/profile.js - GYMENEZ BIOMETRICS COCKPIT
 
 // 🚀 DETECTOR INTELIGENTE DE ENTORNO PERIMETRAL
 const isLocalhost = window.location.hostname === '127.0.0.1' || 
@@ -8,7 +8,7 @@ const isLocalhost = window.location.hostname === '127.0.0.1' ||
 const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
 
 /**
- * Función Helper para obtener el Pasaporte Criptográfico (Token)
+ * Función Helper para obtener el Pasaporte Criptográfico (Token JWT)
  */
 function getBearerToken() {
     const token = localStorage.getItem('gymen_auth_token');
@@ -16,7 +16,7 @@ function getBearerToken() {
 }
 
 /**
- * Sistema de Notificaciones Elegante
+ * Sistema de Notificaciones Flotantes Premium de GYMENEZ
  */
 function showMessage(message, type = 'error') {
     const messagebox = document.getElementById('message-box');
@@ -34,19 +34,22 @@ function showMessage(message, type = 'error') {
 }
 
 /**
- * Sistema de Seguridad UI: Bloqueo de Tarjetas (Candados)
+ * Sistema de Seguridad UI: Velo Esmerilado Inteligente (Product-Led Growth)
  */
 function lockDataCard(cardId, requiredLevel) {
     const card = document.getElementById(cardId);
     if (!card) return;
     
-    // Ofuscar valores visibles
+    // 1. Ofuscar valores visibles para generar el efecto "Teasing"
     const values = card.querySelectorAll('.value, p.text-gray-300');
     values.forEach(v => v.textContent = '***'); 
 
-    // Crear velo esmerilado
+    // Guardas de control para evitar duplicar overlays en el DOM
+    if (card.querySelector('.lock-overlay')) return;
+
+    // 2. Crear velo esmerilado de alta gama coherente con Tailwind
     const overlay = document.createElement('div');
-    overlay.className = 'lock-overlay absolute inset-0 z-20 bg-[#030305]/60 flex flex-col items-center justify-center cursor-not-allowed rounded-[24px] md:rounded-[32px]';
+    overlay.className = 'lock-overlay absolute inset-0 z-20 bg-[#030305]/75 backdrop-blur-md flex flex-col items-center justify-center cursor-pointer rounded-[24px] md:rounded-[32px] transition-all duration-300 hover:bg-[#030305]/60';
     overlay.innerHTML = `
         <div class="bg-[#111] border border-white/10 px-4 md:px-5 py-2 md:py-2.5 rounded-xl uppercase tracking-widest text-[9px] md:text-[10px] font-black text-gray-300 shadow-2xl flex items-center gap-2 hover:border-[#FFC300]/50 transition-colors">
             <span>🔒</span> REQUIERE PLAN ${requiredLevel}
@@ -55,45 +58,22 @@ function lockDataCard(cardId, requiredLevel) {
     
     overlay.onclick = (e) => {
         e.stopPropagation();
-        showMessage(`ACCESO RESTRINGIDO: El registro avanzado requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
+        showMessage(`MÓDULO RESTRINGIDO: El mapeo antropométrico avanzado requiere Plan ${requiredLevel}. Mejora tu suscripción.`, 'error');
+        // Redirección suave al catálogo de facturación tras 1.5 segundos
+        setTimeout(() => {
+            window.location.href = '/billing/planes.html';
+        }, 1500);
     };
     
     card.appendChild(overlay);
 }
 
-function applyProfileLocks(level) {
-    const normalizedLevel = (level || 'No Suscrito').toUpperCase();
-    const isUltra = normalizedLevel === 'ULTRA';
-    const isPlus = normalizedLevel === 'PLUS' || isUltra;
-
-    // Si NO es Plus ni Ultra, bloqueamos las métricas
-    if (!isPlus) {
-        setTimeout(() => {
-            lockDataCard('card-upper-body', 'PLUS');
-            lockDataCard('card-lower-body', 'PLUS');
-            lockDataCard('card-medical', 'PLUS');
-        }, 300); // Retardo sutil para asegurar que el DOM cargó
-    }
-}
-
 /**
- * Fetch a la API
+ * Fetch a la API: Ficha de Identidad Base (Agnóstica y Libre)
  */
 async function apiFetchProfileData() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/profile/me`, { headers: getBearerToken() }); 
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-        const data = await response.json();
-        return { success: true, profile: data.profile };
-    } catch (e) {
-        return { success: false, error: e.message };
-    }
-}
-
-async function apiFetchMetrics() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/metrics/me`, { headers: getBearerToken() });
-        if (response.status === 403) return { success: false, isForbidden: true, message: 'Módulo restringido por plan.' };
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         return await response.json();
     } catch (e) {
@@ -102,21 +82,33 @@ async function apiFetchMetrics() {
 }
 
 /**
- * Renderizado de Datos
+ * Fetch a la API: Telemetría Antropométrica (Parcializada en el Servidor)
+ */
+async function apiFetchMetrics() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/metrics/me`, { headers: getBearerToken() });
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+        return await response.json();
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+}
+
+/**
+ * Renderizado Dinámico: Tarjeta de Identidad (Siempre Visible)
  */
 function renderProfile(data) {
     document.getElementById('p-fullname').textContent = `${data.name || ''} ${data.last_name || ''}`.trim() || 'ATLETA';
     document.getElementById('p-email').textContent = data.email || '--';
-    document.getElementById('p-subscription').textContent = data.subscription_level ? `PLAN ${data.subscription_level}` : 'PLAN BASE';
+    document.getElementById('p-subscription').textContent = data.subscription_level ? `PLAN ${data.subscription_level}` : 'PLAN BÁSICO';
     
-    // Parseo inteligente de fechas por si vienen de Firestore en otro formato
+    // Parseo inteligente de fechas contra colisiones de formato de Firestore
     let dobText = data.dob || '--';
     if (dobText.includes('-')) {
         const parts = dobText.split('-');
         if (parts.length === 3) dobText = `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
     document.getElementById('p-dob').textContent = dobText;
-    
     document.getElementById('p-sex').textContent = data.sex || '--';
     
     let activeSinceText = data.activo_desde || '--';
@@ -127,30 +119,36 @@ function renderProfile(data) {
     document.getElementById('p-active-since').textContent = activeSinceText;
 }
 
+/**
+ * Renderizado Dinámico: Fichas Corporales y Médicas
+ */
 function renderMetrics(m) {
+    // Las 3 métricas de control rápido básico siempre se renderizan (vienen del servidor para planes básicos)
     document.getElementById('m-peso').textContent = m.peso ? m.peso : '--';
     document.getElementById('m-estatura').textContent = m.estatura ? m.estatura : '--';
     document.getElementById('m-edad').textContent = m.edad ? m.edad : '--';
-    document.getElementById('m-cuello').textContent = m.cuello ? `${m.cuello} cm` : '--';
-    document.getElementById('m-espalda').textContent = m.espalda ? `${m.espalda} cm` : '--';
-    document.getElementById('m-torax').textContent = m.torax ? `${m.torax} cm` : '--';
-    document.getElementById('m-abdomen').textContent = m.abdomen ? `${m.abdomen} cm` : '--';
-    document.getElementById('m-brazo_der').textContent = m.brazo_derecho || '--';
-    document.getElementById('m-brazo_izq').textContent = m.brazo_izquierdo || '--';
-    document.getElementById('m-antebrazo_der').textContent = m.antebrazo_derecho || '--';
-    document.getElementById('m-antebrazo_izq').textContent = m.antebrazo_izquierdo || '--';
-    document.getElementById('m-cintura').textContent = m.cintura ? `${m.cintura} cm` : '--';
-    document.getElementById('m-femur_der').textContent = m.femur_derecho || '--';
-    document.getElementById('m-femur_izq').textContent = m.femur_izquierdo || '--';
-    document.getElementById('m-tibia_der').textContent = m.tibia_derecha || '--';
-    document.getElementById('m-tibia_izq').textContent = m.tibia_izquierda || '--';
-    document.getElementById('m-alergias').textContent = m.alergias || 'Ninguna registrada.';
-    document.getElementById('m-enfermedades').textContent = m.enfermedades_cronicas || 'Ninguna registrada.';
-    document.getElementById('m-otros').textContent = m.otros || 'Sin observaciones.';
+    
+    // Si vienen campos avanzados (Planes Standard o superiores), se mapean con normalidad
+    if (document.getElementById('m-cuello')) document.getElementById('m-cuello').textContent = m.cuello ? `${m.cuello} cm` : '--';
+    if (document.getElementById('m-espalda')) document.getElementById('m-espalda').textContent = m.espalda ? `${m.espalda} cm` : '--';
+    if (document.getElementById('m-torax')) document.getElementById('m-torax').textContent = m.torax ? `${m.torax} cm` : '--';
+    if (document.getElementById('m-abdomen')) document.getElementById('m-abdomen').textContent = m.abdomen ? `${m.abdomen} cm` : '--';
+    if (document.getElementById('m-brazo_der')) document.getElementById('m-brazo_der').textContent = m.brazo_derecho || '--';
+    if (document.getElementById('m-brazo_izq')) document.getElementById('m-brazo_izq').textContent = m.brazo_izquierdo || '--';
+    if (document.getElementById('m-antebrazo_der')) document.getElementById('m-antebrazo_der').textContent = m.antebrazo_derecho || '--';
+    if (document.getElementById('m-antebrazo_izq')) document.getElementById('m-antebrazo_izq').textContent = m.antebrazo_izquierdo || '--';
+    if (document.getElementById('m-cintura')) document.getElementById('m-cintura').textContent = m.cintura ? `${m.cintura} cm` : '--';
+    if (document.getElementById('m-femur_der')) document.getElementById('m-femur_der').textContent = m.femur_derecho || '--';
+    if (document.getElementById('m-femur_izq')) document.getElementById('m-femur_izq').textContent = m.femur_izquierdo || '--';
+    if (document.getElementById('m-tibia_der')) document.getElementById('m-tibia_der').textContent = m.tibia_derecha || '--';
+    if (document.getElementById('m-tibia_izq')) document.getElementById('m-tibia_izq').textContent = m.tibia_izquierda || '--';
+    if (document.getElementById('m-alergias')) document.getElementById('m-alergias').textContent = m.alergias || 'Ninguna registrada.';
+    if (document.getElementById('m-enfermedades')) document.getElementById('m-enfermedades').textContent = m.enfermedades_cronicas || 'Ninguna registrada.';
+    if (document.getElementById('m-otros')) document.getElementById('m-otros').textContent = m.otros || 'Sin observaciones.';
 }
 
 /**
- * Función Principal
+ * Orquestador Principal de Inicialización
  */
 async function loadProfileData() {
     const storedSession = localStorage.getItem('userSession');
@@ -167,26 +165,35 @@ async function loadProfileData() {
             apiFetchMetrics()
         ]);
 
-        if (profileRes.success) {
+        if (profileRes.success && profileRes.profile) {
             renderProfile(profileRes.profile);
-            // 🔥 APLICAR CANDADOS CON LA DATA QUE YA OBTUVIMOS
-            applyProfileLocks(profileRes.profile.subscription_level);
-        } else {
-            applyProfileLocks('No Suscrito');
         }
 
-        if (metricsRes.success && metricsRes.metrics && !metricsRes.isForbidden) {
+        if (metricsRes.success && metricsRes.metrics) {
             renderMetrics(metricsRes.metrics);
+            
+            // 🔥 CONTROLADOR SINTIENTE DE CONVERSIÓN PLG:
+            // Interceptamos la bandera inmutable del servidor para inyectar los candados
+            if (metricsRes.metrics.is_restricted_tier) {
+                setTimeout(() => {
+                    lockDataCard('card-upper-body', 'STANDARD');
+                    lockDataCard('card-lower-body', 'STANDARD');
+                    lockDataCard('card-medical', 'STANDARD');
+                }, 150); // Pequeño delay táctico para asegurar la carga completa de la UI
+            }
         }
 
-        document.getElementById('loading-spinner').classList.add('hidden');
-        document.getElementById('profile-content').classList.remove('hidden');
+        // Apagar spinners de carga y revelar cockpit biográfico
+        const spinner = document.getElementById('loading-spinner');
+        const content = document.getElementById('profile-content');
+        if (spinner) spinner.classList.add('hidden');
+        if (content) content.classList.remove('hidden');
 
     } catch (error) {
-        console.error("Error fatal en la carga de perfil:", error);
+        console.error("Error fatal en el ciclo de renderizado perimetral:", error);
         const spinner = document.getElementById('loading-spinner');
         if (spinner) {
-            spinner.innerHTML = '<p class="text-red-400 font-bold uppercase tracking-widest">❌ Error al conectar con el servidor.</p>';
+            spinner.innerHTML = '<p class="text-red-400 font-bold uppercase tracking-widest text-xs">❌ Error al sincronizar con el Núcleo GYMENEZ.</p>';
         }
     }
 }
