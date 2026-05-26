@@ -19,7 +19,6 @@
             overflow-x: hidden;
         }
         
-        /* Glassmorphism de Alta Gama */
         .glass-panel {
             background: rgba(15, 15, 20, 0.65);
             backdrop-filter: blur(24px);
@@ -28,7 +27,6 @@
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        /* Hover effects para las tarjetas Bento */
         .bento-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }
         .bento-card:hover {
             transform: translateY(-4px) scale(1.01);
@@ -37,12 +35,10 @@
             z-index: 10;
         }
 
-        /* Variantes de color para hover */
         .hover-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.15); }
         .hover-red:hover { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(220, 38, 38, 0.15); }
         .hover-sky:hover { border-color: rgba(56, 189, 248, 0.4); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), 0 0 20px rgba(56, 189, 248, 0.15); }
 
-        /* Estilo para tarjetas bloqueadas */
         .locked-card {
             filter: grayscale(100%);
             opacity: 0.6;
@@ -54,7 +50,6 @@
             box-shadow: none !important;
         }
 
-        /* Imágenes de fondo para módulos Premium */
         .bg-eats {
             background: linear-gradient(to top, rgba(3,3,5,1) 10%, rgba(3,3,5,0.4)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800');
             background-size: cover; background-position: center;
@@ -67,7 +62,6 @@
             background: radial-gradient(circle at top right, rgba(255,195,0,0.08), transparent 60%);
         }
 
-        /* Animación de entrada suave */
         .fade-in-up {
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0; transform: translateY(20px);
@@ -78,7 +72,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
 
-        /* Estilo para la encuesta Matutina */
         .score-box {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -275,23 +268,6 @@
                     </a>
                 </div>
             </div>
-
-            <div class="mt-12 max-w-4xl mx-auto border-t border-white/5 pt-8 fade-in-up" style="animation-delay: 0.8s;">
-                <div class="flex items-center gap-2 mb-6 px-1">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                    </span>
-                    <h3 class="text-xs font-black uppercase tracking-[0.25em] text-gray-400">Canal de Transmisión Activo</h3>
-                </div>
-                
-                <div id="pulse-alerts-container" class="space-y-3 transition-all duration-500 rounded-[24px] p-1">
-                    <div class="glass-panel rounded-2xl p-4 text-center border border-white/5 animate-pulse">
-                        <div class="h-3 bg-white/10 rounded w-1/4 mx-auto mb-2"></div>
-                        <div class="h-2 bg-white/5 rounded w-1/2 mx-auto"></div>
-                    </div>
-                </div>
-            </div>
         </main>
         
         <footer class="text-center py-6 border-t border-white/5 mt-auto">
@@ -302,7 +278,6 @@
     <script src="/static/js/auth.js"></script>
     
     <script>
-        // 🚀 TUNELIZACIÓN ENTORNO LOCAL/PRODUCCIÓN AISLADO
         const isLocalHostEnvironment = window.location.hostname === '127.0.0.1' || 
                                        window.location.hostname === 'localhost' || 
                                        window.location.protocol === 'file:';
@@ -331,9 +306,6 @@
             }, 3500);
         }
 
-        // ==========================================
-        // TACTICAL UI: INTERACCIÓN DEL CHECK-IN MATUTINO
-        // ==========================================
         function setScore(metric, value) {
             readinessTelemetry[metric] = value;
             const container = document.getElementById(`group-${metric}`);
@@ -378,55 +350,29 @@
                 }
             } catch (err) {
                 console.error(err);
-                showMessage("Fallo crítico de red con la aduana perimetral.", "error");
+                showMessage("Fallo crítico de red.", "error");
             }
         }
 
-        // ==========================================
-        // ALGORITMO GENERADOR DE MOTIVACIÓN BIOMECÁNICA
-        // ==========================================
         function setMotivationalQuote() {
             const quoteEl = document.getElementById('motivational-message');
             if (!quoteEl) return;
 
             const parts = {
-                p1: [
-                    "La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", 
-                    "La dedicación innegociable", "Cada gota de sudor", "Una mentalidad de hierro", 
-                    "El enfoque milimétrico", "La verdadera resiliencia", "El trabajo inteligente", 
-                    "La intensidad calculada"
-                ],
-                p2: [
-                    "forja", "construye", "materializa", "desencadena", "garantiza", 
-                    "consolida", "despierta", "maximiza", "blinda", "potencia"
-                ],
-                p3: [
-                    "tu mejor versión física", "resultados matemáticos", "un progreso innegable", 
-                    "una fuerza interior brutal", "el rendimiento a largo plazo", "un sistema inquebrantable", 
-                    "tu capacidad de adaptación", "la verdadera excelencia", "una genética de élite", 
-                    "tu resistencia ante la fatiga"
-                ],
-                p4: [
-                    "día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", 
-                    "superando los límites del cuerpo.", "en cada fase del entrenamiento.", "para alcanzar tu pico de rendimiento.", 
-                    "venciendo la comodidad.", "un 1% a la vez.", "con cada repetición.", 
-                    "manteniendo la visión clara."
-                ]
+                p1: ["La disciplina táctica", "El esfuerzo invisible", "La constancia absoluta", "La dedicación innegociable", "Cada gota de sudor", "Una mentalidad de hierro", "El enfoque milimétrico", "La verdadera resiliencia", "El trabajo inteligente", "La intensidad calculada"],
+                p2: ["forja", "construye", "materializa", "desencadena", "garantiza", "consolida", "despierta", "maximiza", "blinda", "potencia"],
+                p3: ["tu mejor versión física", "resultados matemáticos", "un progreso innegable", "una fuerza interior brutal", "el rendimiento a largo plazo", "un sistema inquebrantable", "tu capacidad de adaptación", "la verdadera excelencia", "una genética de élite", "tu resistencia ante la fatiga"],
+                p4: ["día tras día.", "cuando nadie está mirando.", "destruyendo las excusas.", "superando los límites del cuerpo.", "en cada fase del entrenamiento.", "para alcanzar tu pico de rendimiento.", "venciendo la comodidad.", "un 1% a la vez.", "con cada repetición.", "manteniendo la visión clara."]
             };
 
             const r = (arr) => arr[Math.floor(Math.random() * arr.length)];
             quoteEl.textContent = `"${r(parts.p1)} ${r(parts.p2)} ${r(parts.p3)} ${r(parts.p4)}"`;
         }
 
-        // ==========================================
-        // 📢 BUFFER FRONTEND: SINCRONIZADOR GYMENEZ PULSE
-        // ==========================================
+        // 📢 PRE-FETCHING DE ENTRADA CON PUENTE DE CACHÉ LOCAL STORAGE
         async function loadGymenezPulse() {
-            const container = document.getElementById('pulse-alerts-container');
             const badgeCount = document.getElementById('pulse-badge-count');
             const bellBadge = document.getElementById('pulse-bell-badge');
-            
-            if (!container) return;
 
             try {
                 const response = await fetch(`${LOCAL_API_URL}/api/pulse/alerts`, {
@@ -437,125 +383,42 @@
                     }
                 });
 
-                if (!response.ok) throw new Error("Fallo de sincronización.");
+                if (!response.ok) throw new Error("Fallo de sincronización pasiva.");
                 const data = await response.json();
                 
                 if (!data.success || !data.alerts || data.alerts.length === 0) {
-                    container.innerHTML = `
-                        <div class="glass-panel rounded-2xl p-5 text-center border border-white/5">
-                            <p class="text-[11px] text-gray-500 uppercase tracking-wider font-medium font-mono">⚡ PULSO ESTABLE • SIN ALERTAS VIGENTES</p>
-                        </div>
-                    `;
+                    localStorage.removeItem('gymen_pulse_cache');
                     if (badgeCount) badgeCount.classList.add('hidden');
                     if (bellBadge) bellBadge.classList.add('hidden');
                     return;
                 }
 
-                // Encender contadores de campana y bento card
+                // 💾 El truco de guerrilla: Guardamos el payload en local sin golpear de nuevo el server
+                localStorage.setItem('gymen_pulse_cache', JSON.stringify(data.alerts));
+
                 if (bellBadge) bellBadge.classList.remove('hidden');
                 if (badgeCount) {
                     badgeCount.textContent = data.alerts.length;
                     badgeCount.classList.remove('hidden');
                 }
 
-                container.innerHTML = '';
-                data.alerts.forEach(alert => {
-                    let cardTemplate = '';
-
-                    switch(alert.category) {
-                        case 'COACH_AUDIT':
-                            cardTemplate = `
-                                <div class="glass-panel rounded-2xl p-5 border border-red-500/30 bg-gradient-to-r from-red-950/10 to-transparent shadow-[0_0_30px_rgba(220,38,38,0.05)]">
-                                    <div class="flex items-start gap-3">
-                                        <span class="text-base mt-0.5">🚨</span>
-                                        <div class="flex-1">
-                                            <h4 class="text-xs font-black text-red-400 uppercase tracking-wide font-mono">${alert.title}</h4>
-                                            <p class="text-xs text-gray-200 mt-2 leading-relaxed font-medium">${alert.content}</p>
-                                            <div class="text-[9px] text-red-500/60 font-black mt-3 uppercase tracking-widest font-mono">⚠️ ORDEN DIRECTA DEL STAFF TÉCNICO</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            break;
-
-                        case 'PROMO':
-                            cardTemplate = `
-                                <div class="glass-panel rounded-2xl p-5 border border-[#FFC300]/30 bg-gradient-to-br from-yellow-500/5 to-transparent shadow-xl">
-                                    <div class="flex items-start gap-3">
-                                        <span class="text-base mt-0.5">👑</span>
-                                        <div class="flex-1">
-                                            <h4 class="text-xs font-black text-[#FFC300] uppercase tracking-wider font-mono">${alert.title}</h4>
-                                            <p class="text-xs text-gray-300 mt-1.5 leading-relaxed">${alert.content}</p>
-                                            <button onclick="window.location.href='/apps/user/checkout.html'" class="mt-4 bg-[#FFC300] hover:bg-yellow-400 text-black font-black text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all duration-200 shadow-[0_0_15px_rgba(255,195,0,0.15)]">
-                                                MEJORAR PLAN AHORA
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            break;
-
-                        case 'PLUS_INFO':
-                        case 'PLAN_INFO':
-                            cardTemplate = `
-                                <div class="glass-panel rounded-2xl p-4 border border-blue-500/20 bg-gradient-to-r from-blue-950/5 to-transparent shadow-md">
-                                    <div class="flex items-start gap-3">
-                                        <span class="text-base mt-0.5">💎</span>
-                                        <div class="flex-1">
-                                            <h4 class="text-xs font-black text-blue-400 uppercase tracking-wide font-mono">${alert.title}</h4>
-                                            <p class="text-xs text-gray-300 mt-1 leading-relaxed font-medium">${alert.content}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            break;
-
-                        default:
-                            cardTemplate = `
-                                <div class="glass-panel rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors duration-300">
-                                    <div class="flex items-start gap-3">
-                                        <span class="text-base mt-0.5">📢</span>
-                                        <div class="flex-1">
-                                            <h4 class="text-xs font-bold text-white uppercase tracking-tight">${alert.title}</h4>
-                                            <p class="text-xs text-gray-400 mt-1 leading-relaxed">${alert.content}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                    }
-                    container.insertAdjacentHTML('beforeend', cardTemplate);
-                });
-
             } catch (error) {
-                console.error("🔴 Error en el renderizador de Pulse:", error);
+                console.error("🔴 Error en pre-fetch Pulse:", error);
             }
         }
 
-        // Desplazamiento Enfocado y Destello de Neón al presionar la campana o la bento card
+        // Saltador hacia la pantalla independiente dedicada
         function scrollToPulseCard() {
-            const pulseSection = document.getElementById('pulse-alerts-container');
-            if (pulseSection) {
-                pulseSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                pulseSection.classList.add('ring-2', 'ring-[#FFC300]/40', 'scale-[1.01]', 'shadow-[0_0_30px_rgba(255,195,0,0.1)]');
-                
-                setTimeout(() => {
-                    pulseSection.classList.remove('ring-2', 'ring-[#FFC300]/40', 'scale-[1.01]', 'shadow-[0_0_30px_rgba(255,195,0,0.1)]');
-                }, 1200);
-            }
+            window.location.href = '/apps/user/pulse.html';
         }
 
-        // CONTROL DE SUSCRIPCIONES SILENCIOSO
         function applySubscriptionLocks(level) {
             console.log("Suscripción verificada en el Hub:", level);
         }
 
-        // ==========================================
-        // ORQUESTACIÓN AL CARGAR LA PÁGINA (DOM)
-        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             setMotivationalQuote();
 
-            // Enlace nativo seguro para el botón de cierre de sesión
             const logoutBtn = document.getElementById('logout-button');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -576,17 +439,15 @@
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
 
-                // Evaluar Check-In Diario Obligatorio
                 const todayStr = new Date().toISOString().split('T')[0];
                 if (!localStorage.getItem(`gymen_readiness_done_${todayStr}`)) {
                     const modal = document.getElementById('readiness-modal');
                     modal.classList.remove('hidden');
                 }
 
-                // Sincronizar alertas dinámicas de Gymenez Pulse
+                // Disparar pre-cache pasivo
                 loadGymenezPulse();
 
-                // Fetch Nivel Suscripción del Servidor
                 fetch(`${LOCAL_API_URL}/api/profile/me`, {
                     headers: {
                         ...getBearerToken(),
@@ -610,7 +471,6 @@
                     applySubscriptionLocks('BÁSICO'); 
                 });
             } else {
-                // Forzar redirección perimetral si el estado local está vacío
                 window.location.href = '/apps/start/login.html';
             }
         });
