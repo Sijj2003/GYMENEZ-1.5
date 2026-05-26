@@ -1,116 +1,155 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ | Módulo en Desarrollo</title>
+    <title>GYMENEZ | Pulse Center</title>
     
     <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #030305;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #030305; 
             color: #ffffff;
             overflow-x: hidden;
         }
-        
-        /* Glassmorphism Premium */
         .glass-panel {
-            background: rgba(15, 15, 20, 0.6);
+            background: rgba(15, 15, 20, 0.65);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
-
-        /* Botón Dorado */
-        .btn-gold {
-            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
-            color: #000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
-        }
-
-        /* Animación de Entrada */
         .fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0; 
-            transform: translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; transform: translateY(15px);
         }
-        @keyframes fadeInUp { 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        /* Ambient Glow Automático */
-        .ambient-glow {
-            animation: pulseGlow 4s ease-in-out infinite alternate;
-        }
-        @keyframes pulseGlow {
-            0% { opacity: 0.4; transform: scale(0.95) translateX(-50%); }
-            100% { opacity: 0.7; transform: scale(1.05) translateX(-50%); }
-        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black min-h-screen flex flex-col">
+<body class="selection:bg-[#FFC300] selection:text-black">
 
-    <div class="fixed inset-0 bg-[url('/static/img/backgrounds/PROFILE_FONDO.png')] bg-cover bg-center opacity-10 -z-10 mix-blend-screen grayscale pointer-events-none"></div>
-    <div class="fixed inset-0 bg-gradient-to-b from-[#030305]/50 via-[#030305]/90 to-[#030305] -z-10 pointer-events-none"></div>
-    
-    <div class="ambient-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] bg-[#FFC300]/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-[#030305] via-[#050508] to-[#030305] -z-10"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-sky-950/10 via-transparent to-transparent -z-10"></div>
 
-    <header class="w-full border-b border-white/5 bg-black/30 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2 md:gap-3">
-                <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter block">
-                    <span class="text-[#FFC300]">GYM</span><span class="text-white">ENEZ</span>
-                </h1>
-            </div>
-            <button onclick="history.back()" class="px-4 py-2 md:px-6 md:py-2 rounded-full border border-white/10 text-white font-bold text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+    <div class="min-h-screen w-full flex flex-col max-w-xl mx-auto px-4 py-6">
+        
+        <header class="flex items-center justify-between mb-8 fade-in-up">
+            <button onclick="window.location.href='/apps/start/inicio.html'" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
                 Volver al Hub
             </button>
-        </div>
-    </header>
+            <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#FFC300] font-mono bg-[#FFC300]/5 px-3 py-1 rounded-full border border-[#FFC300]/10">Pulse Box</span>
+        </header>
 
-    <main class="flex-grow flex items-center justify-center p-4 md:p-6 w-full relative z-10">
-        <div class="glass-panel p-8 md:p-14 w-full max-w-2xl mx-auto rounded-[32px] md:rounded-[40px] text-center fade-in-up border-t border-[#FFC300]/30 relative overflow-hidden">
-            
-            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-[#FFC300]/10 blur-[40px] rounded-full pointer-events-none"></div>
-            
-            <div class="w-20 h-20 md:w-24 md:h-24 mx-auto bg-[#FFC300]/10 rounded-[24px] flex items-center justify-center border border-[#FFC300]/20 mb-6 md:mb-8 relative z-10">
-                <svg class="w-10 h-10 md:w-12 md:h-12 text-[#FFC300] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
+        <main class="flex-grow">
+            <div class="mb-8 fade-in-up" style="animation-delay: 0.1s;">
+                <h2 class="text-3xl font-black uppercase tracking-tighter leading-none">Centro de <span class="text-sky-400">Comandos</span></h2>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-2 font-mono">Monitoreo y transmisiones directas del Staff</p>
             </div>
 
-            <span class="text-[#FFC300] text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.4em] mb-2 block relative z-10">Módulo Restringido</span>
-            <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white mb-4 relative z-10 drop-shadow-lg leading-none">
-                En <span class="text-[#FFC300]">Desarrollo</span>
-            </h2>
+            <div id="pulse-page-container" class="space-y-4 fade-in-up" style="animation-delay: 0.2s;"></div>
+        </main>
+
+        <footer class="text-center py-8 border-t border-white/5 mt-12 fade-in-up" style="animation-delay: 0.3s;">
+            <p class="text-[8px] font-bold uppercase tracking-[0.4em] text-gray-600">© 2026 GYMENEZ PERFORMANCE • PULSE MODULE</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('pulse-page-container');
+            if (!container) return;
+
+            // ⚡ Leemos directo de la memoria local a velocidad luz
+            const cachedData = localStorage.getItem('gymen_pulse_cache');
             
-            <p class="text-gray-400 text-xs md:text-sm leading-relaxed max-w-md mx-auto mb-8 md:mb-10 font-medium relative z-10">
-                Nuestros ingenieros están forjando el código de esta sección. 
-                Pronto tendrás acceso a las funcionalidades completas de <span class="text-white font-bold tracking-wider">GYMENEZ ON, GOALS y PULSE CENTER</span>. 
-                <br><br>La excelencia requiere tiempo.
-            </p>
+            if (!cachedData) {
+                container.innerHTML = `
+                    <div class="glass-panel rounded-3xl p-8 text-center border border-white/5">
+                        <span class="text-2xl block mb-2">⚡</span>
+                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest font-mono">PULSO EN ESTABILIDAD</h4>
+                        <p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">No tienes transmisiones ni directrices pendientes por el comando técnico en este momento.</p>
+                    </div>
+                `;
+                return;
+            }
 
-            <div class="relative z-10 flex flex-col justify-center items-center">
-                <button onclick="history.back()" class="btn-gold w-full sm:w-auto px-10 py-4 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,195,0,0.2)]">
-                    Regresar al Hub
-                </button>
-            </div>
-        </div>
-    </main>
+            const alerts = JSON.parse(cachedData);
+            container.innerHTML = '';
 
-    <footer class="text-center py-6 border-t border-white/5 mt-auto relative z-10">
-        <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE</p>
-    </footer>
+            alerts.forEach((alert, index) => {
+                let cardTemplate = '';
+                const delay = (index * 0.1).toFixed(1);
 
+                switch(alert.category) {
+                    case 'COACH_AUDIT':
+                        cardTemplate = `
+                            <div class="glass-panel rounded-3xl p-6 border border-red-500/30 bg-gradient-to-r from-red-950/10 to-transparent shadow-[0_0_30px_rgba(220,38,38,0.05)] fade-in-up" style="animation-delay: ${delay}s">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-sm">🚨</div>
+                                    <div class="flex-1">
+                                        <h4 class="text-xs font-black text-red-400 uppercase tracking-wider font-mono">${alert.title}</h4>
+                                        <p class="text-xs text-gray-200 mt-2 leading-relaxed font-medium">${alert.content}</p>
+                                        <div class="text-[9px] text-red-500/60 font-black mt-4 uppercase tracking-widest font-mono">⚠️ INSTRUCCIÓN CRÍTICA DE ASESORÍA VIP</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'PROMO':
+                        cardTemplate = `
+                            <div class="glass-panel rounded-3xl p-6 border border-[#FFC300]/30 bg-gradient-to-br from-yellow-500/5 to-transparent shadow-xl fade-in-up" style="animation-delay: ${delay}s">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-[#FFC300]/10 border border-[#FFC300]/20 flex items-center justify-center text-sm">👑</div>
+                                    <div class="flex-1">
+                                        <h4 class="text-xs font-black text-[#FFC300] uppercase tracking-wider font-mono">${alert.title}</h4>
+                                        <p class="text-xs text-gray-300 mt-2 leading-relaxed font-medium">${alert.content}</p>
+                                        <button onclick="window.location.href='/apps/user/checkout.html'" class="mt-4 bg-[#FFC300] hover:bg-yellow-400 text-black font-black text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all duration-200 shadow-[0_0_15px_rgba(255,195,0,0.15)]">
+                                            ACTIVAR ACCESO ÉLITE
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'PLUS_INFO':
+                    case 'PLAN_INFO':
+                        cardTemplate = `
+                            <div class="glass-panel rounded-3xl p-5 border border-blue-500/20 bg-gradient-to-r from-blue-950/5 to-transparent shadow-md fade-in-up" style="animation-delay: ${delay}s">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-sm">💎</div>
+                                    <div class="flex-1">
+                                        <h4 class="text-xs font-black text-blue-400 uppercase tracking-wide font-mono">${alert.title}</h4>
+                                        <p class="text-xs text-gray-300 mt-1.5 leading-relaxed font-medium">${alert.content}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    default:
+                        cardTemplate = `
+                            <div class="glass-panel rounded-3xl p-5 border border-white/5 hover:border-white/10 transition-colors duration-300 fade-in-up" style="animation-delay: ${delay}s">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-sm">📢</div>
+                                    <div class="flex-1">
+                                        <h4 class="text-xs font-bold text-white uppercase tracking-tight">${alert.title}</h4>
+                                        <p class="text-xs text-gray-400 mt-1.5 leading-relaxed">${alert.content}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                }
+                container.insertAdjacentHTML('beforeend', cardTemplate);
+            });
+        });
+    </script>
 </body>
 </html>
