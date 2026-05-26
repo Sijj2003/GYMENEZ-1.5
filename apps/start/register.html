@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GYMENEZ | Unirse al Ecosistema</title>
     
-    <link rel="icon" type="image/png" href="static/img/logos/mini_logo.png">
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
 
-        /* 🚀 FONDO PARALLAX (Igual a Index) */
+        /* 🚀 FONDO PARALLAX */
         .parallax-bg {
             background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070');
             background-attachment: fixed;
@@ -145,13 +145,13 @@
     <div class="parallax-overlay"></div>
 
     <nav class="relative w-full z-40 py-6 px-6 md:px-12 flex justify-between items-center bg-transparent transition-all duration-1000 delay-300 opacity-0 transform -translate-y-4" id="main-nav">
-        <div class="flex items-center cursor-pointer group" onclick="window.location.href='index.html'">
+        <div class="flex items-center cursor-pointer group" onclick="window.location.href='/index.html'">
             <span class="text-[#FFC300] font-[900] text-2xl md:text-3xl italic tracking-tighter">GYM</span>
             <span class="text-white font-[900] text-2xl md:text-3xl italic tracking-tighter">ENEZ</span>
         </div>
         
         <div class="flex items-center gap-5 md:gap-6">
-            <a href="../../index.html" class="text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase whitespace-nowrap">Regresar</a>
+            <a href="/index.html" class="text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase whitespace-nowrap">Regresar</a>
             <a href="login.html" class="border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black px-5 py-2 rounded-full text-[10px] font-black tracking-widest transition-all uppercase whitespace-nowrap">Ingresar</a>
         </div>
     </nav>
@@ -184,7 +184,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Correo Electrónico</label>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Correo Electrónico Verificado</label>
                         <input type="email" id="reg-email" required class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs font-medium" placeholder="atleta@gymenez.com">
                     </div>
                     <div class="pt-6">
@@ -252,6 +252,7 @@
     </footer>
 
     <script>
+        // Inicialización y limpieza visual
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             const nav = document.getElementById('main-nav');
@@ -268,9 +269,16 @@
             }, 1000);
         });
 
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
+        // 🔴 ENRUTAMIENTO INTELIGENTE
+        const isLocalHostEnvironment = window.location.hostname === '127.0.0.1' || 
+                                       window.location.hostname === 'localhost' || 
+                                       window.location.protocol === 'file:';
+
+        const API_BASE_URL = isLocalHostEnvironment ? 'http://127.0.0.1:5000' : 'https://sijj2003.pythonanywhere.com';
+        
         let activeStep = 1;
 
+        // Máscara de fecha
         function applyDateMask(e) {
             if (e.inputType === 'deleteContentBackward') return;
             const input = e.target;
@@ -282,6 +290,7 @@
             input.value = formatted;
         }
 
+        // 🛡️ REFACTOR CISO: Manejo consolidado de retroalimentación UI
         function showUIFeedback(message, type = 'error') {
             const box = document.getElementById('message-box');
             if(!box) return;
@@ -300,6 +309,7 @@
             }, 4000);
         }
 
+        // Validación secuencial
         function validateFields(step) {
             if (step === 1) {
                 const name = document.getElementById('reg-name').value.trim();
@@ -322,6 +332,7 @@
             return true;
         }
 
+        // Navegación de pasos (UX Fluida)
         function goToStep(nextStep) {
             if (nextStep > activeStep && !validateFields(activeStep)) return;
 
@@ -348,6 +359,7 @@
             }, 400);
         }
 
+        // 🧠 EJECUCIÓN FINAL (Integración con RegisterUseCase)
         async function processSecureRegistration() {
             const password = document.getElementById('reg-password').value;
             if(password.length < 6 || password.length > 15) {
@@ -358,8 +370,9 @@
             const athleteName = document.getElementById('reg-name').value.trim().toUpperCase();
             const btn = document.querySelector('#step-section-3 .btn-gold');
             btn.disabled = true;
-            btn.textContent = "VALIDANDO...";
+            btn.textContent = "VALIDANDO IDENTIDAD...";
 
+            // Generamos un Placeholder para la cédula si no se exige
             const ciPlaceholder = `V-TEMP-${Date.now().toString().slice(-6)}`; 
             const payload = {
                 email: document.getElementById('reg-email').value.trim().toLowerCase(),
@@ -379,22 +392,33 @@
                     body: JSON.stringify(payload)
                 });
 
+                // 🔥 Capturamos bloqueos del Rate Limiter en O(1)
+                if (response.status === 429) {
+                    showUIFeedback("Múltiples intentos detectados. Espera 60 segundos.", "error");
+                    btn.disabled = false;
+                    btn.textContent = "Activar Perfil";
+                    return;
+                }
+
                 const data = await response.json();
 
+                // Si se ejecuta con éxito, o si hay un error de validación (409 Conflict)
                 if (response.ok && data.success) {
                     triggerCinematicSetup(athleteName);
                 } else {
-                    showUIFeedback(data.error || "Error al procesar el alta.", "error");
+                    // Muestra perfectamente el mensaje del filtro CISO de correos
+                    showUIFeedback(data.error || "No se pudo procesar el alta.", "error");
                     btn.disabled = false;
                     btn.textContent = "Activar Perfil";
                 }
             } catch (err) {
-                showUIFeedback("Error de enlace perimetral con el servidor.", "error");
+                showUIFeedback("Fallo de conexión perimetral con el servidor.", "error");
                 btn.disabled = false;
                 btn.textContent = "Activar Perfil";
             }
         }
 
+        // 🎬 Secuencia Cinematográfica Post-Registro
         function triggerCinematicSetup(name) {
             const container = document.getElementById('register-container');
             const setup = document.getElementById('setup-screen');
@@ -416,10 +440,10 @@
         function runSequence(name) {
             const steps = [
                 { text: `Hola, ${name}`, time: 0 },
-                { text: "Creando tu perfil...", time: 1800 },
+                { text: "Creando tu perfil en el Núcleo...", time: 1800 },
                 { text: "Estructurando tu entrenamiento...", time: 3600 },
                 { text: "Asegurando tu acceso...", time: 5400 },
-                { text: "¡Bienvenido!", time: 7200 }
+                { text: "¡Bienvenido a la Élite!", time: 7200 }
             ];
 
             steps.forEach(s => {
