@@ -192,14 +192,10 @@
         import { showMessage, openModalSafe, closeModalSafe } from '/static/js/utils/ui.js';
         import { localDeviceId, AUTH_TOKEN_KEY } from '/static/js/core/session.js';
 
-        // Puentes globales necesarios para la comunicación con auth_main.js
+        // Puentes globales para auth_main.js
         window.openModalSafe = openModalSafe;
         window.closeModalSafe = closeModalSafe;
-        window.showForceLogoutMessage = function(txt) {
-            if(txt) document.getElementById('force-logout-msg').textContent = txt;
-        };
 
-        // Controlador de Preloader y Foco de entrada
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             if (preloader) preloader.style.opacity = '0';
@@ -245,16 +241,25 @@
         // 🛡️ CONTROLADOR: SOLICITAR CÓDIGO PARA CIERRE FORZADO
         // ========================================================
         async function handleRequestShieldCode() {
-            const email = document.getElementById('force-email').value;
+            // 🚀 PROGRAMACIÓN DEFENSIVA AVANZADA:
+            // Intentamos capturar el correo desde la variable inyectada, 
+            // y si por asincronía está vacío, lo extraemos directo del input de login.
+            const email = (document.getElementById('force-email').value || '').trim() || 
+                          (document.getElementById('login-email').value || '').trim();
             const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showMessage("Datos de credenciales ausentes para desvincular.", "error");
+                return;
+            }
 
             showMessage("Solicitando código de desvinculación...", "success");
             
             try {
                 const res = await apiRequestShieldCode(email, password);
 
-                if (res.ok && res.data && res.data.success) {
-                    // Transición limpia de elementos dentro de la misma ventana modal
+                // Verificación altamente flexible tolerante a respuestas del backend
+                if (res.ok && res.data && (!res.data.error || res.data.success || res.data.status === 'success')) {
                     document.getElementById('modal-options').classList.add('hidden');
                     document.getElementById('force-logout-form').classList.remove('hidden');
                     document.getElementById('force-code').focus();
@@ -273,7 +278,8 @@
         document.getElementById('force-logout-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('force-submit-btn');
-            const email = document.getElementById('force-email').value;
+            const email = (document.getElementById('force-email').value || '').trim() || 
+                          (document.getElementById('login-email').value || '').trim();
             const code = document.getElementById('force-code').value;
 
             btn.disabled = true; btn.textContent = 'EXPULSANDO...';
@@ -283,7 +289,6 @@
                 if (res.ok && res.data && res.data.success) {
                     showMessage("Dispositivo desvinculado. Abriendo canal...", "success");
                     
-                    // Guardar credenciales de sesión autorizadas
                     localStorage.setItem('userSession', JSON.stringify(res.data.user));
                     if (res.data.token) localStorage.setItem(AUTH_TOKEN_KEY, res.data.token);
                     localStorage.setItem('gymen_session_exp', Date.now() + (480 * 60 * 1000));
@@ -301,18 +306,11 @@
             }
         });
 
-        // Enlace seguro de clics desde JavaScript (Arquitectura desacoplada)
+        // Event listeners seguros
         document.getElementById('btn-force-logout-request').addEventListener('click', handleRequestShieldCode);
-        
-        document.getElementById('btn-keep-old').addEventListener('click', () => {
-            closeModalSafe('active-session-modal');
-        });
-        
-        document.getElementById('btn-cancel-activation').addEventListener('click', () => {
-            closeModalSafe('activation-modal');
-        });
+        document.getElementById('btn-keep-old').addEventListener('click', () => closeModalSafe('active-session-modal'));
+        document.getElementById('btn-cancel-activation').addEventListener('click', () => closeModalSafe('activation-modal'));
 
-        // Automatización de enfoque en inputs al abrir modals
         document.getElementById('activation-modal').addEventListener('transitionend', () => {
             if(!document.getElementById('activation-modal').classList.contains('hidden')) {
                 document.getElementById('activation-code').focus();
