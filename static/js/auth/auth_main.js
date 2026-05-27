@@ -6,18 +6,28 @@ import { showMessage, openModalSafe, closeModalSafe } from '../utils/ui.js';
 import { applyDateMask, applyCIMask, applyPhoneMask } from '../utils/masks.js';
 import { apiLogin, apiRegister, apiVerifyOTP, apiLogout } from './auth_api.js';
 
-// Inicializar interceptor de red global
-setupFetchInterceptor();
+// Inicializar interceptor de red global de forma inmediata
+try {
+    setupFetchInterceptor();
+} catch (err) {
+    console.error("🚨 Error inicializando el interceptor de red:", err);
+}
 
 // ==========================================
 // CONTROLADORES DE EVENTOS
 // ==========================================
 
 async function handleLoginSubmit(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
+    e.preventDefault(); // 🛡️ DETENER EL REINICIO DE LA PÁGINA INSTANTÁNEAMENTE
+    
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
     const btn = document.getElementById('login-btn');
+
+    if (!emailInput || !passwordInput) return;
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
     btn.disabled = true;
     btn.textContent = 'VERIFICANDO...';
@@ -35,7 +45,6 @@ async function handleLoginSubmit(e) {
             return;
         }
         
-        // 🛡️ ESCÁNER INTELIGENTE REFORZADO (Caso-Insensible y Tolerante a Keywords del Backend)
         const errorText = (response.error || '').toLowerCase();
         const isSessionActive = response.is_session_active || 
                                 errorText.includes('sesión activa') || 
@@ -127,18 +136,21 @@ async function handleRegisterSubmit(e) {
 }
 
 // ==========================================
-// INICIALIZACIÓN DEL DOM
+// 🚀 INICIALIZADOR SEGURO (ANTI-RELOAD TRAP)
 // ==========================================
-window.addEventListener('DOMContentLoaded', () => {
-    startSmartSessionWatcher();
-
-    const isLoginScreen = document.getElementById('login-screen') !== null;
-    if (isLoginScreen && localStorage.getItem('userSession')) {
-        window.location.href = '/apps/start/inicio.html';
-        return;
+function executeAuthCoreBinding() {
+    try {
+        startSmartSessionWatcher();
+    } catch (e) {
+        console.warn("Watchdog inactivo.");
     }
 
-    document.getElementById('login-form')?.addEventListener('submit', handleLoginSubmit);
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.removeEventListener('submit', handleLoginSubmit); // Prevenir duplicados
+        loginForm.addEventListener('submit', handleLoginSubmit);
+        console.log("🔒 Escudo de login acoplado de forma segura.");
+    }
     
     const regForm = document.getElementById('multi-step-form');
     if (regForm) {
@@ -150,6 +162,7 @@ window.addEventListener('DOMContentLoaded', () => {
         regBtn.addEventListener('click', handleRegisterSubmit);
     }
 
+    // Aplicar máscaras de forma segura si los elementos existen en el DOM
     document.getElementById('reg-dob')?.addEventListener('input', applyDateMask);
     document.getElementById('reg-ci')?.addEventListener('input', applyCIMask);
     document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
@@ -161,4 +174,11 @@ window.addEventListener('DOMContentLoaded', () => {
         await apiLogout(userId, localDeviceId);
         forceGlobalLogout("Sesión cerrada correctamente.");
     });
-});
+}
+
+// 🌉 MECANISMO DEFENSIVO DE ATRAJE DE DOM
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', executeAuthCoreBinding);
+} else {
+    executeAuthCoreBinding(); // Si el DOM ya cargó, se ejecuta inmediatamente
+}
