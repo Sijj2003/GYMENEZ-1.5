@@ -27,105 +27,86 @@
             position: absolute;
             inset: 0;
             z-index: 0;
-            transform: scale(1.1);
-            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(1.05);
+            transition: transform 3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         body.loaded .parallax-bg { transform: scale(1); }
 
         .parallax-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(3,3,5,0.9) 0%, rgba(3,3,5,0.7) 50%, rgba(3,3,5,0.95) 100%);
+            background: radial-gradient(circle at center, rgba(3,3,5,0.7) 0%, rgba(3,3,5,0.95) 100%);
             z-index: 1;
         }
 
         .glass-panel {
-            background: rgba(10, 10, 15, 0.45);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             opacity: 0;
             transform: translateY(20px);
-            filter: blur(10px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        body.loaded .glass-panel { opacity: 1; transform: translateY(0); filter: blur(0); }
+        body.loaded .glass-panel { opacity: 1; transform: translateY(0); }
 
         .glass-input {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s ease;
         }
         .glass-input:focus {
             border-color: #FFC300;
-            box-shadow: 0 0 15px rgba(255, 195, 0, 0.2);
-            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 0 1px #FFC300, 0 0 15px rgba(255, 195, 0, 0.1);
+            background: rgba(0, 0, 0, 0.7);
             outline: none;
         }
 
         .btn-gold {
-            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
+            background: #FFC300;
             color: #000;
             font-weight: 900;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s ease;
         }
         .btn-gold:hover {
+            background: #eab308;
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(255, 195, 0, 0.35);
+            box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
         }
+        .btn-gold:active { transform: translateY(0); }
 
-        .kinetic-orb {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,195,0,0.15) 0%, transparent 70%);
-        }
-        .kinetic-ring {
-            position: absolute;
-            inset: 0;
-            border: 2px solid transparent;
-            border-top-color: #FFC300;
-            border-radius: 50%;
-            animation: spinRing 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-            filter: drop-shadow(0 0 8px #FFC300);
-        }
-        .kinetic-ring-inner {
-            position: absolute;
-            inset: 10px;
-            border: 1.5px solid transparent;
-            border-bottom-color: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            animation: spinRingInverse 1.5s linear infinite;
-        }
-        @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes spinRingInverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        /* Indicador de Progreso Premium */
+        .progress-container { display: flex; gap: 8px; width: 100%; margin-bottom: 2rem; }
+        .step-segment { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; transition: all 0.5s ease; }
+        .step-segment.active { background: #FFC300; box-shadow: 0 0 10px rgba(255,195,0,0.4); }
 
-        .step-dot {
-            width: 33.33%;
-            height: 3px;
-            background: rgba(255,255,255,0.05);
-            transition: all 0.5s ease;
-        }
-        .step-dot.active { background: #FFC300; box-shadow: 0 0 10px rgba(255,195,0,0.5); }
+        /* Cinemática */
+        .kinetic-orb { position: relative; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(255,195,0,0.1) 0%, transparent 70%); }
+        .kinetic-ring { position: absolute; inset: 0; border: 2px solid transparent; border-top-color: #FFC300; border-radius: 50%; animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        .kinetic-ring-inner { position: absolute; inset: 10px; border: 1px solid transparent; border-bottom-color: rgba(255, 255, 255, 0.5); border-radius: 50%; animation: spinReverse 1s linear infinite; }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spinReverse { 100% { transform: rotate(-360deg); } }
 
-        #preloader {
-            position: fixed;
-            inset: 0;
-            background: #030305;
-            z-index: 10000;
-            transition: opacity 1s ease;
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #preloader { position: fixed; inset: 0; background: #030305; z-index: 10000; transition: opacity 0.8s ease; }
+        
+        /* Animaciones de Formulario */
+        .step-container { transition: opacity 0.4s ease, transform 0.4s ease; }
+        .step-hidden-right { opacity: 0; transform: translateX(30px); pointer-events: none; position: absolute; width: 100%; }
+        .step-hidden-left { opacity: 0; transform: translateX(-30px); pointer-events: none; position: absolute; width: 100%; }
+        .step-active { opacity: 1; transform: translateX(0); position: relative; pointer-events: auto; }
+        
+        /* Ocultar flechas en inputs numéricos */
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="selection:bg-[#FFC300] selection:text-black min-h-screen relative flex flex-col justify-between">
     
     <div id="preloader"></div>
 
-    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 opacity-0 z-[9999] transition-all duration-500"></div>
+    <div id="message-box" class="fixed top-6 left-1/2 transform -translate-x-1/2 opacity-0 z-[9999] transition-all duration-400"></div>
 
     <div class="parallax-bg"></div>
     <div class="parallax-overlay"></div>
@@ -136,86 +117,89 @@
             <span class="text-white font-[900] text-2xl md:text-3xl italic tracking-tighter">ENEZ</span>
         </div>
         
-        <div class="flex items-center gap-5 md:gap-6">
-            <a href="/index.html" class="text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase whitespace-nowrap">Regresar</a>
-            <a href="login.html" class="border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black px-5 py-2 rounded-full text-[10px] font-black tracking-widest transition-all uppercase whitespace-nowrap">Ingresar</a>
+        <div class="flex items-center gap-6">
+            <a href="login.html" class="text-[11px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase">Ya tengo cuenta</a>
         </div>
     </nav>
 
-    <main id="register-container" class="relative z-10 w-full flex-grow flex items-center justify-center p-4 md:p-8">
-        <div class="glass-panel p-6 md:p-10 w-full max-w-xl rounded-[28px] md:rounded-[36px] flex flex-col justify-between relative overflow-hidden min-h-[480px]">
+    <main id="register-container" class="relative z-10 w-full flex-grow flex items-center justify-center p-4">
+        <div class="glass-panel p-8 md:p-10 w-full max-w-lg rounded-[24px] flex flex-col relative overflow-hidden">
             
-            <div class="absolute top-0 left-0 w-full flex">
-                <div id="dot-1" class="step-dot active"></div>
-                <div id="dot-2" class="step-dot"></div>
-                <div id="dot-3" class="step-dot"></div>
+            <div class="progress-container">
+                <div id="seg-1" class="step-segment active"></div>
+                <div id="seg-2" class="step-segment"></div>
+                <div id="seg-3" class="step-segment"></div>
             </div>
 
-            <div class="text-center mb-8 mt-4">
-                <h1 id="register-title" class="text-2xl md:text-3xl font-[900] text-white uppercase tracking-tighter transition-all duration-300">Identidad Base</h1>
-                <p id="register-subtitle" class="text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] mt-1.5">Paso 1 de 3 • Datos de Cuenta</p>
+            <div class="mb-8">
+                <h1 id="register-title" class="text-2xl md:text-3xl font-[900] text-white uppercase tracking-tighter">Identidad Base</h1>
+                <p id="register-subtitle" class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Paso 1 de 3 • Datos de Cuenta</p>
             </div>
 
-            <form id="multi-step-form" class="flex-grow flex flex-col justify-between">
+            <form id="multi-step-form" class="relative min-h-[300px]">
                 
-                <div id="step-section-1" class="space-y-5 transition-all duration-500">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div id="step-section-1" class="step-container step-active space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nombre</label>
-                            <input type="text" id="reg-name" required class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Carlos">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Nombre</label>
+                            <input type="text" id="reg-name" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm uppercase font-bold placeholder-gray-600" placeholder="Ej. Carlos">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Apellido</label>
-                            <input type="text" id="reg-lastname" required class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs uppercase font-bold" placeholder="Ej. Mendoza">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Apellido</label>
+                            <input type="text" id="reg-lastname" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm uppercase font-bold placeholder-gray-600" placeholder="Ej. Mendoza">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Correo Electrónico Verificado</label>
-                        <input type="email" id="reg-email" required class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs font-medium" placeholder="atleta@gymenez.com">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Correo Electrónico</label>
+                        <input type="email" id="reg-email" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm font-medium placeholder-gray-600" placeholder="atleta@gymenez.com">
                     </div>
-                    <div class="pt-6">
-                        <button type="button" onclick="goToStep(2)" class="w-full btn-gold py-4 md:py-5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Continuar</button>
+                    <div class="pt-4">
+                        <button type="button" onclick="goToStep(2)" class="w-full btn-gold py-4 rounded-xl text-[11px] uppercase tracking-[0.2em] shadow-lg">Siguiente Paso</button>
                     </div>
                 </div>
 
-                <div id="step-section-2" class="hidden opacity-0 space-y-5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div id="step-section-2" class="step-container step-hidden-right space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nacimiento</label>
-                            <input type="text" id="reg-dob" required class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs font-mono" placeholder="DD/MM/YYYY" maxlength="10">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Nacimiento</label>
+                            <input type="text" id="reg-dob" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm font-mono placeholder-gray-600" placeholder="DD/MM/YYYY" maxlength="10">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Sexo Biológico</label>
-                            <select id="reg-sex" class="w-full glass-input px-5 py-4 rounded-xl text-white text-xs font-bold appearance-none cursor-pointer">
-                                <option value="" disabled selected>Seleccionar...</option>
-                                <option value="Hombre">Hombre</option>
-                                <option value="Mujer">Mujer</option>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Sexo Biológico</label>
+                            <select id="reg-sex" class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm font-bold appearance-none cursor-pointer">
+                                <option value="" disabled selected class="text-gray-500">Seleccionar...</option>
+                                <option value="Hombre" class="text-black">Hombre</option>
+                                <option value="Mujer" class="text-black">Mujer</option>
                             </select>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">WhatsApp</label>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Teléfono (WhatsApp)</label>
                         <div class="flex gap-2">
-                            <select id="reg-phone-prefix" class="w-24 px-2 py-4 rounded-xl glass-input text-white text-xs font-bold text-center cursor-pointer">
-                                <option value="0414">0414</option><option value="0424">0424</option><option value="0412">0412</option><option value="0416">0416</option><option value="0426">0426</option>
+                            <select id="reg-phone-prefix" class="w-24 px-2 py-3.5 rounded-xl glass-input text-white text-sm font-bold text-center cursor-pointer">
+                                <option value="0414" class="text-black">0414</option>
+                                <option value="0424" class="text-black">0424</option>
+                                <option value="0412" class="text-black">0412</option>
+                                <option value="0416" class="text-black">0416</option>
+                                <option value="0426" class="text-black">0426</option>
                             </select>
-                            <input type="text" id="reg-phone-num" required class="flex-1 glass-input px-5 py-4 rounded-xl text-white text-xs" placeholder="7654321" maxlength="7">
+                            <input type="tel" id="reg-phone-num" required class="flex-1 glass-input px-4 py-3.5 rounded-xl text-white text-sm placeholder-gray-600" placeholder="7654321" maxlength="7">
                         </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3 pt-6">
-                        <button type="button" onclick="goToStep(1)" class="bg-white/5 border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition py-4 md:py-5">Atrás</button>
-                        <button type="button" onclick="goToStep(3)" class="col-span-2 btn-gold py-4 md:py-5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Continuar</button>
-                    </div>
-                </div>
-
-                <div id="step-section-3" class="hidden opacity-0 space-y-6">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] text-center mb-4">Define tu Clave Secreta</label>
-                        <input type="password" id="reg-password" minlength="6" maxlength="15" required class="w-full glass-input px-5 py-5 rounded-xl text-white text-center text-xl font-mono tracking-[0.5em]" placeholder="••••••">
                     </div>
                     <div class="grid grid-cols-3 gap-3 pt-4">
-                        <button type="button" onclick="goToStep(2)" class="bg-white/5 border border-white/10 text-white font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-white/10 transition py-4 md:py-5">Atrás</button>
-                        <button type="submit" id="reg-submit-btn" class="col-span-2 btn-gold py-4 md:py-5 rounded-xl text-[10px] uppercase tracking-[0.25em]">Activar Perfil</button>
+                        <button type="button" onclick="goToStep(1)" class="bg-white/5 border border-white/10 text-gray-300 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 hover:text-white transition py-4">Atrás</button>
+                        <button type="button" onclick="goToStep(3)" class="col-span-2 btn-gold py-4 rounded-xl text-[11px] uppercase tracking-[0.2em] shadow-lg">Siguiente Paso</button>
+                    </div>
+                </div>
+
+                <div id="step-section-3" class="step-container step-hidden-right space-y-6">
+                    <div class="pt-4">
+                        <label class="block text-[11px] font-black text-gray-300 uppercase tracking-[0.2em] text-center mb-4">Define tu Clave Secreta</label>
+                        <input type="password" id="reg-password" minlength="6" maxlength="15" required class="w-full glass-input px-4 py-4 rounded-xl text-white text-center text-2xl font-mono tracking-[0.4em] placeholder-gray-700" placeholder="••••••">
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 pt-4">
+                        <button type="button" onclick="goToStep(2)" class="bg-white/5 border border-white/10 text-gray-300 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 hover:text-white transition py-4">Atrás</button>
+                        <button type="submit" id="reg-submit-btn" class="col-span-2 btn-gold py-4 rounded-xl text-[11px] uppercase tracking-[0.2em] shadow-lg">Activar Perfil</button>
                     </div>
                 </div>
 
@@ -223,51 +207,44 @@
         </div>
     </main>
 
-    <div id="setup-screen" class="fixed inset-0 bg-[#030305] z-[5000] hidden flex flex-col items-center justify-center p-6 text-center transition-all duration-1000 opacity-0">
-        <div class="kinetic-orb mb-12 flex items-center justify-center scale-125">
+    <div id="setup-screen" class="fixed inset-0 bg-[#030305] z-[5000] hidden flex flex-col items-center justify-center p-6 text-center transition-opacity duration-1000 opacity-0">
+        <div class="kinetic-orb mb-10 flex items-center justify-center scale-110">
             <div class="kinetic-ring"></div>
             <div class="kinetic-ring-inner"></div>
-            <div class="w-3 h-3 bg-[#FFC300] rounded-full shadow-[0_0_15px_#FFC300]"></div>
+            <div class="w-2 h-2 bg-[#FFC300] rounded-full shadow-[0_0_15px_#FFC300]"></div>
         </div>
-        <h2 id="setup-message" class="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter max-w-lg transition-all duration-700 transform scale-95 opacity-0 filter blur-[6px]">Iniciando</h2>
-        <p class="text-gray-600 text-[9px] font-black uppercase tracking-[0.5em] mt-8">Ecosistema GYMENEZ PERFORMANCE</p>
+        <h2 id="setup-message" class="text-xl md:text-3xl font-[900] text-white uppercase tracking-tighter transition-all duration-500 opacity-0 transform translate-y-2">Iniciando</h2>
+        <p class="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em] mt-8">Ecosistema GYMENEZ</p>
     </div>
-
-    <footer class="relative z-10 py-8 text-center border-t border-white/5 opacity-40 transition-all duration-1000 delay-500" id="main-footer">
-        <p class="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-600">© 2026 GYMENEZ PERFORMANCE • TU MEJOR VERSIÓN</p>
-    </footer>
 
     <script type="module" src="/static/js/auth/auth_main.js"></script>
 
     <script>
-        // Remover Preloader
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
-            const nav = document.getElementById('main-nav');
-            const footer = document.getElementById('main-footer');
-
             preloader.style.opacity = '0';
             setTimeout(() => {
                 preloader.style.display = 'none';
                 document.body.classList.add('loaded');
                 document.body.style.overflow = 'auto';
-                
-                nav.classList.remove('opacity-0', '-translate-y-4');
-                footer.classList.remove('opacity-0');
-            }, 1000);
+                document.getElementById('main-nav').classList.remove('opacity-0', '-translate-y-4');
+                document.getElementById('reg-name').focus(); // Auto-focus inicial
+            }, 800);
         });
 
-        // Lógica Visual de Pasos
         let activeStep = 1;
 
         function showLocalFeedback(message) {
             const box = document.getElementById('message-box');
             if(!box) return;
             box.textContent = message;
-            box.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-full text-[10px] font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-400 text-center border backdrop-blur-md w-11/12 max-w-[360px] bg-red-950/80 text-red-400 border-red-500/30';
+            box.className = 'fixed top-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl text-[10px] font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-300 text-center border bg-red-950/90 text-red-400 border-red-500/30 backdrop-blur-md whitespace-nowrap';
             box.style.opacity = '1';
             box.style.transform = 'translate(-50%, 0)';
-            setTimeout(() => { box.style.opacity = '0'; box.style.transform = 'translate(-50%, -20px)'; }, 4000);
+            setTimeout(() => { 
+                box.style.opacity = '0'; 
+                box.style.transform = 'translate(-50%, -10px)'; 
+            }, 3500);
         }
 
         function validateFields(step) {
@@ -276,7 +253,7 @@
                 const lastname = document.getElementById('reg-lastname').value.trim();
                 const email = document.getElementById('reg-email').value.trim();
                 if (!name || !lastname || !email || !document.getElementById('reg-email').checkValidity()) {
-                    showLocalFeedback("Completa tus datos con un correo electrónico válido.");
+                    showLocalFeedback("Completa tus datos básicos correctamente.");
                     return false;
                 }
             }
@@ -285,7 +262,7 @@
                 const sex = document.getElementById('reg-sex').value;
                 const phone = document.getElementById('reg-phone-num').value.trim();
                 if (dob.length !== 10 || !sex || phone.length < 7) {
-                    showLocalFeedback("Ingresa una fecha válida y tu número móvil completo.");
+                    showLocalFeedback("Fecha de nacimiento o móvil inválidos.");
                     return false;
                 }
             }
@@ -298,42 +275,61 @@
             const currentSection = document.getElementById(`step-section-${activeStep}`);
             const nextSection = document.getElementById(`step-section-${nextStep}`);
             
-            currentSection.style.opacity = '0';
-            currentSection.style.transform = nextStep > activeStep ? 'translateX(-20px)' : 'translateX(20px)';
-            document.getElementById(`dot-${activeStep}`).classList.remove('active');
+            // Asignar clases de salida
+            currentSection.className = `step-container space-y-5 ${nextStep > activeStep ? 'step-hidden-left' : 'step-hidden-right'}`;
+            document.getElementById(`seg-${activeStep}`).classList.remove('active');
 
+            // Preparar y mostrar nueva sección
+            nextSection.className = 'step-container step-active space-y-5';
+            document.getElementById(`seg-${nextStep}`).classList.add('active');
+            
+            // Actualizar Textos
+            const titles = { 1: "Identidad Base", 2: "Biometría Básica", 3: "Seguridad" };
+            document.getElementById('register-title').textContent = titles[nextStep];
+            document.getElementById('register-subtitle').textContent = `Paso ${nextStep} de 3 • ${nextStep === 2 ? 'Fisiología' : 'Acceso'}`;
+            
+            activeStep = nextStep;
+
+            // UX Premium: Auto-focus en el primer input del nuevo paso
             setTimeout(() => {
-                currentSection.classList.add('hidden');
-                nextSection.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    nextSection.style.opacity = '1';
-                    nextSection.style.transform = 'translateX(0)';
-                    document.getElementById(`dot-${nextStep}`).classList.add('active');
-                    
-                    const titles = { 1: "Identidad Base", 2: "Biometría Básica", 3: "Seguridad" };
-                    document.getElementById('register-title').textContent = titles[nextStep];
-                    document.getElementById('register-subtitle').textContent = `Paso ${nextStep} de 3`;
-                    activeStep = nextStep;
-                }, 50);
+                if(activeStep === 2) document.getElementById('reg-dob').focus();
+                if(activeStep === 3) document.getElementById('reg-password').focus();
             }, 400);
         };
 
-        // Secuencia Cinematográfica expuesta para auth_main.js
+        // 🛡️ INTERCEPTOR DEL TECLADO (Solución al "Enter noob")
+        document.getElementById('multi-step-form').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Detiene el envío por defecto del navegador
+                if (activeStep < 3) {
+                    goToStep(activeStep + 1); // Simula el clic en "Siguiente Paso"
+                } else {
+                    document.getElementById('reg-submit-btn').click(); // Dispara el submit final controlado
+                }
+            }
+        });
+
+        // ==========================================
+        // 🎬 CINEMÁTICA EXPUESTA AL MÓDULO AUTH_MAIN
+        // ==========================================
         window.triggerCinematicSetup = function(name) {
             const container = document.getElementById('register-container');
             const setup = document.getElementById('setup-screen');
 
+            // Desvanecer el formulario principal
+            container.style.transition = 'all 0.6s ease';
             container.style.opacity = '0';
-            container.style.transform = 'scale(0.95)';
+            container.style.transform = 'scale(0.95) translateY(20px)';
 
             setTimeout(() => {
                 container.classList.add('hidden');
                 setup.classList.remove('hidden');
+                
+                // Mostrar cinemática
                 setTimeout(() => {
                     setup.classList.remove('opacity-0');
                     runSequence(name);
-                }, 100);
+                }, 50);
             }, 600);
         };
 
@@ -341,22 +337,27 @@
             const steps = [
                 { text: `Hola, ${name}`, time: 0 },
                 { text: "Creando tu perfil en el Núcleo...", time: 1800 },
-                { text: "Estructurando tu entrenamiento...", time: 3600 },
+                { text: "Estructurando tu fisiología...", time: 3600 },
                 { text: "Asegurando tu acceso...", time: 5400 },
                 { text: "¡Bienvenido a la Élite!", time: 7200 }
             ];
 
+            const msgElement = document.getElementById('setup-message');
+
             steps.forEach(s => {
                 setTimeout(() => {
-                    document.getElementById('setup-message').classList.add('opacity-0', 'blur-[6px]');
+                    msgElement.classList.remove('opacity-100', 'translate-y-0');
+                    msgElement.classList.add('opacity-0', 'translate-y-2');
+                    
                     setTimeout(() => {
-                        document.getElementById('setup-message').textContent = s.text;
-                        document.getElementById('setup-message').classList.remove('opacity-0', 'blur-[6px]');
-                        document.getElementById('setup-message').classList.add('opacity-100', 'blur-0');
-                    }, 300);
+                        msgElement.textContent = s.text;
+                        msgElement.classList.remove('opacity-0', 'translate-y-2');
+                        msgElement.classList.add('opacity-100', 'translate-y-0');
+                    }, 300); // Tiempo del fade out
                 }, s.time);
             });
 
+            // Redirección final
             setTimeout(() => window.location.href = 'login.html', 8800);
         }
     </script>
