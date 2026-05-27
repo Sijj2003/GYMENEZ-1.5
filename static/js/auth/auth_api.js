@@ -46,11 +46,12 @@ export async function apiVerifyOTP(email, code) {
 }
 
 // ==========================================
-// 🛡️ REFORZADO: SOLICITAR CÓDIGO DE ESCUDO
+// 🛡️ CORREGIDO: SOLICITAR CÓDIGO DE ESCUDO (SIN /AUTH)
 // ==========================================
 export async function apiRequestShieldCode(email, password) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/request_force_code`, {
+        // Quitamos /auth/ para acoplarnos al prefijo real del Blueprint
+        const response = await fetch(`${API_BASE_URL}/api/request_force_code`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -61,7 +62,6 @@ export async function apiRequestShieldCode(email, password) {
             const data = await response.json();
             return { ok: response.ok, data };
         } else {
-            // Si el servidor responde con HTML (Error 404 o 500), evitamos el crash
             console.error(`🚨 Servidor respondió con código ${response.status} sin formato JSON.`);
             return { ok: false, data: { error: `Error de ruta o servidor (${response.status}).` } };
         }
@@ -72,11 +72,12 @@ export async function apiRequestShieldCode(email, password) {
 }
 
 // ==========================================
-// 🛡️ REFORZADO: VERIFICAR CÓDIGO DE ESCUDO
+// 🛡️ CORREGIDO: VERIFICAR CÓDIGO DE ESCUDO (SIN /AUTH)
 // ==========================================
 export async function apiVerifyShieldCode(email, code, deviceId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/verify_force_logout`, {
+        // Quitamos /auth/ para acoplarnos al prefijo real del Blueprint
+        const response = await fetch(`${API_BASE_URL}/api/verify_force_logout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, code, deviceId })
@@ -93,17 +94,5 @@ export async function apiVerifyShieldCode(email, code, deviceId) {
     } catch (e) {
         console.error("Fallo de red crítico:", e);
         return { ok: false, data: { error: "No hay conexión con el servidor perimetral." } };
-    }
-}
-
-export async function apiLogout(userId, deviceId) {
-    try {
-        await fetch(`${API_BASE_URL}/api/logout`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ userId, deviceId })
-        });
-    } catch (e) {
-        console.error("Error al cerrar sesión", e);
     }
 }
