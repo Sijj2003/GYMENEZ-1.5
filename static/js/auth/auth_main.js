@@ -2,9 +2,9 @@
 
 import { setupFetchInterceptor } from '../core/api.js';
 import { localDeviceId, AUTH_TOKEN_KEY, startSmartSessionWatcher, forceGlobalLogout } from '../core/session.js';
-import { showMessage, showForceLogoutMessage, openModalSafe, closeModalSafe } from '../utils/ui.js';
+import { showMessage, openModalSafe, closeModalSafe } from '../utils/ui.js';
 import { applyDateMask, applyCIMask, applyPhoneMask } from '../utils/masks.js';
-import { apiLogin, apiRegister, apiVerifyOTP, apiRequestShieldCode, apiVerifyShieldCode, apiLogout } from './auth_api.js';
+import { apiLogin, apiRegister, apiVerifyOTP, apiLogout } from './auth_api.js';
 
 // Inicializar interceptor de red global
 setupFetchInterceptor();
@@ -15,7 +15,7 @@ setupFetchInterceptor();
 
 async function handleLoginSubmit(e) {
     e.preventDefault();
-    const email = document.getElementById('login-email').value;
+    const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = document.getElementById('login-btn');
 
@@ -35,20 +35,38 @@ async function handleLoginSubmit(e) {
             return;
         }
         
-        if (response.is_session_active || (response.error && response.error.includes('Sesión activa'))) {
+        // 🛡️ ESCÁNER INTELIGENTE REFORZADO (Caso-Insensible y Tolerante a Keywords del Backend)
+        const errorText = (response.error || '').toLowerCase();
+        const isSessionActive = response.is_session_active || 
+                                errorText.includes('sesión activa') || 
+                                errorText.includes('sesion activa') || 
+                                errorText.includes('activa') || 
+                                errorText.includes('dispositivo') ||
+                                errorText.includes('abierta') ||
+                                errorText.includes('duplicada');
+
+        if (isSessionActive) {
             openModalSafe('active-session-modal');
-            document.getElementById('modal-options').classList.remove('hidden');
-            document.getElementById('force-logout-form').classList.add('hidden');
-            document.getElementById('force-email').value = email;
-            showForceLogoutMessage(''); 
+            
+            const modalOptions = document.getElementById('modal-options');
+            const forceLogoutForm = document.getElementById('force-logout-form');
+            const forceEmailInput = document.getElementById('force-email');
+            const forceLogoutMsg = document.getElementById('force-logout-msg');
+
+            if (modalOptions) modalOptions.classList.remove('hidden');
+            if (forceLogoutForm) forceLogoutForm.classList.add('hidden');
+            if (forceEmailInput) forceEmailInput.value = email;
+            if (forceLogoutMsg && response.error) {
+                forceLogoutMsg.textContent = response.error;
+            }
             return;
         }
         
-        if (response.error && response.error.includes('bloqueada')) {
+        if (errorText.includes('bloqueada') || errorText.includes('suspendida') || errorText.includes('intentos')) {
             openModalSafe('block-modal');
             setTimeout(() => closeModalSafe('block-modal'), 10000); 
         } else {
-            showMessage(response.error, 'error');
+            showMessage(response.error || 'Credenciales incorrectas.', 'error');
         }
         return;
     } 
@@ -96,7 +114,6 @@ async function handleRegisterSubmit(e) {
 
     const res = await apiRegister(data);
     if (res.success) {
-        // Asumiendo que `triggerCinematicSetup` es global en register.html
         if (typeof window.triggerCinematicSetup === 'function') {
             window.triggerCinematicSetup(data.name.toUpperCase());
         } else {
@@ -113,7 +130,6 @@ async function handleRegisterSubmit(e) {
 // INICIALIZACIÓN DEL DOM
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-    // Si estamos en una página autenticada, iniciamos el vigilante de sesión
     startSmartSessionWatcher();
 
     const isLoginScreen = document.getElementById('login-screen') !== null;
@@ -122,27 +138,22 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Atar Formularios
     document.getElementById('login-form')?.addEventListener('submit', handleLoginSubmit);
     
-    // Atar el botón final de Registro
-    const regBtn = document.getElementById('reg-submit-btn');
-    if (regBtn) {
-        regBtn.addEventListener('click', handleRegisterSubmit);
-    }
-
-    // Prevenir que la tecla ENTER recargue la página en los pasos 1 y 2
     const regForm = document.getElementById('multi-step-form');
     if (regForm) {
         regForm.addEventListener('submit', (e) => e.preventDefault());
     }
 
-    // Atar Máscaras
+    const regBtn = document.getElementById('reg-submit-btn');
+    if (regBtn) {
+        regBtn.addEventListener('click', handleRegisterSubmit);
+    }
+
     document.getElementById('reg-dob')?.addEventListener('input', applyDateMask);
     document.getElementById('reg-ci')?.addEventListener('input', applyCIMask);
     document.getElementById('reg-phone-num')?.addEventListener('input', applyPhoneMask);
 
-    // Atar Botón de Logout Global
     document.getElementById('logout-button')?.addEventListener('click', async (e) => {
         e.target.disabled = true;
         const user = JSON.parse(localStorage.getItem('userSession') || '{}');
