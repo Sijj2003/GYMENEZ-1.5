@@ -125,11 +125,16 @@ window.addEventListener('DOMContentLoaded', () => {
     // Atar Formularios
     document.getElementById('login-form')?.addEventListener('submit', handleLoginSubmit);
     
-    // Si usas el multi-step form de registro y tienes un botón final:
-    const regBtn = document.querySelector('button[onclick="processSecureRegistration()"]');
+    // Atar el botón final de Registro
+    const regBtn = document.getElementById('reg-submit-btn');
     if (regBtn) {
-        regBtn.removeAttribute('onclick'); // Limpiamos la vieja función global
         regBtn.addEventListener('click', handleRegisterSubmit);
+    }
+
+    // Prevenir que la tecla ENTER recargue la página en los pasos 1 y 2
+    const regForm = document.getElementById('multi-step-form');
+    if (regForm) {
+        regForm.addEventListener('submit', (e) => e.preventDefault());
     }
 
     // Atar Máscaras
