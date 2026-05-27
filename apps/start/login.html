@@ -99,10 +99,10 @@
     <div class="parallax-overlay"></div>
 
     <nav class="relative w-full z-40 py-6 px-6 md:px-12 flex justify-between items-center bg-transparent transition-all duration-1000 delay-300 opacity-0 transform -translate-y-4" id="main-nav">
-        <div class="flex items-center cursor-pointer group" onclick="window.location.href='/index.html'">
+        <a href="/index.html" class="flex items-center cursor-pointer group">
             <span class="text-[#FFC300] font-[900] text-2xl md:text-3xl italic tracking-tighter">GYM</span>
             <span class="text-white font-[900] text-2xl md:text-3xl italic tracking-tighter">ENEZ</span>
-        </div>
+        </a>
         
         <div class="flex items-center gap-5 md:gap-6">
             <a href="/index.html" class="text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase whitespace-nowrap">Regresar</a>
@@ -139,14 +139,14 @@
         <div class="glass-modal p-6 md:p-8 rounded-[24px] w-full max-w-sm text-center space-y-5">
             <div class="text-2xl">✉️</div>
             <h3 class="text-lg font-black text-white uppercase tracking-tight">Activación de Cuenta</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">Tu perfil requiere verificación inicial. Ingresa el código numérico de 6 dígitos enviado a tu correo.</p>
+            <p class="text-xs text-gray-400 leading-relaxed">Tu perfil requiere verificación inicial. Ingresa el código de 6 dígitos enviado a tu correo electrónico.</p>
             
             <form id="activation-form" class="space-y-4">
                 <input type="hidden" id="activation-email">
                 <input type="text" id="activation-code" maxlength="6" class="w-full glass-input py-4 rounded-xl text-center text-2xl font-mono tracking-[0.5em] text-[#FFC300]" placeholder="000000" required>
                 <button type="submit" id="activation-submit-btn" class="w-full btn-gold py-3.5 rounded-xl text-[10px] uppercase tracking-widest">Verificar Token</button>
             </form>
-            <button onclick="closeModalSafe('activation-modal')" class="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-wider transition">Cancelar</button>
+            <button id="btn-cancel-activation" type="button" class="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-wider transition">Cancelar</button>
         </div>
     </div>
 
@@ -154,16 +154,16 @@
         <div class="glass-modal p-6 md:p-8 rounded-[24px] w-full max-w-md text-center space-y-5">
             <div class="text-2xl text-red-500">🛡️</div>
             <h3 class="text-lg font-black text-white uppercase tracking-tight">Escudo de Dispositivo Activo</h3>
-            <p id="force-logout-msg" class="text-xs text-gray-400 leading-relaxed">Detectamos una sesión activa en otro terminal. Por seguridad, no permitimos accesos simultáneos.</p>
+            <p id="force-logout-msg" class="text-xs text-gray-400 leading-relaxed">Detectamos una sesión activa en otro terminal. Por seguridad perimetral, no permitimos conexiones simultáneas.</p>
             
             <div id="modal-options" class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="closeModalSafe('active-session-modal')" class="bg-white/5 border border-white/10 text-gray-300 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 hover:text-white transition py-4">Mantener Antigua</button>
-                <button onclick="triggerRequestShieldCode()" class="btn-gold py-4 rounded-xl text-[10px] uppercase tracking-widest shadow-lg">Cerrar la Otra</button>
+                <button id="btn-keep-old" type="button" class="bg-white/5 border border-white/10 text-gray-300 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 hover:text-white transition py-4">Mantener Antigua</button>
+                <button id="btn-force-logout-request" type="button" class="btn-gold py-4 rounded-xl text-[10px] uppercase tracking-widest shadow-lg">Cerrar la Otra</button>
             </div>
 
             <form id="force-logout-form" class="space-y-4 hidden transition-all duration-300">
                 <input type="hidden" id="force-email">
-                <p class="text-[10px] text-[#FFC300] font-black uppercase tracking-wider">Se envió un código de autorización a tu correo</p>
+                <p class="text-[10px] text-[#FFC300] font-black uppercase tracking-wider animate-pulse">Código de seguridad enviado a tu casilla</p>
                 <input type="text" id="force-code" maxlength="6" class="w-full glass-input py-4 rounded-xl text-center text-2xl font-mono tracking-[0.5em] text-[#FFC300]" placeholder="000000" required>
                 <button type="submit" id="force-submit-btn" class="w-full btn-gold py-3.5 rounded-xl text-[10px] uppercase tracking-widest">Ejecutar Desconexión</button>
             </form>
@@ -174,7 +174,7 @@
         <div class="glass-modal p-8 rounded-[24px] w-full max-w-sm text-center space-y-4 border-red-500/20">
             <div class="text-3xl animate-bounce">🚨</div>
             <h3 class="text-lg font-black text-red-400 uppercase tracking-tight">Acceso Suspendido</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">Múltiples intentos fallidos detectados desde tu dirección IP. Tu cuenta ha sido congelada temporalmente por 60 segundos por políticas perimetrales de seguridad.</p>
+            <p class="text-xs text-gray-400 leading-relaxed">Múltiples intentos fallidos detectados desde tu dirección IP. Tu cuenta ha sido congelada temporalmente por 60 segundos por seguridad.</p>
             <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden mt-4">
                 <div class="h-full bg-red-500" style="width: 100%"></div>
             </div>
@@ -182,7 +182,7 @@
     </div>
 
     <footer class="relative z-10 py-6 text-center border-t border-white/5 opacity-30" id="main-footer">
-        <p class="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-500">© 2026 GYMENEZ • CRYPTO SECURE HUB</p>
+        <p class="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-500">© 2026 GYMENEZ • NÚCLEO DE ACCESO SEGURO</p>
     </footer>
 
     <script type="module" src="/static/js/auth/auth_main.js"></script>
@@ -192,28 +192,28 @@
         import { showMessage, openModalSafe, closeModalSafe } from '/static/js/utils/ui.js';
         import { localDeviceId, AUTH_TOKEN_KEY } from '/static/js/core/session.js';
 
-        // Remover Preloader
-        window.addEventListener('load', () => {
-            const preloader = document.getElementById('preloader');
-            preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-                document.body.classList.add('loaded');
-                document.getElementById('main-nav').classList.remove('opacity-0', '-translate-y-4');
-                document.getElementById('login-email').focus();
-            }, 600);
-        });
-
-        // Hacer globales las funciones de cerrado y apertura requeridas por auth_main.js
+        // Puentes globales necesarios para la comunicación con auth_main.js
         window.openModalSafe = openModalSafe;
         window.closeModalSafe = closeModalSafe;
         window.showForceLogoutMessage = function(txt) {
             if(txt) document.getElementById('force-logout-msg').textContent = txt;
         };
 
-        // ==========================================
-        // ✉️ CONTROLADOR: PROCESAR ACTIVACIÓN OTP
-        // ==========================================
+        // Controlador de Preloader y Foco de entrada
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) preloader.style.opacity = '0';
+            setTimeout(() => {
+                if (preloader) preloader.style.display = 'none';
+                document.body.classList.add('loaded');
+                document.getElementById('main-nav').classList.remove('opacity-0', '-translate-y-4');
+                document.getElementById('login-email').focus();
+            }, 600);
+        });
+
+        // ========================================================
+        // ✉️ CONTROLADOR: PROCESAR ACTIVACIÓN DE CUENTA NUEVA (OTP)
+        // ========================================================
         document.getElementById('activation-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('activation-submit-btn');
@@ -227,9 +227,6 @@
                 showMessage("Cuenta Activada con Éxito. Iniciando Sesión...", "success");
                 closeModalSafe('activation-modal');
                 
-                // 🚀 SOLUCIÓN AL ERROR 400 (BAD REQUEST):
-                // En lugar de disparar eventos sintéticos vacíos, esperamos a que el DOM se asiente
-                // y disparamos un .click() físico en el botón principal para arrastrar los valores nativos de los inputs.
                 setTimeout(() => {
                     const mainLoginBtn = document.getElementById('login-btn');
                     if (mainLoginBtn) {
@@ -244,28 +241,35 @@
             }
         });
 
-        // ==========================================
-        // 🛡️ CONTROLADOR: SOLICITAR CÓDIGO DE ESCUDO
-        // ==========================================
-        window.triggerRequestShieldCode = async function() {
+        // ========================================================
+        // 🛡️ CONTROLADOR: SOLICITAR CÓDIGO PARA CIERRE FORZADO
+        // ========================================================
+        async function handleRequestShieldCode() {
             const email = document.getElementById('force-email').value;
             const password = document.getElementById('login-password').value;
 
             showMessage("Solicitando código de desvinculación...", "success");
-            const res = await apiRequestShieldCode(email, password);
+            
+            try {
+                const res = await apiRequestShieldCode(email, password);
 
-            if (res.ok && res.data.success) {
-                document.getElementById('modal-options').classList.add('hidden');
-                document.getElementById('force-logout-form').classList.remove('hidden');
-                document.getElementById('force-code').focus();
-            } else {
-                showMessage(res.data.error || "Error al solicitar código", "error");
+                if (res.ok && res.data && res.data.success) {
+                    // Transición limpia de elementos dentro de la misma ventana modal
+                    document.getElementById('modal-options').classList.add('hidden');
+                    document.getElementById('force-logout-form').classList.remove('hidden');
+                    document.getElementById('force-code').focus();
+                } else {
+                    const errorMsg = res.data ? (res.data.error || res.data.message) : "Error al solicitar código";
+                    showMessage(errorMsg, "error");
+                }
+            } catch (err) {
+                showMessage("Error de comunicación con el servidor perimetral.", "error");
             }
-        };
+        }
 
-        // ==========================================
-        // 🛡️ CONTROLADOR: VERIFICAR ESCUDO Y FORZAR LOGOUT
-        // ==========================================
+        // ========================================================
+        // 🛡️ CONTROLADOR: INYECTAR CÓDIGO Y EXPULSAR SESIÓN ANTIGUA
+        // ========================================================
         document.getElementById('force-logout-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('force-submit-btn');
@@ -274,23 +278,41 @@
 
             btn.disabled = true; btn.textContent = 'EXPULSANDO...';
 
-            const res = await apiVerifyShieldCode(email, code, localDeviceId);
-            if (res.ok && res.data.success) {
-                showMessage("Dispositivo desvinculado. Iniciando sesión...", "success");
-                
-                localStorage.setItem('userSession', JSON.stringify(res.data.user));
-                if (res.data.token) localStorage.setItem(AUTH_TOKEN_KEY, res.data.token);
-                localStorage.setItem('gymen_session_exp', Date.now() + (480 * 60 * 1000));
-                
-                closeModalSafe('active-session-modal');
-                setTimeout(() => window.location.href = '/apps/start/inicio.html', 1200);
-            } else {
-                showMessage(res.data.error || "Código inválido", "error");
+            try {
+                const res = await apiVerifyShieldCode(email, code, localDeviceId);
+                if (res.ok && res.data && res.data.success) {
+                    showMessage("Dispositivo desvinculado. Abriendo canal...", "success");
+                    
+                    // Guardar credenciales de sesión autorizadas
+                    localStorage.setItem('userSession', JSON.stringify(res.data.user));
+                    if (res.data.token) localStorage.setItem(AUTH_TOKEN_KEY, res.data.token);
+                    localStorage.setItem('gymen_session_exp', Date.now() + (480 * 60 * 1000));
+                    
+                    closeModalSafe('active-session-modal');
+                    setTimeout(() => window.location.href = '/apps/start/inicio.html', 1200);
+                } else {
+                    const errorMsg = res.data ? (res.data.error || res.data.message) : "Código inválido o vencido";
+                    showMessage(errorMsg, "error");
+                    btn.disabled = false; btn.textContent = 'Ejecutar Desconexión';
+                }
+            } catch (err) {
+                showMessage("Error de red al procesar desvinculación forzada.", "error");
                 btn.disabled = false; btn.textContent = 'Ejecutar Desconexión';
             }
         });
 
-        // Foco automático en el input del código al abrir modales
+        // Enlace seguro de clics desde JavaScript (Arquitectura desacoplada)
+        document.getElementById('btn-force-logout-request').addEventListener('click', handleRequestShieldCode);
+        
+        document.getElementById('btn-keep-old').addEventListener('click', () => {
+            closeModalSafe('active-session-modal');
+        });
+        
+        document.getElementById('btn-cancel-activation').addEventListener('click', () => {
+            closeModalSafe('activation-modal');
+        });
+
+        // Automatización de enfoque en inputs al abrir modals
         document.getElementById('activation-modal').addEventListener('transitionend', () => {
             if(!document.getElementById('activation-modal').classList.contains('hidden')) {
                 document.getElementById('activation-code').focus();
