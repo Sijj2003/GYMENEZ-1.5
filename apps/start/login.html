@@ -154,7 +154,7 @@
         <div class="glass-modal p-6 md:p-8 rounded-[24px] w-full max-w-md text-center space-y-5">
             <div class="text-2xl text-red-500">🛡️</div>
             <h3 class="text-lg font-black text-white uppercase tracking-tight">Escudo de Dispositivo Activo</h3>
-            <p id="force-logout-msg" class="text-xs text-gray-400 leading-relaxed">Detectamos una sesión activa en otro terminal. Por seguridad, no permitimos accesos simultáneos simultáneos.</p>
+            <p id="force-logout-msg" class="text-xs text-gray-400 leading-relaxed">Detectamos una sesión activa en otro terminal. Por seguridad, no permitimos accesos simultáneos.</p>
             
             <div id="modal-options" class="grid grid-cols-2 gap-3 pt-2">
                 <button onclick="closeModalSafe('active-session-modal')" class="bg-white/5 border border-white/10 text-gray-300 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 hover:text-white transition py-4">Mantener Antigua</button>
@@ -176,7 +176,7 @@
             <h3 class="text-lg font-black text-red-400 uppercase tracking-tight">Acceso Suspendido</h3>
             <p class="text-xs text-gray-400 leading-relaxed">Múltiples intentos fallidos detectados desde tu dirección IP. Tu cuenta ha sido congelada temporalmente por 60 segundos por políticas perimetrales de seguridad.</p>
             <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden mt-4">
-                <div class="h-full bg-red-500 animate-[pulse_1s_infinite]" style="width: 100%"></div>
+                <div class="h-full bg-red-500" style="width: 100%"></div>
             </div>
         </div>
     </div>
@@ -224,16 +224,22 @@
 
             const res = await apiVerifyOTP(email, code);
             if (res.success) {
-                showMessage("Cuenta Activada. Procediendo a login...", "success");
+                showMessage("Cuenta Activada con Éxito. Iniciando Sesión...", "success");
                 closeModalSafe('activation-modal');
+                
+                // 🚀 SOLUCIÓN AL ERROR 400 (BAD REQUEST):
+                // En lugar de disparar eventos sintéticos vacíos, esperamos a que el DOM se asiente
+                // y disparamos un .click() físico en el botón principal para arrastrar los valores nativos de los inputs.
                 setTimeout(() => {
-                    document.getElementById('login-password').value = '';
-                    document.getElementById('login-btn').disabled = false;
-                    document.getElementById('login-btn').textContent = 'Ingresar al Portal';
-                    document.getElementById('login-form').dispatchEvent(new Event('submit'));
-                }, 1500);
+                    const mainLoginBtn = document.getElementById('login-btn');
+                    if (mainLoginBtn) {
+                        mainLoginBtn.disabled = false;
+                        mainLoginBtn.textContent = 'Ingresar al Portal';
+                        mainLoginBtn.click();
+                    }
+                }, 1000);
             } else {
-                showMessage(res.error || "Código inválido", "error");
+                showMessage(res.error || "Código de activación inválido", "error");
                 btn.disabled = false; btn.textContent = 'Verificar Token';
             }
         });
@@ -272,7 +278,6 @@
             if (res.ok && res.data.success) {
                 showMessage("Dispositivo desvinculado. Iniciando sesión...", "success");
                 
-                // Guardar la nueva sesión entregada por el Backend
                 localStorage.setItem('userSession', JSON.stringify(res.data.user));
                 if (res.data.token) localStorage.setItem(AUTH_TOKEN_KEY, res.data.token);
                 localStorage.setItem('gymen_session_exp', Date.now() + (480 * 60 * 1000));
@@ -285,7 +290,7 @@
             }
         });
 
-        // Asegurar foco automático al abrir modales pidiendo códigos
+        // Foco automático en el input del código al abrir modales
         document.getElementById('activation-modal').addEventListener('transitionend', () => {
             if(!document.getElementById('activation-modal').classList.contains('hidden')) {
                 document.getElementById('activation-code').focus();
