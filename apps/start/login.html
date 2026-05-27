@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GYMENEZ | Portal de Acceso</title>
     
-    <link rel="icon" type="image/png" href="static/img/logos/mini_logo.png">
+    <link rel="icon" type="image/png" href="/static/img/logos/mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
@@ -14,13 +14,12 @@
             font-family: 'Inter', sans-serif; 
             background-color: #030305; 
             color: white; 
-            overflow-x: hidden;
+            overflow: hidden;
             min-height: 100vh;
         }
 
-        /* 🚀 FONDO PARALLAX EXCLUSIVO PARA LOGIN (Textura Dark Gym) */
         .parallax-bg {
-            background-image: url('https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=2070');
+            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070');
             background-attachment: fixed;
             background-position: center;
             background-repeat: no-repeat;
@@ -28,294 +27,269 @@
             position: absolute;
             inset: 0;
             z-index: 0;
+            transform: scale(1.05);
+            transition: transform 3s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        body.loaded .parallax-bg { transform: scale(1); }
 
         .parallax-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(3,3,5,0.9) 0%, rgba(3,3,5,0.7) 50%, rgba(3,3,5,0.95) 100%);
+            background: radial-gradient(circle at center, rgba(3,3,5,0.7) 0%, rgba(3,3,5,0.95) 100%);
             z-index: 1;
         }
 
-        /* Glassmorphism Pro de Alta Gama */
         .glass-panel {
-            background: rgba(10, 10, 15, 0.45);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        body.loaded .glass-panel { opacity: 1; transform: translateY(0); }
+
+        .glass-modal {
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
         }
 
         .glass-input {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
+            transition: all 0.3s ease;
         }
-
         .glass-input:focus {
             border-color: #FFC300;
-            box-shadow: 0 0 15px rgba(255, 195, 0, 0.2);
-            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 0 1px #FFC300, 0 0 15px rgba(255, 195, 0, 0.1);
+            background: rgba(0, 0, 0, 0.7);
             outline: none;
         }
 
         .btn-gold {
-            background: linear-gradient(135deg, #FFC300 0%, #eab308 100%);
+            background: #FFC300;
             color: #000;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-weight: 900;
+            transition: all 0.3s ease;
         }
-
         .btn-gold:hover {
+            background: #eab308;
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(255, 195, 0, 0.4);
         }
+        .btn-gold:active { transform: translateY(0); }
 
-        /* 📱 KINETIC CORE ANIMATION (Reemplazo de la "Huella" para el Splash Screen) */
-        .kinetic-orb {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,195,0,0.15) 0%, transparent 70%);
-        }
+        #preloader { position: fixed; inset: 0; background: #030305; z-index: 10000; transition: opacity 0.8s ease; }
         
-        .kinetic-ring {
-            position: absolute;
-            inset: 0;
-            border: 2px solid transparent;
-            border-top-color: #FFC300;
-            border-radius: 50%;
-            animation: spinRing 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-            filter: drop-shadow(0 0 8px #FFC300);
-        }
-
-        .kinetic-ring-inner {
-            position: absolute;
-            inset: 10px;
-            border: 1.5px solid transparent;
-            border-bottom-color: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            animation: spinRingInverse 1.5s linear infinite;
-        }
-
-        @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes spinRingInverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
-
-        /* Message Box superior flotante */
-        #message-box {
-            position: fixed;
-            top: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .animate-premium-in { animation: premiumReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes premiumReveal {
-            0% { opacity: 0; filter: blur(10px); transform: scale(0.97) translateY(15px); }
-            100% { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); }
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="selection:bg-[#FFC300] selection:text-black overflow-x-hidden min-h-screen relative flex flex-col justify-between">
+<body class="selection:bg-[#FFC300] selection:text-black min-h-screen relative flex flex-col justify-between">
+    
+    <div id="preloader"></div>
 
-    <div id="splash-screen" class="fixed inset-0 z-[5000] bg-[#030305] flex flex-col items-center justify-center transition-all duration-1000">
-        <div class="kinetic-orb mb-10 flex items-center justify-center scale-110 md:scale-125">
-            <div class="kinetic-ring"></div>
-            <div class="kinetic-ring-inner"></div>
-            <div class="w-3 h-3 bg-[#FFC300] rounded-full shadow-[0_0_15px_#FFC300]"></div>
-        </div>
-        <h2 id="splash-text" class="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-[0.5em] opacity-0 transition-all duration-1000 filter blur-[4px]">
-            Iniciando Core
-        </h2>
-    </div>
-
-    <div id="message-box"></div>
+    <div id="message-box" class="fixed top-8 left-1/2 transform -translate-x-1/2 opacity-0 z-[9999] transition-all duration-300 text-center border px-6 py-3 rounded-xl text-[10px] font-black tracking-widest uppercase backdrop-blur-md"></div>
 
     <div class="parallax-bg"></div>
     <div class="parallax-overlay"></div>
 
-    <nav class="relative w-full z-40 py-5 px-6 md:px-12 flex justify-between items-center bg-transparent">
-        <div class="flex items-center cursor-pointer group" onclick="window.location.href='index.html'">
-            <span class="text-[#FFC300] font-[900] text-2xl md:text-3xl italic tracking-tighter transition-transform group-hover:scale-105">GYM</span>
+    <nav class="relative w-full z-40 py-6 px-6 md:px-12 flex justify-between items-center bg-transparent transition-all duration-1000 delay-300 opacity-0 transform -translate-y-4" id="main-nav">
+        <div class="flex items-center cursor-pointer group" onclick="window.location.href='/index.html'">
+            <span class="text-[#FFC300] font-[900] text-2xl md:text-3xl italic tracking-tighter">GYM</span>
             <span class="text-white font-[900] text-2xl md:text-3xl italic tracking-tighter">ENEZ</span>
         </div>
         
-        <div class="flex items-center gap-5 md:gap-6">
-            <a href="../../index.html" class="text-[9px] md:text-[10px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase whitespace-nowrap">
-                Regresar
-            </a>
-            <a href="register.html" class="border border-white/10 bg-white/5 text-white hover:bg-[#FFC300] hover:text-black hover:border-[#FFC300] px-4 md:px-5 py-2 rounded-full text-[9px] md:text-[10px] font-black tracking-widest transition-all uppercase whitespace-nowrap shadow-lg">
-                Registrarse
-            </a>
+        <div class="flex items-center gap-6">
+            <a href="register.html" class="text-[11px] font-black tracking-widest text-gray-400 hover:text-white transition uppercase">Crear Cuenta</a>
         </div>
     </nav>
 
-    <main id="login-screen" class="relative z-10 w-full flex-grow flex items-center justify-center p-4 md:p-6 hidden">
-        <div class="glass-panel p-6 md:p-12 w-full max-w-md mx-auto rounded-[24px] md:rounded-[36px] relative animate-premium-in">
+    <main id="login-screen" class="relative z-10 w-full flex-grow flex items-center justify-center p-4">
+        <div class="glass-panel p-8 md:p-10 w-full max-w-md rounded-[24px] flex flex-col relative overflow-hidden">
             
-                <div class="text-center mb-8 md:mb-10">
-    <span class="text-[#FFC300] text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] mb-3 block drop-shadow-md">
-        System Core
-    </span>
-    <h1 class="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase mb-3">
-        Portal Atleta
-    </h1>
-    <div class="w-10 h-1 bg-[#FFC300] mx-auto mb-4 rounded-full shadow-[0_0_15px_rgba(255,195,0,0.6)]"></div>
-    <p class="text-gray-500 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.35em]">
-        Acceso Encriptado
-    </p>
-</div>
+            <div class="mb-8 text-center">
+                <h1 class="text-2xl md:text-3xl font-[900] text-white uppercase tracking-tighter">Autenticación</h1>
+                <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Ingreso al Sistema de Alto Rendimiento</p>
+            </div>
 
-            <form id="login-form" class="space-y-4 md:space-y-5">
+            <form id="login-form" class="space-y-5">
                 <div>
-                    <label class="block text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Correo Electrónico</label>
-                    <input type="email" id="login-email" name="email" placeholder="atleta@gymenez.com" class="w-full glass-input px-4 md:px-5 py-3.5 md:py-4 rounded-xl text-white text-xs md:text-sm font-medium" required>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Correo Electrónico</label>
+                    <input type="email" id="login-email" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm placeholder-gray-600" placeholder="atleta@gymenez.com">
                 </div>
                 <div>
-                    <label class="block text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Clave de Acceso</label>
-                    <input type="password" id="login-password" name="password" placeholder="••••••••" class="w-full glass-input px-4 md:px-5 py-3.5 md:py-4 rounded-xl text-white text-xs md:text-sm font-mono tracking-widest" required>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Contraseña</label>
+                    <input type="password" id="login-password" required class="w-full glass-input px-4 py-3.5 rounded-xl text-white text-sm font-mono placeholder-gray-600" placeholder="••••••••">
                 </div>
-
-                <div class="pt-3 md:pt-4">
-                    <button type="submit" id="login-btn" class="btn-gold w-full py-4 md:py-4 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-[0.25em]">
-                        Ingresar al Sistema
-                    </button>
+                
+                <div class="pt-4">
+                    <button type="submit" id="login-btn" class="w-full btn-gold py-4 rounded-xl text-[11px] uppercase tracking-[0.2em] shadow-lg">Ingresar al Portal</button>
                 </div>
             </form>
-            
-            <div id="login-help-links" class="mt-8 pt-5 border-t border-white/5 flex justify-between items-center px-1">
-                <button id="staff-access-link" type="button" class="text-[8px] md:text-[9px] font-bold text-gray-500 hover:text-white transition uppercase tracking-[0.15em]">
-                    Acceso Staff
-                </button>
-                <button id="forgot-password-link" type="button" class="text-[8px] md:text-[9px] font-bold text-gray-500 hover:text-white transition uppercase tracking-[0.15em]">
-                    Recuperar Credencial
-                </button>
-            </div>
         </div>
     </main>
 
-    <div id="active-session-modal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[1000] p-4 transition-opacity">
-        <div class="glass-panel p-6 md:p-10 w-full max-w-md mx-auto rounded-[24px] md:rounded-[32px] border-t border-red-500/50">
-            <div class="w-12 h-12 md:w-14 md:h-14 mx-auto mb-4 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
-                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </div>
-            <h3 class="text-lg font-black mb-2 text-white text-center uppercase tracking-widest">Sesión en Uso</h3>
-            <p class="text-gray-400 text-[10px] text-center mb-6 uppercase tracking-wider leading-relaxed">Tus credenciales se encuentran activas en otra terminal.</p>
+    <div id="activation-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="glass-modal p-6 md:p-8 rounded-[24px] w-full max-w-sm text-center space-y-5">
+            <div class="text-2xl">✉️</div>
+            <h3 class="text-lg font-black text-white uppercase tracking-tight">Activación de Cuenta</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">Tu perfil requiere verificación inicial. Ingresa el código numérico de 6 dígitos enviado a tu correo.</p>
             
-            <div id="modal-options" class="space-y-4">
-                <div class="flex flex-col gap-2">
-                    <button id="modal-confirm-btn" class="w-full py-3.5 rounded-xl bg-red-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-red-500 transition">Solicitar Código SHIELD</button>
-                    <button id="modal-cancel-btn" class="w-full py-3 rounded-xl border border-white/10 text-gray-400 font-bold text-[10px] uppercase tracking-widest hover:text-white hover:bg-white/5 transition">Cancelar</button>
-                </div>
+            <form id="activation-form" class="space-y-4">
+                <input type="hidden" id="activation-email">
+                <input type="text" id="activation-code" maxlength="6" class="w-full glass-input py-4 rounded-xl text-center text-2xl font-mono tracking-[0.5em] text-[#FFC300]" placeholder="000000" required>
+                <button type="submit" id="activation-submit-btn" class="w-full btn-gold py-3.5 rounded-xl text-[10px] uppercase tracking-widest">Verificar Token</button>
+            </form>
+            <button onclick="closeModalSafe('activation-modal')" class="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-wider transition">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="active-session-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="glass-modal p-6 md:p-8 rounded-[24px] w-full max-w-md text-center space-y-5">
+            <div class="text-2xl text-red-500">🛡️</div>
+            <h3 class="text-lg font-black text-white uppercase tracking-tight">Escudo de Dispositivo Activo</h3>
+            <p id="force-logout-msg" class="text-xs text-gray-400 leading-relaxed">Detectamos una sesión activa en otro terminal. Por seguridad, no permitimos accesos simultáneos simultáneos.</p>
+            
+            <div id="modal-options" class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeModalSafe('active-session-modal')" class="bg-white/5 border border-white/10 text-gray-300 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 hover:text-white transition py-4">Mantener Antigua</button>
+                <button onclick="triggerRequestShieldCode()" class="btn-gold py-4 rounded-xl text-[10px] uppercase tracking-widest shadow-lg">Cerrar la Otra</button>
             </div>
 
-            <form id="force-logout-form" class="hidden mt-4 pt-4 border-t border-white/10 space-y-5">
-                <p class="text-[9px] font-black text-[#FFC300] text-center uppercase tracking-[0.2em]">Protocolo SHIELD de Desconexión</p>
-                <input type="hidden" id="force-email" name="email">
-                <div id="force-logout-message" class="hidden p-2 rounded-lg text-[10px] font-bold text-center uppercase tracking-widest"></div>
-                <div>
-                    <input type="text" id="force-shield-code" maxlength="6" placeholder="······" class="w-full max-w-[260px] mx-auto block px-2 py-3 text-center text-3xl tracking-[0.4em] rounded-xl glass-input text-[#FFC300] font-mono focus:border-red-500" required>
-                </div>
-                <div class="pt-2 space-y-2">
-                    <button type="submit" id="force-logout-btn" class="w-full py-3.5 rounded-xl bg-red-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-red-500 transition">Expulsar Dispositivo Remoto</button>
-                    <button type="button" id="force-logout-cancel" class="w-full text-center text-[9px] font-bold text-gray-500 hover:text-white uppercase tracking-widest transition mt-3">Abortar</button>
-                </div>
+            <form id="force-logout-form" class="space-y-4 hidden transition-all duration-300">
+                <input type="hidden" id="force-email">
+                <p class="text-[10px] text-[#FFC300] font-black uppercase tracking-wider">Se envió un código de autorización a tu correo</p>
+                <input type="text" id="force-code" maxlength="6" class="w-full glass-input py-4 rounded-xl text-center text-2xl font-mono tracking-[0.5em] text-[#FFC300]" placeholder="000000" required>
+                <button type="submit" id="force-submit-btn" class="w-full btn-gold py-3.5 rounded-xl text-[10px] uppercase tracking-widest">Ejecutar Desconexión</button>
             </form>
         </div>
     </div>
 
-    <div id="activation-modal" class="hidden fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
-        <div class="glass-panel relative w-full max-w-md mx-auto p-6 md:p-10 rounded-[24px] md:rounded-[36px] border border-[#FFC300]/20 text-center">
-            <h3 class="text-2xl font-black mb-2 text-white tracking-tighter uppercase">Código SHIELD</h3>
-            <p class="text-[10px] text-gray-400 mb-6 font-medium leading-relaxed">Ingresa la clave de verificación enviada a tu correo.</p>
-            <form id="activation-form" class="space-y-6">
-                <input type="hidden" id="activation-email">
-                <div><input type="text" id="activation-code" maxlength="6" placeholder="······" class="w-full max-w-[260px] mx-auto block px-2 py-3 text-center text-3xl tracking-[0.4em] rounded-xl glass-input text-[#FFC300] font-mono" required></div>
-                <div class="space-y-2">
-                    <button type="submit" id="verify-btn" class="btn-gold w-full py-3.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em]">Autenticar Código</button>
-                    <button type="button" id="close-activation-modal" class="w-full py-2 text-[9px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition">Volver</button>
-                </div>
-            </form>
+    <div id="block-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl hidden transition-all duration-300">
+        <div class="glass-modal p-8 rounded-[24px] w-full max-w-sm text-center space-y-4 border-red-500/20">
+            <div class="text-3xl animate-bounce">🚨</div>
+            <h3 class="text-lg font-black text-red-400 uppercase tracking-tight">Acceso Suspendido</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">Múltiples intentos fallidos detectados desde tu dirección IP. Tu cuenta ha sido congelada temporalmente por 60 segundos por políticas perimetrales de seguridad.</p>
+            <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden mt-4">
+                <div class="h-full bg-red-500 animate-[pulse_1s_infinite]" style="width: 100%"></div>
+            </div>
         </div>
     </div>
 
-    <div id="block-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[2000] hidden flex items-center justify-center p-4">
-        <div class="glass-panel p-6 md:p-10 w-full max-w-sm mx-auto rounded-[24px] md:rounded-[32px] border border-red-600/30 text-center">
-            <h3 class="text-xl font-black text-white uppercase tracking-widest mb-2">Acceso Denegado</h3>
-            <p class="text-[10px] text-gray-400 leading-relaxed mb-4 uppercase tracking-wider">Perfil inhabilitado por directrices de seguridad.</p>
-            <p class="text-[8px] font-bold text-red-500 uppercase tracking-[0.2em]">CODE: 403_RESTRICTED</p>
-        </div>
-    </div>
-
-    <footer class="relative z-10 py-6 text-center border-t border-white/5 opacity-40">
-        <p class="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.5em] text-gray-600">
-            © 2026 GYMENEZ PERFORMANCE • EL ESTÁNDAR DE EXCELENCIA
-        </p>
+    <footer class="relative z-10 py-6 text-center border-t border-white/5 opacity-30" id="main-footer">
+        <p class="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-500">© 2026 GYMENEZ • CRYPTO SECURE HUB</p>
     </footer>
 
-    <script src="/static/js/auth.js"></script>
-    <script>
-        // Lógica de Splash Screen (Arranque Premium)
-        window.addEventListener('DOMContentLoaded', () => {
-            const splashScreen = document.getElementById('splash-screen');
-            const loginScreen = document.getElementById('login-screen');
-            const splashText = document.getElementById('splash-text');
+    <script type="module" src="/static/js/auth/auth_main.js"></script>
 
-            // Si ya hay sesión, auth.js se encargará de redirigir,
-            // pero si no hay, corremos la animación.
-            if (!localStorage.getItem('userSession')) {
-                // Aparece el texto con efecto blur
-                setTimeout(() => {
-                    splashText.classList.remove('opacity-0', 'blur-[4px]');
-                    splashText.classList.add('opacity-100', 'blur-0');
-                }, 300);
+    <script type="module">
+        import { apiVerifyOTP, apiRequestShieldCode, apiVerifyShieldCode } from '/static/js/auth/auth_api.js';
+        import { showMessage, openModalSafe, closeModalSafe } from '/static/js/utils/ui.js';
+        import { localDeviceId, AUTH_TOKEN_KEY } from '/static/js/core/session.js';
 
-                // Desvanecer Splash y Mostrar Login
+        // Remover Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                document.body.classList.add('loaded');
+                document.getElementById('main-nav').classList.remove('opacity-0', '-translate-y-4');
+                document.getElementById('login-email').focus();
+            }, 600);
+        });
+
+        // Hacer globales las funciones de cerrado y apertura requeridas por auth_main.js
+        window.openModalSafe = openModalSafe;
+        window.closeModalSafe = closeModalSafe;
+        window.showForceLogoutMessage = function(txt) {
+            if(txt) document.getElementById('force-logout-msg').textContent = txt;
+        };
+
+        // ==========================================
+        // ✉️ CONTROLADOR: PROCESAR ACTIVACIÓN OTP
+        // ==========================================
+        document.getElementById('activation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('activation-submit-btn');
+            const email = document.getElementById('activation-email').value;
+            const code = document.getElementById('activation-code').value;
+
+            btn.disabled = true; btn.textContent = 'VERIFICANDO...';
+
+            const res = await apiVerifyOTP(email, code);
+            if (res.success) {
+                showMessage("Cuenta Activada. Procediendo a login...", "success");
+                closeModalSafe('activation-modal');
                 setTimeout(() => {
-                    splashScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        splashScreen.classList.add('hidden');
-                        loginScreen.classList.remove('hidden');
-                    }, 1000);
-                }, 2800); // Duración de la pantalla de carga (aprox 3 seg)
+                    document.getElementById('login-password').value = '';
+                    document.getElementById('login-btn').disabled = false;
+                    document.getElementById('login-btn').textContent = 'Ingresar al Portal';
+                    document.getElementById('login-form').dispatchEvent(new Event('submit'));
+                }, 1500);
+            } else {
+                showMessage(res.error || "Código inválido", "error");
+                btn.disabled = false; btn.textContent = 'Verificar Token';
             }
         });
 
-        // Configuración de notificaciones flotantes específicas del login
-        function showUIFeedback(message, type = 'success') {
-            const box = document.getElementById('message-box');
-            if(!box) return;
-            box.textContent = message;
-            box.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-full text-[10px] font-black tracking-widest uppercase shadow-2xl z-[9999] transition-all duration-400 text-center border backdrop-blur-md w-11/12 max-w-[360px]';
-            
-            if(type === 'success') {
-                box.classList.add('bg-emerald-950/80', 'text-emerald-400', 'border-emerald-500/30');
+        // ==========================================
+        // 🛡️ CONTROLADOR: SOLICITAR CÓDIGO DE ESCUDO
+        // ==========================================
+        window.triggerRequestShieldCode = async function() {
+            const email = document.getElementById('force-email').value;
+            const password = document.getElementById('login-password').value;
+
+            showMessage("Solicitando código de desvinculación...", "success");
+            const res = await apiRequestShieldCode(email, password);
+
+            if (res.ok && res.data.success) {
+                document.getElementById('modal-options').classList.add('hidden');
+                document.getElementById('force-logout-form').classList.remove('hidden');
+                document.getElementById('force-code').focus();
             } else {
-                box.classList.add('bg-red-950/80', 'text-red-400', 'border-red-500/30');
+                showMessage(res.data.error || "Error al solicitar código", "error");
             }
-            
-            box.style.opacity = '1';
-            box.style.transform = 'translate(-50%, 0)';
-            
-            setTimeout(() => {
-                box.style.opacity = '0';
-                box.style.transform = 'translate(-50%, -20px)';
-            }, 4000);
-        }
+        };
+
+        // ==========================================
+        // 🛡️ CONTROLADOR: VERIFICAR ESCUDO Y FORZAR LOGOUT
+        // ==========================================
+        document.getElementById('force-logout-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('force-submit-btn');
+            const email = document.getElementById('force-email').value;
+            const code = document.getElementById('force-code').value;
+
+            btn.disabled = true; btn.textContent = 'EXPULSANDO...';
+
+            const res = await apiVerifyShieldCode(email, code, localDeviceId);
+            if (res.ok && res.data.success) {
+                showMessage("Dispositivo desvinculado. Iniciando sesión...", "success");
+                
+                // Guardar la nueva sesión entregada por el Backend
+                localStorage.setItem('userSession', JSON.stringify(res.data.user));
+                if (res.data.token) localStorage.setItem(AUTH_TOKEN_KEY, res.data.token);
+                localStorage.setItem('gymen_session_exp', Date.now() + (480 * 60 * 1000));
+                
+                closeModalSafe('active-session-modal');
+                setTimeout(() => window.location.href = '/apps/start/inicio.html', 1200);
+            } else {
+                showMessage(res.data.error || "Código inválido", "error");
+                btn.disabled = false; btn.textContent = 'Ejecutar Desconexión';
+            }
+        });
+
+        // Asegurar foco automático al abrir modales pidiendo códigos
+        document.getElementById('activation-modal').addEventListener('transitionend', () => {
+            if(!document.getElementById('activation-modal').classList.contains('hidden')) {
+                document.getElementById('activation-code').focus();
+            }
+        });
     </script>
 </body>
 </html>
